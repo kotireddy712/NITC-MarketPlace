@@ -17,5 +17,6 @@ int main()
     car.speed = 200;
     car.cost = 400;
     cout << car.total() << " "<< "\n";
+    // HI,THIS IS KOTI..
 
 }
