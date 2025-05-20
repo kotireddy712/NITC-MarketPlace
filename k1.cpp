@@ -15,7 +15,7 @@ int main()
 {
     veichile car;
     car.speed = 200;
-    car.cost = 200;
+    car.cost = 400;
     cout << car.total() << " "<< "\n";
 
 }
