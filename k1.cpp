@@ -16,7 +16,8 @@ int main()
     veichile car;
     car.speed = 200;
     car.cost = 200;
-    hi this is sekhar
+    // hi this is sekhar
+    // this is koti reporting ..
     cout << car.total() << " "<< "\n";
 
 }
