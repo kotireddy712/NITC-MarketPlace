@@ -1,5 +1,5 @@
 import csv
-import mysql.connector
+import mysql.connector 
 
 # Connect to MySQL
 conn = mysql.connector.connect(
