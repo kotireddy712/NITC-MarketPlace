@@ -14,4 +14,4 @@ CREATE TABLE nitc_mp_db.users (
 );
 
 --@block
-SELECT * FROM users;
+SELECT * FROM users limit 10;
