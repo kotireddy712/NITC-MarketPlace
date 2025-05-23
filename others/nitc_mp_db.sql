@@ -34,3 +34,7 @@ CREATE TABLE items (
 
 --@block
 desc items;
+SELECT * FROM nitc_mp_db.users WHERE name LIKE "%koti%";
+
+--@block
+SELECT * FROM users limit 10;
