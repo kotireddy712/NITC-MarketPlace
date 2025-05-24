@@ -14,6 +14,26 @@ CREATE TABLE nitc_mp_db.users (
 );
 
 --@block
+SELECT * FROM users limit 10;
+--@block
+CREATE TABLE items (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    category VARCHAR(100),
+    image_url TEXT,
+    item_condition VARCHAR(20) DEFAULT 'Used',
+    is_sold BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+--@block
+desc items;
 SELECT * FROM nitc_mp_db.users WHERE name LIKE "%koti%";
 
 --@block
