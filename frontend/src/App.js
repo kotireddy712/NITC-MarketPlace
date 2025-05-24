@@ -1,39 +1,20 @@
-import './App.css';
+// File: src/App.js
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AuthForm from './AuthForm';
+import Dashboard from './Dashboard';
+import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <AuthForm />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<AuthForm />} />
+        <Route path="/Dashboard" element={<Dashboard />} />
+        {/* Add Buy and Sell components here */}
+      </Routes>
+    </Router>
   );
 }
 
 export default App;
-
-// import './App.css';
-// import AuthForm from './AuthForm';
-
-// function App() {
-//   return (
-//     <div
-//       className="App"
-//       style={{
-//         backgroundImage: "url('/p1.png')", // from public folder
-//         backgroundSize: 'cover',
-//         backgroundPosition: 'center',
-//         minHeight: '100vh',
-//         display: 'flex',
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//       }}
-//     >
-//       <AuthForm />
-//     </div>
-//   );
-// }
-
-// export default App;
-
-
-

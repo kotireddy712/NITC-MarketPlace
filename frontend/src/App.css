@@ -50,3 +50,108 @@ button[type="submit"] {
   border-radius: 6px;
   cursor: pointer;
 }
+/* App.css */
+
+:root {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --input-bg: #f0f0f0;
+  --input-text: #000000;
+  --btn-bg: #007bff;
+  --btn-text: #ffffff;
+  --btn-hover-bg: #0056b3;
+}
+
+[data-theme='dark'] {
+  --bg-color: #121212;
+  --text-color: #f5f5f5;
+  --input-bg: #333333;
+  --input-text: #ffffff;
+  --btn-bg: #1e90ff;
+  --btn-text: #ffffff;
+  --btn-hover-bg: #3742fa;
+}
+
+body, .App {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.auth-container {
+  background-color: var(--input-bg);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  color: var(--text-color);
+  width: 320px;
+}
+
+.auth-container input {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: var(--input-bg);
+  color: var(--input-text);
+}
+
+.auth-container input::placeholder {
+  color: var(--input-text);
+  opacity: 0.7;
+}
+
+.auth-container button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.auth-container button:hover {
+  background-color: var(--btn-hover-bg);
+}
+
+.tab button {
+  padding: 10px 20px;
+  margin-right: 5px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: none;
+  cursor: pointer;
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.tab button.active {
+  border-color: var(--btn-bg);
+}
+
+#toggle-theme {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--btn-bg);
+  background-color: transparent;
+  color: var(--btn-bg);
+  transition: all 0.3s ease;
+}
+
+#toggle-theme:hover {
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
+}
+
+
