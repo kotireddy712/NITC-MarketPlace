@@ -18,5 +18,7 @@
 
 10. pip freeze > requirements.txt
 
+11. i am in koti branch..
+
 
 
