@@ -53,6 +53,14 @@ def login():
         return jsonify({"message": "Incorrect password"}), 403
 
     return jsonify({"message": "Login successful!", "user": user})
+@app.route('/items', methods=['GET'])
+def get_items():
+    category = request.args.get('category')
+    if not category:
+        return jsonify({'message': 'Category required'}), 400
 
+    cursor.execute("SELECT * FROM items WHERE category = %s AND is_sold = FALSE", (category,))
+    items = cursor.fetchall()
+    return jsonify(items)
 if __name__ == "__main__":
     app.run(debug=True)
