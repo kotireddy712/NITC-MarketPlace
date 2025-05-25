@@ -39,3 +39,5 @@ VALUES
 (104, '2019 Suzuki Access 125', 'Top model with all features, recently serviced.', 70000.00, 'Bike', 'https://images.pexels.com/photos/276517/pexels-photo-276517.jpeg', 'Used', FALSE);
 --@block
 SELECT * FROM items limit 10;
+--@block
+desc items;
