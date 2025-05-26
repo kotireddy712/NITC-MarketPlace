@@ -15,8 +15,11 @@ CREATE TABLE nitc_mp_db.users (
 
 --@block
 SELECT * FROM users limit 10;
+
 --@block
-CREATE TABLE items (
+USE nitc_mp_db;
+--@block
+CREATE TABLE nitc_mp_db.items (
     item_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     title VARCHAR(150) NOT NULL,
@@ -28,7 +31,6 @@ CREATE TABLE items (
     is_sold BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 

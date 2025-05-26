@@ -18,7 +18,14 @@
 
 10. pip freeze > requirements.txt
 
-11. i am in koti branch..
+11. pip install cloudinary python-dotenv flask-cors
+
+12. pip install cloudinary
+
+13. npm install cloudinary
+
+14. 
+
 
 
 
