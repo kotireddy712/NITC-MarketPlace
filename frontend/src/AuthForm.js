@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './App.css';
+import './App.css'; // Assuming this contains your styling
 
 function AuthForm() {
   const navigate = useNavigate();
@@ -49,12 +49,24 @@ function AuthForm() {
       setMessage(res.data.message);
       setIsSuccess(true);
 
-      if (isLogin) {
-        setTimeout(() => navigate('/dashboard'), 1500);
+      if (isLogin && res.data.user_id) { // Check if it's a login and user_id is returned
+        // Store user details in localStorage
+        localStorage.setItem('user_id', res.data.user_id);
+        localStorage.setItem('user_name', res.data.name);
+        localStorage.setItem('user_email', res.data.email);
+        setTimeout(() => navigate('/dashboard'), 1500); // Redirect after a short delay
+      } else if (!isLogin) { // After successful signup, you might want to switch to login tab
+        setTimeout(() => {
+          setIsLogin(true);
+          setForm({ email: form.email, password: '', name: '', contact_number: '' }); // Pre-fill email for login
+          setMessage('Signup successful! Please log in.');
+          setIsSuccess(true);
+        }, 1500);
       }
     } catch (err) {
-      setMessage(err.response?.data?.message || 'Failed');
+      setMessage(err.response?.data?.message || 'Operation failed');
       setIsSuccess(false);
+      console.error("Auth error:", err.response?.data?.message || err.message);
     }
   };
 
@@ -116,8 +128,8 @@ function AuthForm() {
       <div className="auth-container">
         <h2>NITC Marketplace</h2>
         <div className="tab">
-          <button className={isLogin ? 'active' : ''} onClick={() => setIsLogin(true)}>Login</button>
-          <button className={!isLogin ? 'active' : ''} onClick={() => setIsLogin(false)}>Signup</button>
+          <button className={isLogin ? 'active' : ''} onClick={toggleMode}>Login</button>
+          <button className={!isLogin ? 'active' : ''} onClick={toggleMode}>Signup</button>
         </div>
 
         <form onSubmit={handleSubmit}>
