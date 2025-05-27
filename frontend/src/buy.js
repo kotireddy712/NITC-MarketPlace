@@ -120,6 +120,7 @@ function Buy() {
     'Event Tickets & Passes',
     'Services',
     'Car',
+    'Bike',
   ];
 
   return (
