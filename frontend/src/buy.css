@@ -11,3 +11,11 @@
   border-radius: 8px;
   padding: 1rem;
 }
+.item-image {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+

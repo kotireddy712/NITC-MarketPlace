@@ -69,14 +69,24 @@ function Buy() {
       )}
 
       <div className="items-list">
-        {filteredItems.map((item) => (
-          <div className="item-card" key={item.item_id}>
-            <h4>{item.title}</h4>
-            <p>{item.description}</p>
-            <p>₹{item.price}</p>
-            <button onClick={() => handleBuy(item.item_id)}>Buy</button>
-          </div>
-        ))}
+       {filteredItems.map((item) => (
+  <div className="item-card" key={item.item_id}>
+    <img
+      src={item.image_url}
+      alt={item.title}
+      className="item-image"
+      onError={(e) => {
+        e.target.onerror = null;
+        e.target.src = 'https://via.placeholder.com/150'; // fallback image
+      }}
+    />
+    <h4>{item.title}</h4>
+    <p>{item.description}</p>
+    <p>₹{item.price}</p>
+    <button onClick={() => handleBuy(item.item_id)}>Buy</button>
+  </div>
+))}
+
       </div>
     </div>
   );
