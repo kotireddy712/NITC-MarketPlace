@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './Sell.css'; // You can create this for styling
+import './sell.css'; // You can create this for styling
 
 export default function Sell() {
     const navigate = useNavigate();

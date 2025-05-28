@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AuthForm from './AuthForm';
 import Dashboard from './Dashboard';
 import Buy from './buy';
-import Sell from './Sell'; // Import the new Sell component
+import Sell from './sell'; // Import the new Sell component
 import './App.css';
 
 function App() {
