@@ -41,3 +41,18 @@ VALUES
 SELECT * FROM items limit 10;
 --@block
 desc items;
+--@block
+INSERT INTO nitc_mp_db.items (
+    title, description, price, quantity, image_url, item_condition,
+    is_sold, user_id, category_id
+)
+VALUES
+('2018 Hero Passion Pro', 'Well-maintained, single owner, excellent mileage.', 65000.00, 1,
+ 'https://images.pexels.com/photos/276517/pexels-photo-276517.jpeg', 'Used', FALSE, 48, 4),
+ 
+('2019 Mahindra Scorpio', 'Well-maintained, single owner, excellent mileage.', 1100000.00, 1,
+ 'https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg', 'Used', FALSE, 93, 4),
+
+('2017 Hyundai i20', 'Sportz variant, no accidents, new tires.', 580000.00, 1,
+ 'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg', 'Used', FALSE, 56, 4);
+
