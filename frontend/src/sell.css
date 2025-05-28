@@ -1,0 +1,90 @@
+/* src/Sell.css */
+.sell-item-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.sell-item-container h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
+}
+
+.sell-item-container .form-group {
+    margin-bottom: 15px;
+}
+
+.sell-item-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.sell-item-container input[type="text"],
+.sell-item-container input[type="number"],
+.sell-item-container textarea,
+.sell-item-container select {
+    width: calc(100% - 20px); /* Adjust for padding */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Include padding in width */
+    font-size: 16px;
+}
+
+.sell-item-container textarea {
+    resize: vertical;
+}
+
+.sell-item-container button[type="submit"] {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 17px;
+    width: 100%;
+    margin-top: 20px;
+    transition: background-color 0.2s;
+}
+
+.sell-item-container button[type="submit"]:hover:not(:disabled) {
+    background-color: #218838;
+}
+
+.sell-item-container button[type="submit"]:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.sell-item-container .error-message {
+    color: red;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.sell-item-container .back-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.sell-item-container .back-button:hover {
+    background-color: #0056b3;
+}

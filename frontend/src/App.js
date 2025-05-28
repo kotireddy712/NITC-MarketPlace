@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AuthForm from './AuthForm';
 import Dashboard from './Dashboard';
 import Buy from './buy';
+import Sell from './Sell'; // Import the new Sell component
 import './App.css';
 
 function App() {
@@ -13,7 +14,7 @@ function App() {
         <Route path="/" element={<AuthForm />} />
         <Route path="/Dashboard" element={<Dashboard />} />
         <Route path="/buy" element={<Buy />} />
-        {/* Add Buy and Sell components here */}
+        <Route path="/sell" element={<Sell />} /> {/* New Sell route */}
       </Routes>
     </Router>
   );
