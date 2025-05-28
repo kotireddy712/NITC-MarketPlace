@@ -38,6 +38,8 @@ CREATE TABLE nitc_mp_db.categories (
     total_items INT DEFAULT 0 
 );
 
+--  ** NEW-ITEMS TABLE DROP ABOVE TABLE AND UPDATE THIS **
+
 --@block
 CREATE TABLE nitc_mp_db.items (
     item_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -78,14 +80,7 @@ INSERT INTO categories (category_id, name) VALUES
 (16, 'Miscellaneous');
 
 --@block
-CREATE TABLE nitc_mp_db.users (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100),
-    email VARCHAR(150) NOT NULL UNIQUE,
-    password VARCHAR(255),
-    contact_number VARCHAR(20),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
---@block
-SELECT * FROM categories;
+SELECT * FROM nitc_mp_db.categories;
 
+--@block
+SELECT * FROM nitc_mp_db.items;
