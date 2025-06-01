@@ -267,6 +267,146 @@ def sell_item():
         db_conn.rollback()
         app.logger.error(f"An unexpected error occurred listing item {title}: {e}")
         return jsonify({"message": f"An unexpected error occurred: {e}"}), 500
+    
+    # // **
+    
+# Add these imports if not already present at the top
+# from flask import Flask, request, jsonify, g
+# (Keep your existing imports)
+
+# ... (Keep your existing Flask app setup, db_pool, get_db, close_db_connection, Cloudinary config, and existing routes) ...
+
+@app.route('/user/<int:user_id>/items', methods=['GET'])
+def get_user_items(user_id):
+    """Fetches all items listed by a specific user."""
+    db_conn = get_db()
+    cursor = db_conn.cursor(dictionary=True)
+
+    try:
+        query = """
+        SELECT
+            i.item_id, i.title, i.description, i.price, i.quantity, i.image_url,
+            i.item_condition, i.is_sold, i.created_at, i.user_id, i.category_id,
+            c.name as category_name
+        FROM items i
+        JOIN categories c ON i.category_id = c.category_id
+        WHERE i.user_id = %s
+        ORDER BY i.created_at DESC
+        """
+        cursor.execute(query, (user_id,))
+        items = cursor.fetchall()
+        return jsonify(items)
+
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error fetching items for user {user_id}: {err}")
+        return jsonify({"message": f"Database error: {err}"}), 500
+    except Exception as e:
+        app.logger.error(f"Unexpected error fetching items for user {user_id}: {e}")
+        return jsonify({"message": f"An unexpected error occurred: {e}"}), 500
+
+@app.route('/items/<int:item_id>/status', methods=['PATCH'])
+def update_item_status(item_id):
+    """Updates the 'is_sold' status of an item."""
+    db_conn = get_db()
+    cursor = db_conn.cursor(dictionary=True)
+
+    data = request.json
+    new_status = data.get('is_sold') # Expecting: {"is_sold": true} or {"is_sold": false}
+    requesting_user_id = data.get('user_id') # The user ID making the request
+
+    if new_status is None or not isinstance(new_status, bool):
+        return jsonify({"message": "Invalid 'is_sold' status provided. Must be true or false."}), 400
+    if requesting_user_id is None:
+        return jsonify({"message": "User ID is required to update status."}), 400
+
+    try:
+        # First, verify ownership
+        cursor.execute("SELECT user_id FROM items WHERE item_id = %s", (item_id,))
+        item = cursor.fetchone()
+
+        if not item:
+            return jsonify({"message": "Item not found."}), 404
+        
+        if item['user_id'] != requesting_user_id:
+            return jsonify({"message": "Unauthorized. You can only update status for your own items."}), 403
+
+        # Update the item status
+        update_query = "UPDATE items SET is_sold = %s WHERE item_id = %s"
+        cursor.execute(update_query, (new_status, item_id))
+        db_conn.commit()
+        
+        # Optionally, refetch the item to return its updated state
+        cursor.execute("""
+            SELECT i.item_id, i.title, i.is_sold 
+            FROM items i WHERE i.item_id = %s
+        """, (item_id,))
+        updated_item = cursor.fetchone()
+
+        return jsonify({"message": "Item status updated successfully.", "item": updated_item})
+
+    except mysql.connector.Error as err:
+        db_conn.rollback()
+        app.logger.error(f"Database error updating status for item {item_id}: {err}")
+        return jsonify({"message": f"Database error: {err}"}), 500
+    except Exception as e:
+        db_conn.rollback()
+        app.logger.error(f"Unexpected error updating status for item {item_id}: {e}")
+        return jsonify({"message": f"An unexpected error occurred: {e}"}), 500
+
+@app.route('/items/<int:item_id>', methods=['DELETE'])
+def delete_item(item_id):
+    """Deletes an item listed by a user."""
+    db_conn = get_db()
+    cursor = db_conn.cursor(dictionary=True)
+
+    # In a real app with token auth, user_id would come from the token.
+    # For now, we expect it in the request body or headers for verification.
+    # Let's assume it's sent in the JSON body for this example.
+    data = request.json
+    requesting_user_id = data.get('user_id')
+
+    if requesting_user_id is None:
+        return jsonify({"message": "User ID is required for deletion."}), 400
+
+    try:
+        # Verify ownership and get category_id for updating count
+        cursor.execute("SELECT user_id, category_id FROM items WHERE item_id = %s", (item_id,))
+        item = cursor.fetchone()
+
+        if not item:
+            return jsonify({"message": "Item not found."}), 404
+
+        if item['user_id'] != requesting_user_id:
+            app.logger.warning(f"Unauthorized delete attempt for item {item_id} by user {requesting_user_id}. Owner is {item['user_id']}.")
+            return jsonify({"message": "Unauthorized. You can only delete your own items."}), 403
+
+        item_category_id = item['category_id']
+
+        # Delete the item
+        cursor.execute("DELETE FROM items WHERE item_id = %s", (item_id,))
+
+        # Decrement the total_items count in the categories table
+        # Ensure total_items does not go below zero
+        update_category_count_query = """
+        UPDATE categories
+        SET total_items = GREATEST(0, total_items - 1) 
+        WHERE category_id = %s
+        """
+        cursor.execute(update_category_count_query, (item_category_id,))
+
+        db_conn.commit()
+        return jsonify({"message": "Item deleted successfully."})
+
+    except mysql.connector.Error as err:
+        db_conn.rollback()
+        app.logger.error(f"Database error deleting item {item_id}: {err}")
+        return jsonify({"message": f"Database error: {err}"}), 500
+    except Exception as e:
+        db_conn.rollback()
+        app.logger.error(f"Unexpected error deleting item {item_id}: {e}")
+        return jsonify({"message": f"An unexpected error occurred: {e}"}), 500
+
+# ... (Keep your if __name__ == "__main__": block) ...
 
 
 if __name__ == "__main__":

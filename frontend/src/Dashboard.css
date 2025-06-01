@@ -1,59 +1,105 @@
-/* File: src/Dashboard.css */
+/* src/Dashboard.css */
 
+/* --- General Dashboard Container --- */
 .dashboard-container {
-  padding: 2rem;
-  text-align: center;
-  background-color: #fdf8f6;
-  min-height: 100vh;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 1000px; /* Optimal reading width */
+    margin: 60px auto; /* More vertical space */
+    padding: 45px; /* Generous internal padding */
+    background-color: var(--dashboard-bg-color, #ffffff); /* Bright, clean background for the dashboard card itself */
+    color: var(--text-color, #333);
+    border-radius: 15px; /* Slightly more rounded corners */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Softer, more diffuse shadow */
+    text-align: center;
+    font-family: 'Poppins', sans-serif; /* Modern, readable font */
+    animation: fadeInScale 0.8s ease-out; /* Smooth entrance animation */
 }
 
+@keyframes fadeInScale {
+    from { opacity: 0; transform: translateY(30px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- Dashboard Title --- */
 .dashboard-title {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 2rem;
-  color: maroon;
+    font-size: 2.8em; /* Prominent title */
+    color: var(--primary-color, #2c3e50); /* A deep, rich primary color */
+    margin-bottom: 50px; /* More space below title */
+    font-weight: 700; /* Bold and impactful */
+    letter-spacing: 0.8px; /* Slightly increased letter spacing for elegance */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08); /* Subtle text shadow */
+    line-height: 1.3; /* Improve readability */
 }
 
+/* --- Actions Grid --- */
 .actions {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-  margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
+    gap: 35px; /* Increased space between cards */
+    margin-bottom: 50px; /* More space before logout button */
 }
 
+/* --- Individual Action Cards --- */
 .card {
-  border: 1px solid #ccc;
-  border-radius: 12px;
-  padding: 1.5rem;
-  width: 260px;
-  background-color: #fff;
-  box-shadow: 0 4px 12px rgba(128, 0, 0, 0.1);
-  transition: transform 0.2s ease-in-out;
+    background-color: var(--card-bg, #f8f9fa); /* Light background for cards */
+    border: 1px solid var(--card-border-color, #e9ecef);
+    border-radius: 12px;
+    padding: 35px; /* More padding inside cards */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); /* Elevated feel */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth transitions */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 200px; /* Ensure consistent card height */
 }
 
 .card:hover {
-  transform: translateY(-4px);
+    transform: translateY(-10px); /* Lift card more on hover */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); /* Deeper, more noticeable shadow */
 }
 
 .card h3 {
-  margin-bottom: 1rem;
-  color: maroon;
-  font-size: 1.3rem;
+    font-size: 1.8em;
+    color: var(--heading-color, #34495e); /* Darker heading color for contrast */
+    margin-bottom: 30px;
+    font-weight: 600;
 }
 
 .card button {
-  padding: 0.6rem 1.2rem;
-  background-color: maroon;
-  color: #fff;
-  border: none;
-  font-weight: 500;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+    background-color: var(--button-bg, #007bff);
+    color: var(--button-text-color, white);
+    padding: 15px 30px; /* Larger buttons */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    width: 100%;
+    max-width: 220px; /* Slightly wider button limit */
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); /* Subtle button shadow */
 }
 
 .card button:hover {
-  background-color: #800000;
+    background-color: var(--button-hover-bg, #0056b3);
+    transform: translateY(-3px); /* Lift button slightly */
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+}
+
+.card button:active {
+    transform: translateY(0); /* Press effect */
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+}
+
+/* --- Logout Button --- */
+.logout-button {
+    background-color: var(--logout-button-bg, #dc3545);
+    color: var(--button-text-color, white);
+    padding: 14px 30px; /* Consistent button size */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 500;
 }
