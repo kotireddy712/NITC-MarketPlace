@@ -6,6 +6,7 @@ import Dashboard from './Dashboard';
 import Buy from './buy';
 import Sell from './sell';
 import Listings from './Listings'; // Import the new Listings component
+import Profile from './profile';
 import './App.css';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/buy" element={<Buy />} />
         <Route path="/sell" element={<Sell />} />
         <Route path="/listings" element={<Listings />} /> {/* New route for Listings */}
+         <Route path="/profile" element={<Profile/>} />
       </Routes>
     </Router>
   );

@@ -1,79 +1,55 @@
-// import React, { useEffect, useState } from 'react'; // Added useEffect and useState
-// import { useNavigate } from 'react-router-dom';
-// import './Dashboard.css';
-
-// function Dashboard() {
-//   const navigate = useNavigate();
-//   const [userName, setUserName] = useState(''); // State to hold user's name
-
-//   useEffect(() => {
-//     // Fetch user's name from localStorage on component mount
-//     const storedUserName = localStorage.getItem('user_name');
-//     if (storedUserName) {
-//       setUserName(storedUserName);
-//     } else {
-//       // If no user is logged in, redirect to auth form
-//       navigate('/');
-//     }
-//   }, [navigate]); // Dependency array to re-run effect if navigate changes (unlikely)
-
-//   const handleLogout = () => {
-//     localStorage.clear(); // Clear all user data from localStorage
-//     navigate('/'); // Redirect to login page
-//   };
-
-//   return (
-//     <div className="dashboard-container">
-//       <h2 className="dashboard-title">Welcome TO NITC-MARKET PLACE, {userName || 'User'}!</h2> {/* Display user's name */}
-//       <div className="actions">
-//         <div className="card">
-//           <h3>Buy Items</h3>
-//           <button onClick={() => navigate('/buy')}>Go to Buy</button>
-//         </div>
-//         <div className="card">
-//           <h3>Sell Items</h3>
-//           <button onClick={() => navigate('/sell')}>Go to Sell</button>
-//         </div>
-//         <div className="card">
-//           <h3>Listed Items</h3>
-//           {/* Changed path to lowercase '/listings' for consistency */}
-//           <button onClick={() => navigate('/listings')}>MY-LISTINGS</button>
-//         </div>
-//       </div>
-//       <button onClick={handleLogout} className="logout-button">Logout</button> {/* Added Logout button */}
-//     </div>
-//   );
-// }
-
-// export default Dashboard;
-// src/Dashboard.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './Dashboard.css';
 
 function Dashboard() {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState(''); // State to hold user's name
+  const [userData, setUserData] = useState({
+    name: '',
+    photo_url: ''
+  });
 
   useEffect(() => {
-    // Fetch user's name from localStorage on component mount
-    const storedUserName = localStorage.getItem('user_name');
-    if (storedUserName) {
-      setUserName(storedUserName);
-    } else {
-      // If no user is logged in, redirect to auth form
+    const email = localStorage.getItem('user_email');
+    if (!email) {
       navigate('/');
+      return;
     }
+
+    // Fetch user data including photo_url
+    axios.get(`http://localhost:5000/api/user/${email}`)
+      .then((res) => {
+        setUserData({
+          name: res.data.name,
+          photo_url: res.data.photo_url
+        });
+      })
+      .catch((err) => {
+        console.error('Failed to load user data:', err);
+        navigate('/');
+      });
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.clear(); // Clear all user data from localStorage
-    navigate('/'); // Redirect to login page
+    localStorage.clear();
+    navigate('/');
   };
 
   return (
     <div className="dashboard-container">
-      <h2 className="dashboard-title">Welcome TO NITC-MARKET PLACE, {userName || 'User'}!</h2>
+      {/* ✅ Profile Button with backend photo_url */}
+      <div className="profile-button" onClick={() => navigate('/profile')}>
+        <img
+          src={userData.photo_url || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}
+          alt="Profile"
+        />
+      </div>
+
+      <h2 className="dashboard-title">
+        Welcome TO NITC-MARKET PLACE, {userData.name || 'User'}!
+      </h2>
+
       <div className="actions">
         <div className="card">
           <h3>Buy Items</h3>
@@ -87,12 +63,8 @@ function Dashboard() {
           <h3>Listed Items</h3>
           <button onClick={() => navigate('/listings')}>MY-LISTINGS</button>
         </div>
-        {/* NEW: Profile Card */}
-        {/* <div className="card">
-          <h3>My Profile</h3>
-          <button onClick={() => navigate('/profile')}>Edit Profile</button>
-        </div> */}
       </div>
+
       <button onClick={handleLogout} className="logout-button">Logout</button>
     </div>
   );

@@ -84,3 +84,6 @@ SELECT * FROM nitc_mp_db.categories;
 
 --@block
 SELECT * FROM nitc_mp_db.items;
+--@block
+ALTER TABLE nitc_mp_db.users
+ADD COLUMN photo_url VARCHAR(255) DEFAULT 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';

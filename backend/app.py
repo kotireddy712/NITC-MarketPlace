@@ -407,6 +407,67 @@ def delete_item(item_id):
         return jsonify({"message": f"An unexpected error occurred: {e}"}), 500
 
 # ... (Keep your if __name__ == "__main__": block) ...
+@app.route('/api/user/<email>', methods=['GET'])
+def get_user(email):
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)  # FIXED
+    cursor.execute("SELECT user_id, name, email, contact_number, photo_url FROM users WHERE email = %s", (email,))
+    user = cursor.fetchone()
+    if user:
+        return jsonify(user)
+    else:
+        return jsonify({"error": "User not found"}), 404
+@app.route('/api/user/<email>', methods=['PUT'])
+def update_user(email):
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+
+    # Use form fields, since frontend sends multipart/form-data
+    name = request.form.get('name')
+    contact_number = request.form.get('contact_number')
+    image_file = request.files.get('image')
+
+    if not name or not contact_number:
+        return jsonify({"message": "Missing name or contact number."}), 400
+
+    photo_url = None
+    if image_file:
+        try:
+            upload_result = cloudinary.uploader.upload(image_file)
+            photo_url = upload_result.get('secure_url')
+        except Exception as e:
+            app.logger.error(f"Image upload failed for user {email}: {e}")
+            return jsonify({"message": "Image upload failed."}), 500
+
+    try:
+        update_query = """
+        UPDATE users
+        SET name = %s,
+            contact_number = %s
+            {photo_clause}
+        WHERE email = %s
+        """
+
+        # If new image uploaded, include photo_url in update
+        photo_clause = ", photo_url = %s" if photo_url else ""
+        final_query = update_query.format(photo_clause=photo_clause)
+
+        params = (name, contact_number, photo_url, email) if photo_url else (name, contact_number, email)
+        cursor.execute(final_query, params)
+        conn.commit()
+
+        # Return updated user data (you can fetch it again or just return the new values)
+        return jsonify({
+            "name": name,
+            "email": email,
+            "contact_number": contact_number,
+            "photo_url": photo_url  # will be None if not updated
+        }), 200
+
+    except Exception as e:
+        conn.rollback()
+        app.logger.error(f"Failed to update user {email}: {e}")
+        return jsonify({"message": "Failed to update profile."}), 500
 
 
 if __name__ == "__main__":
