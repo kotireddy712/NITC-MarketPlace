@@ -11,14 +11,19 @@ function Profile() {
     contact_number: '',
     photo_url: ''
   });
-  const [imageFile, setImageFile] = useState(null);  // store file separately
+
+  const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Password change state
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/user/${email}`)
-      .then((res) => {
-        setUserData(res.data);
-      })
+    axios
+      .get(`http://localhost:5000/api/user/${email}`)
+      .then((res) => setUserData(res.data))
       .catch((err) => console.error('Error loading user data:', err));
   }, [email]);
 
@@ -33,37 +38,61 @@ function Profile() {
   };
 
   const handleSave = async () => {
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('name', userData.name);
-      formData.append('contact_number', userData.contact_number);
-      // email probably not editable, so no need to send
-      if (imageFile) {
-        formData.append('image', imageFile);
+  setLoading(true);
+  try {
+    // 1. Profile Update
+    const formData = new FormData();
+    formData.append('name', userData.name);
+    formData.append('contact_number', userData.contact_number);
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
+
+    const profileRes = await axios.put(`http://localhost:5000/api/user/${email}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    // 2. Password Update (if fields are filled)
+    if (oldPassword || newPassword || confirmPassword) {
+      if (newPassword !== confirmPassword) {
+        alert("New passwords don't match");
+        setLoading(false);
+        return;
       }
 
-      const res = await axios.put(`http://localhost:5000/api/user/${email}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      await axios.put('http://localhost:5000/api/user/change-password', {
+        email,
+        oldPassword,
+        newPassword,
       });
 
-      setUserData(res.data);  // update user data from backend response
-      setEditMode(false);
-      setImageFile(null);
-      alert('Profile updated!');
-    } catch (error) {
-      console.error('Profile update failed:', error);
-      alert('Failed to update profile');
-    } finally {
-      setLoading(false);
+      alert('Password updated successfully!');
     }
-  };
+
+    setUserData(profileRes.data);
+    setEditMode(false);
+    setImageFile(null);
+    setOldPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    alert('Profile updated!');
+  } catch (error) {
+    console.error('Error updating profile or password:', error);
+    alert('Failed to update profile or password: ' + (error.response?.data?.message || 'Unknown error'));
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
 
   return (
     <div className="profile-container">
       <h2>My Profile</h2>
+
       <div className="profile-image">
         <img src={userData.photo_url || 'https://via.placeholder.com/150'} alt="Profile" />
         {editMode && (
@@ -71,31 +100,58 @@ function Profile() {
         )}
       </div>
 
-   <div className="profile-info">
-  <label>Name:</label>
-  {editMode ? (
-    <input name="name" value={userData.name} onChange={handleChange} />
-  ) : (
-    <p>{userData.name}</p>
-  )}
+      <div className="profile-info">
+        <label>Name:</label>
+        {editMode ? (
+          <input name="name" value={userData.name} onChange={handleChange} />
+        ) : (
+          <p>{userData.name}</p>
+        )}
 
-  <label>Email:</label>
-  <p>{userData.email}</p> {/* still read-only */}
+        <label>Email:</label>
+        <p>{userData.email}</p>
 
-  <label>Phone:</label>
-  {editMode ? (
-    <input name="contact_number" value={userData.contact_number} onChange={handleChange} />
-  ) : (
-    <p>{userData.contact_number}</p>
-  )}
-</div>
+        <label>Phone:</label>
+        {editMode ? (
+          <input name="contact_number" value={userData.contact_number} onChange={handleChange} />
+        ) : (
+          <p>{userData.contact_number}</p>
+        )}
+      </div>
 
+      {editMode && (
+        <div className="password-change-section">
+          <h3>Change Password</h3>
+          <input
+            type="password"
+            placeholder="Old Password"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="New Password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Confirm New Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </div>
+      )}
 
       <div className="profile-buttons">
         {editMode ? (
           <>
-            <button onClick={handleSave} disabled={loading}>{loading ? 'Saving...' : 'Save'}</button>
-            <button onClick={() => setEditMode(false)} disabled={loading}>Cancel</button>
+            <button onClick={handleSave} disabled={loading}>
+              {loading ? 'Saving...' : 'Save'}
+            </button>
+            <button onClick={() => setEditMode(false)} disabled={loading}>
+              Cancel
+            </button>
           </>
         ) : (
           <button onClick={() => setEditMode(true)}>Edit Profile</button>

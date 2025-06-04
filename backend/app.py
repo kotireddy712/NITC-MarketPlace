@@ -1,11 +1,15 @@
 from flask import Flask, request, jsonify, g # Import 'g' for per-request storage
 from flask_cors import CORS
+from flask import request, jsonify
+from werkzeug.security import check_password_hash, generate_password_hash
 import mysql.connector
 from mysql.connector import pooling # Import pooling
 import cloudinary
 import cloudinary.uploader
 import os
 import bcrypt
+
+
 
 app = Flask(__name__)
 CORS(app)
@@ -469,6 +473,53 @@ def update_user(email):
         app.logger.error(f"Failed to update user {email}: {e}")
         return jsonify({"message": "Failed to update profile."}), 500
 
+@app.route('/api/user/change-password', methods=['PUT'])
+def change_password():
+    data = request.json
+    email = data.get('email')
+    old_password = data.get('oldPassword')
+    new_password = data.get('newPassword')
+
+    if not email or not old_password or not new_password:
+        return jsonify({'message': 'Missing fields'}), 400
+
+    try:
+        # Connect to MySQL
+        conn = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='1234',
+            database='nitc_mp_db'
+        )
+        cursor = conn.cursor(dictionary=True)
+
+        # Fetch user
+        cursor.execute("SELECT password FROM users WHERE email = %s", (email,))
+        user = cursor.fetchone()
+
+        if not user:
+            return jsonify({'message': 'User not found'}), 404
+
+        stored_hash = user['password']
+
+        # Check old password
+        if not bcrypt.checkpw(old_password.encode('utf-8'), stored_hash.encode('utf-8')):
+            return jsonify({'message': 'Old password is incorrect'}), 400
+
+        # Hash new password and update
+        new_hashed = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        cursor.execute("UPDATE users SET password = %s WHERE email = %s", (new_hashed, email))
+        conn.commit()
+
+        return jsonify({'message': 'Password updated successfully'}), 200
+
+    except Exception as e:
+        print('Error:', e)
+        return jsonify({'message': 'Server error'}), 500
+
+    finally:
+        if 'cursor' in locals(): cursor.close()
+        if 'conn' in locals(): conn.close()
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
