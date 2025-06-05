@@ -17,7 +17,6 @@ function Dashboard() {
       return;
     }
 
-    // Fetch user data including photo_url
     axios.get(`http://localhost:5000/api/user/${email}`)
       .then((res) => {
         setUserData({
@@ -27,7 +26,6 @@ function Dashboard() {
       })
       .catch((err) => {
         console.error('Failed to load user data:', err);
-        navigate('/');
       });
   }, [navigate]);
 
@@ -38,7 +36,6 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      {/* ✅ Profile Button with backend photo_url */}
       <div className="profile-button" onClick={() => navigate('/profile')}>
         <img
           src={userData.photo_url || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}
@@ -47,25 +44,48 @@ function Dashboard() {
       </div>
 
       <h2 className="dashboard-title">
-        Welcome TO NITC-MARKET PLACE, {userData.name || 'User'}!
+        <span className="title-greeting">Welcome TO NITC-MARKET PLACE, </span>
+        <span className="user-name">{userData.name || 'User'}</span>!
       </h2>
 
       <div className="actions">
         <div className="card">
-          <h3>Buy Items</h3>
-          <button onClick={() => navigate('/buy')}>Go to Buy</button>
+          <h3 className="card-title buy-title">Buy Items</h3>
+          {/* ✅ Emoji added */}
+          <button onClick={() => navigate('/buy')} className="action-button buy-button">
+            🛒 Go to Buy
+          </button>
         </div>
         <div className="card">
-          <h3>Sell Items</h3>
-          <button onClick={() => navigate('/sell')}>Go to Sell</button>
+          <h3 className="card-title sell-title">Sell Items</h3>
+          {/* ✅ Emoji added */}
+          <button onClick={() => navigate('/sell')} className="action-button sell-button">
+            💰 Go to Sell
+          </button>
         </div>
         <div className="card">
-          <h3>Listed Items</h3>
-          <button onClick={() => navigate('/listings')}>MY-LISTINGS</button>
+          <h3 className="card-title listings-title">Listed Items</h3>
+          {/* ✅ Emoji added */}
+          <button onClick={() => navigate('/listings')} className="action-button listings-button">
+            📋 MY-LISTINGS
+          </button>
         </div>
       </div>
 
-      <button onClick={handleLogout} className="logout-button">Logout</button>
+      <div className="dashboard-secondary-actions">
+        {/* ✅ Emoji added */}
+        <button
+          onClick={() => navigate('/rules')}
+          className="rules-regulations-button"
+        >
+          📜 View Rules & Regulations
+        </button>
+      </div>
+
+      {/* ✅ Emoji added */}
+      <button onClick={handleLogout} className="logout-button">
+        🚪 Logout
+      </button>
     </div>
   );
 }

@@ -1,25 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Listings.css'; // Create this CSS file for styling
+import './Listings.css'; // Your styles
 
 function MyListings() {
     const navigate = useNavigate();
     const [listings, setListings] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState(''); // 'success' or 'error'
 
-    const userId = localStorage.getItem('user_id'); // Get user_id from localStorage
+    const userId = localStorage.getItem('user_id');
 
     useEffect(() => {
         if (!userId) {
-            alert("You must be logged in to view your listings.");
-            navigate('/'); // Redirect to login if no user_id
+            setMessage("You must be logged in to view your listings.");
+            setMessageType('error');
+            navigate('/');
             return;
         }
 
         const fetchListings = async () => {
             setIsLoading(true);
             setError('');
+            setMessage('');
             try {
                 const response = await fetch(`http://localhost:5000/user/${userId}/items`);
                 if (!response.ok) {
@@ -41,15 +45,15 @@ function MyListings() {
 
     const handleToggleStatus = async (itemId, currentStatus) => {
         const newStatus = !currentStatus;
+        setMessage('');
+        setMessageType('');
         try {
             const response = await fetch(`http://localhost:5000/items/${itemId}/status`, {
                 method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     is_sold: newStatus,
-                    user_id: parseInt(userId) // Ensure user_id is sent for backend authorization
+                    user_id: parseInt(userId)
                 }),
             });
 
@@ -57,44 +61,45 @@ function MyListings() {
                 const errData = await response.json();
                 throw new Error(errData.message || 'Failed to update status');
             }
-            // Update local state
-            setListings(prevListings =>
-                prevListings.map(item =>
-                    item.item_id === itemId ? { ...item, is_sold: newStatus } : item
-                )
+
+            setListings(prev => 
+                prev.map(item => item.item_id === itemId ? { ...item, is_sold: newStatus } : item)
             );
-            alert(`Item status updated to ${newStatus ? 'Unavailable (Sold)' : 'Available'}.`);
+
+            setMessage(`Item status updated to ${newStatus ? 'Unavailable (Sold)' : 'Available'}.`);
+            setMessageType('success');
         } catch (err) {
             console.error("Error updating item status:", err);
-            alert(`Error: ${err.message}`);
+            setMessage(`Error: ${err.message}`);
+            setMessageType('error');
         }
     };
 
     const handleDeleteItem = async (itemId) => {
+        setMessage('');
+        setMessageType('');
         if (!window.confirm("Are you sure you want to delete this item? This action cannot be undone.")) {
             return;
         }
         try {
             const response = await fetch(`http://localhost:5000/items/${itemId}`, {
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ 
-                    user_id: parseInt(userId) // Ensure user_id is sent for backend authorization
-                }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: parseInt(userId) }),
             });
 
             if (!response.ok) {
                 const errData = await response.json();
                 throw new Error(errData.message || 'Failed to delete item');
             }
-            // Remove from local state
-            setListings(prevListings => prevListings.filter(item => item.item_id !== itemId));
-            alert("Item deleted successfully.");
+
+            setListings(prev => prev.filter(item => item.item_id !== itemId));
+            setMessage("Item deleted successfully.");
+            setMessageType('success');
         } catch (err) {
             console.error("Error deleting item:", err);
-            alert(`Error: ${err.message}`);
+            setMessage(`Error: ${err.message}`);
+            setMessageType('error');
         }
     };
 
@@ -104,6 +109,13 @@ function MyListings() {
     return (
         <div className="my-listings-container">
             <h2>My Listed Items</h2>
+            
+            {message && (
+                <div className={`message-box ${messageType === 'success' ? 'success' : 'error'}`}>
+                    {message}
+                </div>
+            )}
+
             {listings.length === 0 ? (
                 <p>You haven't listed any items yet. <button onClick={() => navigate('/sell')}>Sell an Item</button></p>
             ) : (

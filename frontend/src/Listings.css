@@ -1,8 +1,8 @@
 /* src/MyListings.css */
 .my-listings-container {
     padding: 20px;
-    max-width: 1200px;
-    margin: 20px auto;
+    max-width: 1200px; /* Maximum width for the entire listings section */
+    margin: 20px auto; /* Center the container */
     font-family: sans-serif;
 }
 
@@ -22,20 +22,28 @@
     color: red;
 }
 
+/* --- GRID CONTAINER FOR THE LISTING CARDS --- */
 .listings-grid {
-    display: grid;
+    display: grid; /* This is crucial for the grid layout */
+    /* This creates responsive columns:
+       - 'auto-fill': Fills the row with as many columns as possible.
+       - 'minmax(280px, 1fr)': Each column (card) will be at least 280px wide.
+                                If there's extra space, columns will expand equally (1fr).
+    */
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    gap: 20px; /* Space between the cards */
 }
 
+/* --- INDIVIDUAL LISTING CARD STYLING --- */
 .listing-card {
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 15px;
     background-color: #fff;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    /* Flexbox for INTERNAL layout of the card (image over text over buttons) */
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Stacks card content vertically (image, then text, then actions) */
 }
 
 .listing-image {
@@ -50,13 +58,14 @@
     margin-top: 0;
     margin-bottom: 8px;
     font-size: 1.3em;
-    color: #0056b3; /* NITC-like blue */
+    color: #0056b3;
 }
 
 .listing-card p {
     margin: 4px 0;
     font-size: 0.95em;
     color: #555;
+    /* flex-grow: 1; /* Allows text content to take up available space if cards have varying text length */
 }
 
 .status-sold {
@@ -70,11 +79,11 @@
 }
 
 .listing-actions {
-    margin-top: auto; /* Pushes buttons to the bottom */
-    padding-top: 10px;
+    margin-top: auto; /* Pushes buttons to the bottom of the card */
+    padding-top: 10px; /* Space above buttons */
     display: flex;
-    flex-direction: column; /* Stack buttons vertically */
-    gap: 8px;
+    flex-direction: column; /* Stack buttons vertically INSIDE the card */
+    gap: 8px; /* Space between buttons within the card */
 }
 
 .listing-actions button {
@@ -103,9 +112,9 @@
 }
 
 .back-dashboard-button {
-    display: block;
-    width: fit-content;
-    margin: 30px auto 10px;
+    display: block; /* Make it a block to center with margin auto */
+    width: fit-content; /* Adjust width to content */
+    margin: 30px auto 10px; /* Center horizontally, add space */
     padding: 12px 25px;
     background-color: #007bff;
     color: white;
@@ -117,4 +126,23 @@
 }
 .back-dashboard-button:hover {
     background-color: #0056b3;
+}
+
+.message-box {
+    padding: 12px 20px;
+    margin: 15px 0;
+    border-radius: 5px;
+    font-weight: 600;
+}
+
+.message-box.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message-box.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
 }
