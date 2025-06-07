@@ -5,13 +5,13 @@
     max-width: 1000px; /* Optimal reading width */
     margin: 60px auto; /* More vertical space */
     padding: 45px; /* Generous internal padding */
-    background-color: var(--dashboard-bg-color, #ffffff); /* Bright, clean background for the dashboard card itself */
+    background-color: var(--dashboard-bg-color, #ffffff);
     color: var(--text-color, #333);
-    border-radius: 15px; /* Slightly more rounded corners */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Softer, more diffuse shadow */
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     text-align: center;
-    font-family: 'Poppins', sans-serif; /* Modern, readable font */
-    animation: fadeInScale 0.8s ease-out; /* Smooth entrance animation */
+    font-family: 'Poppins', sans-serif;
+    animation: fadeInScale 0.8s ease-out;
 }
 
 @keyframes fadeInScale {
@@ -21,46 +21,46 @@
 
 /* --- Dashboard Title --- */
 .dashboard-title {
-    font-size: 2.8em; /* Prominent title */
-    color: var(--primary-color, #2c3e50); /* A deep, rich primary color */
-    margin-bottom: 50px; /* More space below title */
-    font-weight: 700; /* Bold and impactful */
-    letter-spacing: 0.8px; /* Slightly increased letter spacing for elegance */
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08); /* Subtle text shadow */
-    line-height: 1.3; /* Improve readability */
+    font-size: 2.8em;
+    color: var(--primary-color, #2c3e50);
+    margin-bottom: 50px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
+    line-height: 1.3;
 }
 
 /* --- Actions Grid --- */
 .actions {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
-    gap: 35px; /* Increased space between cards */
-    margin-bottom: 50px; /* More space before logout button */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 35px;
+    margin-bottom: 50px;
 }
 
 /* --- Individual Action Cards --- */
 .card {
-    background-color: var(--card-bg, #f8f9fa); /* Light background for cards */
+    background-color: var(--card-bg, #f8f9fa);
     border: 1px solid var(--card-border-color, #e9ecef);
     border-radius: 12px;
-    padding: 35px; /* More padding inside cards */
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); /* Elevated feel */
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth transitions */
+    padding: 35px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    min-height: 200px; /* Ensure consistent card height */
+    min-height: 200px;
 }
 
 .card:hover {
-    transform: translateY(-10px); /* Lift card more on hover */
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); /* Deeper, more noticeable shadow */
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
 }
 
 .card h3 {
     font-size: 1.8em;
-    color: var(--heading-color, #34495e); /* Darker heading color for contrast */
+    color: var(--heading-color, #34495e);
     margin-bottom: 30px;
     font-weight: 600;
 }
@@ -68,7 +68,7 @@
 .card button {
     background-color: var(--button-bg, #007bff);
     color: var(--button-text-color, white);
-    padding: 15px 30px; /* Larger buttons */
+    padding: 15px 30px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -77,18 +77,18 @@
     letter-spacing: 0.5px;
     transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
     width: 100%;
-    max-width: 220px; /* Slightly wider button limit */
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); /* Subtle button shadow */
+    max-width: 220px;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
 }
 
 .card button:hover {
     background-color: var(--button-hover-bg, #0056b3);
-    transform: translateY(-3px); /* Lift button slightly */
+    transform: translateY(-3px);
     box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
 }
 
 .card button:active {
-    transform: translateY(0); /* Press effect */
+    transform: translateY(0);
     box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
 }
 
@@ -96,31 +96,65 @@
 .logout-button {
     background-color: var(--logout-button-bg, #dc3545);
     color: var(--button-text-color, white);
-    padding: 14px 30px; /* Consistent button size */
+    padding: 14px 30px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-size: 1.1em;
     font-weight: 500;
 }
-/* ✅ Profile Button - Top Right Corner */
+
+/* ✅ Fixed Profile Button - Top Right */
 .profile-button {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  cursor: pointer;
+    position: fixed; /* 🔥 Fixed instead of absolute */
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    z-index: 1000; /* Ensure it's on top */
 }
 
 .profile-button img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%; /* Makes it round */
-  object-fit: cover;
-  border: 2px solid #444;
-  transition: transform 0.2s ease;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #444;
+    transition: transform 0.2s ease;
 }
 
 .profile-button:hover img {
-  transform: scale(1.05);
-  border-color: #007bff;
+    transform: scale(1.05);
+    border-color: #007bff;
+}
+/* Add this to your Dashboard.css file */
+
+/* ... your existing styles for .dashboard-container, .actions, .card, .logout-button etc. ... */
+
+.dashboard-secondary-actions {
+  margin-top: 20px; /* Add some space above this section */
+  margin-bottom: 20px; /* Add some space below this section */
+  text-align: center; /* Center the button(s) within this div */
+}
+
+.rules-regulations-button {
+  background-color: #007bff; /* Example: Blue background */
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  text-decoration: none; /* If you ever make it an <a> tag */
+  transition: background-color 0.3s ease;
+  display: inline-block; /* Or 'block' if you want it to take full width and center with margin auto */
+}
+
+.rules-regulations-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Ensure logout button still has its space if needed */
+.logout-button {
+  /* ... your existing logout button styles ... */
+  margin-top: 10px; /* Adjust if the new section pushes it too close or too far */
 }

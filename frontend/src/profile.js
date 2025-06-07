@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import './profile.css';
 
 function Profile() {
+  const navigate = useNavigate();
   const email = localStorage.getItem('user_email');
   const [editMode, setEditMode] = useState(false);
   const [userData, setUserData] = useState({
@@ -20,12 +22,28 @@ function Profile() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // Message state
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+
   useEffect(() => {
     axios
       .get(`http://localhost:5000/api/user/${email}`)
       .then((res) => setUserData(res.data))
-      .catch((err) => console.error('Error loading user data:', err));
+      .catch((err) => {
+        console.error('Error loading user data:', err);
+        showMessage('Failed to load user data', 'error');
+      });
   }, [email]);
+
+  const showMessage = (msg, type) => {
+    setMessage(msg);
+    setMessageType(type);
+    setTimeout(() => {
+      setMessage('');
+      setMessageType('');
+    }, 4000);
+  };
 
   const handleChange = (e) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
@@ -38,56 +56,56 @@ function Profile() {
   };
 
   const handleSave = async () => {
-  setLoading(true);
-  try {
-    // 1. Profile Update
-    const formData = new FormData();
-    formData.append('name', userData.name);
-    formData.append('contact_number', userData.contact_number);
-    if (imageFile) {
-      formData.append('image', imageFile);
-    }
-
-    const profileRes = await axios.put(`http://localhost:5000/api/user/${email}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-
-    // 2. Password Update (if fields are filled)
-    if (oldPassword || newPassword || confirmPassword) {
-      if (newPassword !== confirmPassword) {
-        alert("New passwords don't match");
-        setLoading(false);
-        return;
+    setLoading(true);
+    try {
+      // 1. Profile Update
+      const formData = new FormData();
+      formData.append('name', userData.name);
+      formData.append('contact_number', userData.contact_number);
+      if (imageFile) {
+        formData.append('image', imageFile);
       }
 
-      await axios.put('http://localhost:5000/api/user/change-password', {
-        email,
-        oldPassword,
-        newPassword,
+      const profileRes = await axios.put(`http://localhost:5000/api/user/${email}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
-      alert('Password updated successfully!');
+      // 2. Password Update (if fields are filled)
+      if (oldPassword || newPassword || confirmPassword) {
+        if (newPassword !== confirmPassword) {
+          showMessage("New passwords don't match", 'error');
+          setLoading(false);
+          return;
+        }
+
+        await axios.put('http://localhost:5000/api/user/change-password', {
+          email,
+          oldPassword,
+          newPassword,
+        });
+
+        showMessage('Password updated successfully!', 'success');
+      }
+
+      setUserData(profileRes.data);
+      setEditMode(false);
+      setImageFile(null);
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      showMessage('Profile updated!', 'success');
+    } catch (error) {
+      console.error('Error updating profile or password:', error);
+      showMessage(
+        'Failed to update profile or password: ' + (error.response?.data?.message || 'Unknown error'),
+        'error'
+      );
+    } finally {
+      setLoading(false);
     }
-
-    setUserData(profileRes.data);
-    setEditMode(false);
-    setImageFile(null);
-    setOldPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
-    alert('Profile updated!');
-  } catch (error) {
-    console.error('Error updating profile or password:', error);
-    alert('Failed to update profile or password: ' + (error.response?.data?.message || 'Unknown error'));
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-
+  };
 
   return (
     <div className="profile-container">
@@ -118,7 +136,7 @@ function Profile() {
           <p>{userData.contact_number}</p>
         )}
       </div>
-
+      
       {editMode && (
         <div className="password-change-section">
           <h3>Change Password</h3>
@@ -156,7 +174,29 @@ function Profile() {
         ) : (
           <button onClick={() => setEditMode(true)}>Edit Profile</button>
         )}
+        <button onClick={() => navigate('/dashboard')}>Return to Dashboard</button>
       </div>
+
+      {/* Bottom message display */}
+      {message && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            backgroundColor: messageType === 'success' ? '#4CAF50' : '#f44336',
+            color: 'white',
+            padding: '10px 20px',
+            borderRadius: '8px',
+            boxShadow: '0 0 10px rgba(0,0,0,0.2)',
+            zIndex: 9999,
+            transition: 'opacity 0.3s ease-in-out'
+          }}
+        >
+          {message}
+        </div>
+      )}
     </div>
   );
 }

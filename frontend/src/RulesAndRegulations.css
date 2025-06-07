@@ -1,0 +1,134 @@
+/* src/components/RulesAndRegulations.css */
+.rules-container {
+  padding: 20px 40px;
+  max-width: 800px;
+  margin: 40px auto;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+  color: #333;
+}
+
+.rules-container h1 {
+  text-align: center;
+  color: #0056b3; /* A blueish color, adjust as needed */
+  margin-bottom: 30px;
+}
+
+.rules-content h2 {
+  color: #004085; /* Darker blue for subheadings */
+  margin-top: 25px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.rules-content p,
+.rules-content li {
+  line-height: 1.6;
+  margin-bottom: 10px;
+  text-align: justify;
+}
+
+.rules-content ul {
+  list-style-type: disc;
+  margin-left: 20px;
+  padding-left: 10px;
+}
+
+.rules-content strong {
+  color: #d9534f; /* A reddish color for emphasis on safety */
+}
+
+.back-button {
+  background-color: #6c757d; /* Grey color */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  margin-bottom: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #5a6268;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .rules-container {
+    padding: 20px;
+    margin: 20px;
+  }
+
+  .rules-container h1 {
+    font-size: 1.5em;
+  }
+
+  .rules-content h2 {
+    font-size: 1.2em;
+  }
+}
+/* src/components/RulesAndRegulations.css */
+
+/* ... (your existing styles for .rules-container, h1, .important-warning, h2, etc.) ... */
+
+.important-warning {
+  color: red;
+  font-weight: bold;
+  background-color: #ffebee; /* Optional: a light red background */
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  border: 1px solid #e57373; /* Optional: a light red border */
+}
+
+.important-warning strong {
+    color: red;
+}
+
+/* ✅ ADDED STYLE FOR THE NEW CAUTION TEXT */
+.caution-notice {
+  color: #E67E22; /* A nice orange color */
+  font-weight: bold;
+  background-color: #FEF5E7; /* Optional: a light orange/yellow background */
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 15px; /* Space above the caution */
+  margin-bottom: 20px; /* Space below the caution */
+  border: 1px solid #F39C12; /* Optional: a light orange border */
+}
+
+.caution-notice strong {
+    color: #D35400; /* A slightly darker orange for the strong text within, or use #E67E22 to match */
+}
+
+
+.rules-content h2 {
+  color: #004085;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+/* ... (rest of your CSS, including .rules-content p, li, ul, .back-button, media queries, etc.) ... */
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  /* ... (your existing responsive styles) ... */
+
+  .important-warning {
+    padding: 8px;
+    font-size: 0.95em;
+  }
+
+  /* ✅ ADDED RESPONSIVE STYLE FOR CAUTION */
+  .caution-notice {
+    padding: 8px;
+    font-size: 0.95em;
+  }
+}
