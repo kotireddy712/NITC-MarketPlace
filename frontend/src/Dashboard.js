@@ -44,36 +44,28 @@ function Dashboard() {
       </div>
 
       <h2 className="dashboard-title">
-        <span className="title-greeting">Welcome TO NITC-MARKET PLACE, </span>
+        <span className="title-greeting">Welcome to NITC Marketplace, </span>
         <span className="user-name">{userData.name || 'User'}</span>!
       </h2>
 
+      {/* ✅ MAIN TWO BUTTONS ONLY */}
       <div className="actions">
         <div className="card">
-          <h3 className="card-title buy-title">Buy Items</h3>
-          {/* ✅ Emoji added */}
-          <button onClick={() => navigate('/buy')} className="action-button buy-button">
-            🛒 Go to Buy
+          <h3 className="card-title">Buy / Sell</h3>
+          <button onClick={() => navigate('/buy-sell')} className="action-button">
+            🛍️ Go to Buy/Sell
           </button>
         </div>
+
         <div className="card">
-          <h3 className="card-title sell-title">Sell Items</h3>
-          {/* ✅ Emoji added */}
-          <button onClick={() => navigate('/sell')} className="action-button sell-button">
-            💰 Go to Sell
-          </button>
-        </div>
-        <div className="card">
-          <h3 className="card-title listings-title">Listed Items</h3>
-          {/* ✅ Emoji added */}
-          <button onClick={() => navigate('/listings')} className="action-button listings-button">
-            📋 MY-LISTINGS
+          <h3 className="card-title">Lost / Found</h3>
+          <button onClick={() => navigate('/lost-found')} className="action-button">
+            🧳 Lost & Found
           </button>
         </div>
       </div>
 
       <div className="dashboard-secondary-actions">
-        {/* ✅ Emoji added */}
         <button
           onClick={() => navigate('/rules')}
           className="rules-regulations-button"
@@ -82,7 +74,6 @@ function Dashboard() {
         </button>
       </div>
 
-      {/* ✅ Emoji added */}
       <button onClick={handleLogout} className="logout-button">
         🚪 Logout
       </button>

@@ -84,6 +84,27 @@ SELECT * FROM nitc_mp_db.categories;
 
 --@block
 SELECT * FROM nitc_mp_db.items;
+
 --@block
 ALTER TABLE nitc_mp_db.users
 ADD COLUMN photo_url VARCHAR(255) DEFAULT 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+
+--@block
+desc users;
+--  ** ADD THIS NEW TABLE **
+--@block
+CREATE TABLE nitc_mp_db.lost_found_items (
+    item_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL, -- Foreign key to the users table (the person who listed it)
+    listing_type ENUM('Lost', 'Found') NOT NULL, -- 'Lost' if user lost it, 'Found' if user found it
+    item_name VARCHAR(255) NOT NULL,
+    description TEXT, -- Detailed description of the item, including distinguishing marks
+    -- item_category VARCHAR(100), -- e.g., 'Electronics', 'Documents', 'Clothing', 'Keys', 'Bags', 'Jewelry', 'Books'
+    location_details VARCHAR(255), -- Specific place it was lost/found (e.g., "NITC Main Library, 2nd Floor", "Near C-Block Parking Lot C")
+    date_time_lost_found DATETIME NOT NULL, -- When the item was lost or found
+    image_url VARCHAR(500), -- URL to the image of the item (assuming images are stored externally, e.g., cloud storage)
+    status ENUM('Active', 'Claimed', 'Returned', 'Archived') DEFAULT 'Active', -- Current status of the listing
+    posted_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- When the listing was created
+    resolved_at DATETIME, -- When the item was successfully returned/claimed
+    FOREIGN KEY (user_id) REFERENCES nitc_mp_db.users(user_id)
+);

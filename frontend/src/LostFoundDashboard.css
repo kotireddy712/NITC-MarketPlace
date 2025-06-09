@@ -1,0 +1,124 @@
+.lost-found-dashboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  max-width: 900px;
+  margin: 40px auto;
+  background-color: #f7f7f7;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Inter', sans-serif;
+  color: #333;
+}
+
+.lost-found-title {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-size: 2.2em;
+  font-weight: 700;
+  text-align: center;
+}
+
+.lost-found-description {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 1.1em;
+  color: #555;
+}
+
+.lost-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.lost-found-actions .card {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 25px;
+  width: 300px; /* Adjust card width as needed */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 180px; /* Ensures consistent card height */
+}
+
+.lost-found-actions .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.lost-found-actions .card-title {
+  color: #34495e;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.lost-found-actions .card p {
+  font-size: 0.95em;
+  color: #666;
+  margin-bottom: 20px;
+  flex-grow: 1; /* Pushes button to the bottom */
+}
+
+.lost-found-actions .action-button {
+  background-color: #28a745; /* Green for action */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+.lost-found-actions .action-button:hover {
+  background-color: #218838;
+}
+
+.lost-found-actions .action-button:active {
+  transform: translateY(1px);
+}
+
+.back-button {
+  background-color: #6c757d; /* Grey for back */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+}
+
+.back-button:hover {
+  background-color: #5a6268;
+}
+
+@media (max-width: 768px) {
+  .lost-found-dashboard-container {
+    margin: 20px auto;
+    padding: 15px;
+  }
+  .lost-found-title {
+    font-size: 1.8em;
+  }
+  .lost-found-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  .lost-found-actions .card {
+    width: 90%; /* Make cards wider on smaller screens */
+  }
+}

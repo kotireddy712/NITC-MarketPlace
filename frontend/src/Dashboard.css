@@ -158,3 +158,43 @@
   /* ... your existing logout button styles ... */
   margin-top: 10px; /* Adjust if the new section pushes it too close or too far */
 }
+ /* ** EXTRA */
+/* // ** // ** */
+.main-actions {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.main-action-button {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  cursor: pointer;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.main-action-button:hover {
+  background-color: #388e3c;
+}
+
+.return-button {
+  background-color: #555;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.return-button:hover {
+  background-color: #333;
+}
+
+

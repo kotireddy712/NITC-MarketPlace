@@ -1,0 +1,242 @@
+.my-lost-found-listings-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 40px auto;
+  background-color: #f7f7f7;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Inter', sans-serif;
+  color: #333;
+}
+
+.my-lost-found-listings-title {
+  color: #2c3e50;
+  margin-bottom: 25px;
+  font-size: 2.5em;
+  font-weight: 700;
+  text-align: center;
+}
+
+.no-listings-message {
+  font-size: 1.1em;
+  color: #666;
+  text-align: center;
+  margin: 30px 0;
+}
+
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.listing-card {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.listing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.listing-type {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.85em;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+}
+
+.listing-type.lost {
+  background-color: #dc3545; /* Red for lost */
+}
+
+.listing-type.found {
+  background-color: #28a745; /* Green for found */
+}
+
+.listing-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #eee;
+}
+
+.listing-name {
+  color: #34495e;
+  font-size: 1.6em;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.listing-description {
+  font-size: 0.95em;
+  color: #555;
+  margin-bottom: 15px;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.listing-details {
+  font-size: 0.9em;
+  color: #777;
+  margin-bottom: 8px;
+}
+
+.listing-details strong {
+  color: #333;
+}
+
+/* Status colors */
+.status-active {
+  color: #007bff; /* Blue */
+  font-weight: bold;
+}
+
+.status-claimed, .status-returned {
+  color: #28a745; /* Green */
+  font-weight: bold;
+}
+
+.status-archived {
+  color: #6c757d; /* Grey */
+  font-weight: bold;
+}
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap; /* Allow buttons to wrap */
+  gap: 10px;
+  margin-top: 15px;
+  justify-content: center;
+}
+
+.action-button {
+  flex: 1 1 auto; /* Allow buttons to grow and shrink */
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 500;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  min-width: 120px; /* Ensure buttons are not too small */
+}
+
+.mark-claimed {
+  background-color: #ffc107; /* Orange/Yellow */
+  color: #333;
+}
+.mark-claimed:hover {
+  background-color: #e0a800;
+}
+
+.mark-returned {
+  background-color: #28a745; /* Green */
+  color: white;
+}
+.mark-returned:hover {
+  background-color: #218838;
+}
+
+.mark-active {
+  background-color: #17a2b8; /* Teal/Light Blue */
+  color: white;
+}
+.mark-active:hover {
+  background-color: #138496;
+}
+
+.delete-button {
+  background-color: #dc3545; /* Red */
+  color: white;
+}
+.delete-button:hover {
+  background-color: #c82333;
+}
+
+.action-button:active {
+  transform: translateY(1px);
+}
+
+.back-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+}
+
+.back-button:hover {
+  background-color: #5a6268;
+}
+
+/* Messages for success/error */
+.status-message {
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.status-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+@media (max-width: 768px) {
+  .my-lost-found-listings-container {
+    margin: 20px auto;
+    padding: 15px;
+  }
+  .my-lost-found-listings-title {
+    font-size: 2em;
+  }
+  .listings-grid {
+    grid-template-columns: 1fr;
+  }
+  .listing-card {
+    width: 95%;
+    margin: 0 auto;
+  }
+  .card-actions {
+    flex-direction: column;
+    align-items: stretch; /* Stretch buttons to full width */
+  }
+  .action-button {
+    width: 100%; /* Full width for stacked buttons */
+  }
+}
