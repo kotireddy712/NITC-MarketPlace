@@ -67,30 +67,40 @@ def signup():
     password = data.get("password")
     name = data.get("name")
     contact = data.get("contact_number")
+
     if not all([email, password, name, contact]):
         return jsonify({"message": "Missing required fields."}), 400
+
     try:
         cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
         user = cursor.fetchone()
+
         if not user:
             return jsonify({"message": "Email not authorized for signup. Please use a registered NITC email."}), 403
+
         if user.get("password"):
             return jsonify({"message": "User already signed up."}), 409
+
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         cursor.execute(
             "UPDATE users SET name=%s, contact_number=%s, password=%s WHERE email=%s",
             (name, contact, hashed_password, email)
         )
         db_conn.commit()
+
         return jsonify({"message": "Signup successful!"})
+
     except mysql.connector.Error as err:
         db_conn.rollback()
         app.logger.error(f"Database error during signup for {email}: {err}")
         return jsonify({"message": f"Database error during signup: {err}"}), 500
+
     except Exception as e:
         db_conn.rollback()
         app.logger.error(f"Unexpected error during signup for {email}: {e}")
         return jsonify({"message": f"An unexpected error occurred during signup: {e}"}), 500
+
+# ------------------ LOGIN ROUTE ------------------
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -99,28 +109,37 @@ def login():
     data = request.json
     email = data.get("email")
     password = data.get("password")
+
     if not all([email, password]):
         return jsonify({"message": "Missing required fields."}), 400
+
     try:
-        cursor.execute("SELECT user_id, name, email, password FROM users WHERE email=%s AND password IS NOT NULL", (email,))
+        cursor.execute("SELECT user_id, name, email, password, role FROM users WHERE email=%s AND password IS NOT NULL", (email,))
         user = cursor.fetchone()
+
         if not user:
             return jsonify({"message": "No such user or not signed up yet."}), 401
+
         if user["password"] is None or not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
             return jsonify({"message": "Incorrect password"}), 403
+
         return jsonify({
             "message": "Login successful!",
             "user_id": user["user_id"],
             "name": user["name"],
-            "email": user["email"]
+            "email": user["email"],
+            "is_admin": user["role"] == "admin"
         })
+
     except mysql.connector.Error as err:
         app.logger.error(f"Database error during login for {email}: {err}")
         return jsonify({"message": f"Database error during login: {err}"}), 500
+
     except Exception as e:
         app.logger.error(f"Unexpected error during login for {email}: {e}")
         return jsonify({"message": f"An unexpected error occurred during login: {e}"}), 500
 
+    
 @app.route('/items', methods=['GET'])
 def get_items():
     db_conn = get_db()
@@ -635,6 +654,94 @@ def delete_lost_found_item(item_id):
         db_conn.rollback()
         app.logger.error(f"An unexpected error occurred deleting lost/found item {item_id}: {e}")
         return jsonify({"message": f"An unexpected error occurred: {e}"}), 500
+@app.route('/admin/category-counts', methods=['GET'])
+def category_counts():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute('''
+            SELECT c.name AS category, COUNT(i.item_id) AS total_items
+            FROM categories c
+            LEFT JOIN items i ON c.category_id = i.category_id AND i.is_approved = TRUE
+            GROUP BY c.category_id
+        ''')
+        result = cursor.fetchall()
+        return jsonify(result)
+    except Exception as e:
+        print("Error fetching category counts:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/admin/users', methods=['GET'])
+def fetch_users():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT user_id, name, email, contact_number, is_disabled FROM users WHERE role = 'user'")
+        result = cursor.fetchall()
+        return jsonify(result)
+    except Exception as e:
+        print("Error fetching users:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+@app.route('/admin/disable-user', methods=['POST'])
+def disable_user():
+    data = request.get_json()
+    user_id = data.get('user_id')
+
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("UPDATE users SET is_disabled = TRUE WHERE user_id = %s", (user_id,))
+        db.commit()
+        return jsonify({'message': 'User disabled'})
+    except Exception as e:
+        print("Error disabling user:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+
+
+@app.route('/admin/pending-items', methods=['GET'])
+def get_pending_items():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute('''
+            SELECT i.item_id, i.title, i.description, i.price, u.name as seller, c.name as category
+            FROM items i
+            JOIN users u ON i.user_id = u.user_id
+            JOIN categories c ON i.category_id = c.category_id
+            WHERE i.is_approved = FALSE
+        ''')
+        result = cursor.fetchall()
+        return jsonify(result)
+    except Exception as e:
+        print("Error fetching pending items:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/admin/approve-item', methods=['POST'])
+def approve_item_post():
+    data = request.get_json()
+    item_id = data.get('item_id')
+
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("UPDATE items SET is_approved = TRUE WHERE item_id = %s", (item_id,))
+        db.commit()
+        return jsonify({'message': 'Item approved'})
+    except Exception as e:
+        print("Error approving item:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+@app.route('/admin/approve-all-items', methods=['PATCH'])
+def approve_all_items():
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("UPDATE items SET is_approved = TRUE WHERE is_approved = FALSE")
+        db.commit()
+        return jsonify({'message': 'All items approved'})
+    except Exception as e:
+        print("Error approving all items:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

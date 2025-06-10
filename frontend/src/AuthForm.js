@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './AuthForm.css'; // <--- UPDATED: Importing AuthForm.css
-import backgroundImage from './p1.png'; // Still importing p1.png from src folder
+import './AuthForm.css';
+import backgroundImage from './p1.png';
 
 function AuthForm() {
   const navigate = useNavigate();
@@ -18,13 +18,14 @@ function AuthForm() {
   const [darkMode, setDarkMode] = useState(false);
   const [message, setMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdminChoice, setShowAdminChoice] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
       setDarkMode(true);
       document.documentElement.setAttribute('data-theme', 'dark');
-    (document.documentElement.getAttribute('data-theme') === 'dark') ? setDarkMode(true) : setDarkMode(false);
     }
   }, []);
 
@@ -33,6 +34,7 @@ function AuthForm() {
     setForm({ email: '', password: '', name: '', contact_number: '' });
     setMessage('');
     setIsSuccess(null);
+    setIsAdmin(false);
   };
 
   const handleChange = (e) => {
@@ -45,14 +47,23 @@ function AuthForm() {
 
     try {
       const res = await axios.post(`http://localhost:5000${endpoint}`, form);
-      setMessage(res.data.message);
+      const data = res.data;
+
+      setMessage(data.message);
       setIsSuccess(true);
 
-      if (isLogin && res.data.user_id) {
-        localStorage.setItem('user_id', res.data.user_id);
-        localStorage.setItem('user_name', res.data.name);
-        localStorage.setItem('user_email', res.data.email);
-        setTimeout(() => navigate('/dashboard'), 1500);
+      if (isLogin && data.user_id) {
+        localStorage.setItem('user_id', data.user_id);
+        localStorage.setItem('user_name', data.name);
+        localStorage.setItem('user_email', data.email);
+        localStorage.setItem('is_admin', data.is_admin);
+        setIsAdmin(data.is_admin);
+
+        if (data.is_admin) {
+          setShowAdminChoice(true); // Show modal for admin choice
+        } else {
+          setTimeout(() => navigate('/dashboard'), 1500);
+        }
       } else if (!isLogin) {
         setTimeout(() => {
           setIsLogin(true);
@@ -80,11 +91,17 @@ function AuthForm() {
     }
   };
 
+  const handleAdminChoice = (choice) => {
+    setShowAdminChoice(false);
+    if (choice === 'admin') {
+      navigate('/admin-dashboard');
+    } else {
+      navigate('/dashboard');
+    }
+  };
+
   return (
-    <div
-      className="app-background"
-      style={{ backgroundImage: `url(${backgroundImage})` }}
-    >
+    <div className="app-background" style={{ backgroundImage: `url(${backgroundImage})` }}>
       <button
         id="toggle-theme"
         onClick={handleToggleTheme}
@@ -144,6 +161,25 @@ function AuthForm() {
         {message && (
           <div className={`message-box ${isSuccess ? 'success' : 'error'}`}>
             {message}
+          </div>
+        )}
+
+        {/* Admin Info Message */}
+        {isSuccess && isAdmin && !showAdminChoice && (
+          <div className="admin-banner">Logged in as Admin</div>
+        )}
+
+        {/* Admin Navigation Modal */}
+        {isAdmin && isSuccess && showAdminChoice && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <h3>Welcome, Admin!</h3>
+              <p>Where would you like to go?</p>
+              <div className="modal-buttons">
+                <button onClick={() => handleAdminChoice('admin')}>Admin Dashboard</button>
+                <button onClick={() => handleAdminChoice('user')}>User Dashboard</button>
+              </div>
+            </div>
           </div>
         )}
       </div>

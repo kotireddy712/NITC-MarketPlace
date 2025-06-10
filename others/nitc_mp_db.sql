@@ -108,3 +108,13 @@ CREATE TABLE nitc_mp_db.lost_found_items (
     resolved_at DATETIME, -- When the item was successfully returned/claimed
     FOREIGN KEY (user_id) REFERENCES nitc_mp_db.users(user_id)
 );
+
+--@block
+ALTER TABLE nitc_mp_db.users
+ADD COLUMN role ENUM('user', 'admin') NOT NULL DEFAULT 'user';
+--@block
+desc users;
+--@block
+ALTER TABLE users ADD COLUMN is_disabled BOOLEAN DEFAULT FALSE;
+--@block
+ALTER TABLE items ADD COLUMN is_approved BOOLEAN DEFAULT FALSE;

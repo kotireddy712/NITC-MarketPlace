@@ -56,5 +56,9 @@ VALUES
 ('2017 Hyundai i20', 'Sportz variant, no accidents, new tires.', 580000.00, 1,
  'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg', 'Used', FALSE, 56, 4);
 --@block
-SELECT email, password FROM users WHERE email = 'vakiti_b231314cs@nitc.ac.in';
+UPDATE users
+SET role = 'admin'
+WHERE email = 'vakiti_b231314cs@nitc.ac.in';
 
+--@block
+SELECT *from users where email='vakiti_b231314cs@nitc.ac.in';
