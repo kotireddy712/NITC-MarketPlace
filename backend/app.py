@@ -139,7 +139,6 @@ def login():
         app.logger.error(f"Unexpected error during login for {email}: {e}")
         return jsonify({"message": f"An unexpected error occurred during login: {e}"}), 500
 
-    
 @app.route('/items', methods=['GET'])
 def get_items():
     db_conn = get_db()
@@ -158,19 +157,24 @@ def get_items():
         JOIN categories c ON i.category_id = c.category_id
         JOIN users u ON i.user_id = u.user_id
         """
-        where_clause = " WHERE i.is_sold = FALSE"
+        # Filter for only unsold and approved items
+        where_clause = " WHERE i.is_sold = FALSE AND i.is_approved = TRUE"
+        
         if category_id:
             cursor.execute(f"{base_query}{where_clause} AND i.category_id = %s", (category_id,))
         else:
             cursor.execute(f"{base_query}{where_clause}")
+        
         items = cursor.fetchall()
         return jsonify(items)
+
     except mysql.connector.Error as err:
         app.logger.error(f"Database error fetching items: {err}")
         return jsonify({"message": f"Database error fetching items: {err}"}), 500
     except Exception as e:
         app.logger.error(f"Unexpected error fetching items: {e}")
         return jsonify({"message": f"An unexpected error occurred fetching items: {e}"}), 500
+
 
 @app.route('/categories', methods=['GET'])
 def get_categories():
