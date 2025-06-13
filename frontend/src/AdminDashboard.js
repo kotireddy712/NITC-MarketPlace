@@ -7,6 +7,9 @@ function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [pendingItems, setPendingItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  //const [selectedItemId, setSelectedItemId] = useState(null);
+const [itemDetails, setItemDetails] = useState(null);
+
 
   useEffect(() => {
     fetchCategoryCounts();
@@ -69,6 +72,16 @@ function AdminDashboard() {
       console.error('Error approving all items:', error);
     }
   };
+  const fetchItemDetails = async (itemId) => {
+  try {
+    const res = await axios.get(`http://localhost:5000/admin/item-details/${itemId}`);
+    setItemDetails(res.data);
+   // setSelectedItemId(itemId);
+  } catch (error) {
+    console.error('Error fetching item details:', error);
+  }
+};
+
 
   // Filter users by search query (name, email, contact number)
 const filteredUsers = users.filter(user =>
@@ -104,18 +117,54 @@ const filteredUsers = users.filter(user =>
         {pendingItems.length === 0 ? (
           <p>No items pending approval.</p>
         ) : (
-          <ul className="pending-list">
-            {pendingItems.map(item => (
-              <li key={item.item_id} className="pending-item">
-                <strong>{item.title}</strong> - {item.category}
-                <button className="btn-approve" onClick={() => approveItem(item.item_id)}>
-                  Approve
-                </button>
-              </li>
-            ))}
-          </ul>
+         <ul className="pending-list">
+  {pendingItems.map(item => (
+    <li key={item.item_id} className="pending-item">
+      <strong
+        className="clickable-title"
+        onClick={() => fetchItemDetails(item.item_id)}
+      >
+        {item.title}
+      </strong>{" "}
+      - {item.category}
+      <button className="btn-approve" onClick={() => approveItem(item.item_id)}>
+        Approve
+      </button>
+    </li>
+  ))}
+</ul>
+
+
         )}
       </section>
+      {itemDetails && (
+  <div className="item-details-modal">
+    <h4>Item Details</h4>
+    <p><strong>Title:</strong> {itemDetails.title}</p>
+    <p><strong>Description:</strong> {itemDetails.description}</p>
+    <p><strong>Price:</strong> ₹{itemDetails.price}</p>
+    <p><strong>Quantity:</strong> {itemDetails.quantity}</p>
+    <p><strong>Condition:</strong> {itemDetails.item_condition}</p>
+    <p><strong>Uploaded by:</strong> {itemDetails.uploaded_by}</p>
+    <p><strong>Category:</strong> {itemDetails.category}</p>
+    <p><strong>Posted on:</strong> {new Date(itemDetails.created_at).toLocaleDateString()}</p>
+
+    {itemDetails.image_url && (
+      <div>
+        <img
+          src={itemDetails.image_url}
+          alt="Item"
+          style={{ maxWidth: '300px', marginTop: '10px', borderRadius: '10px' }}
+        />
+      </div>
+    )}
+
+    <button className="btn-close" onClick={() => setItemDetails(null)}>
+      Close
+    </button>
+  </div>
+)}
+
 
       <section className="dashboard-section">
         <h3>All Users</h3>

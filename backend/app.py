@@ -746,6 +746,39 @@ def approve_all_items():
         print("Error approving all items:", e)
         return jsonify({'error': 'Internal server error'}), 500
 
+@app.route('/admin/item-details/<int:item_id>', methods=['GET'])
+def get_item_details(item_id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    try:
+        query = """
+            SELECT 
+                items.item_id,
+                items.title,
+                items.description,
+                items.price,
+                items.quantity,
+                items.image_url,
+                items.item_condition,
+                items.created_at,
+                users.name AS uploaded_by,
+                categories.name AS category
+            FROM items
+            JOIN users ON items.user_id = users.user_id
+            JOIN categories ON items.category_id = categories.category_id
+            WHERE items.item_id = %s
+        """
+        cursor.execute(query, (item_id,))
+        item = cursor.fetchone()
+
+        if item:
+            return jsonify(item)
+        else:
+            return jsonify({'error': 'Item not found'}), 404
+    except Exception as e:
+        print("Error fetching item details:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
