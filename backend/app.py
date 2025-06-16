@@ -1,23 +1,66 @@
-from flask import Flask, request, jsonify, g
+from flask import Flask, request, jsonify, g, session, render_template_string
 from flask_cors import CORS
+from werkzeug.security import generate_password_hash
 import mysql.connector
 from mysql.connector import pooling
 import cloudinary
 import cloudinary.uploader
 import os
 import bcrypt
-from datetime import datetime
+from datetime import datetime, timedelta
+from flask_mail import Mail, Message
+import secrets
+import string
+from functools import wraps
+import logging # Import logging module
 
 app = Flask(__name__)
-CORS(app)
+
+# --- Configure Logging ---
+# You can set the logging level here. For development, DEBUG is useful.
+# For production, INFO or WARNING is more appropriate.
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+app.logger.setLevel(logging.DEBUG)
+
+
+# Add secret key for sessions
+# IMPORTANT: Change this to a strong, random string in production!
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-super-secret-key-please-change-this-in-production')
+
+# --- Session Cookie Settings for CORS ---
+# 'Lax' sends cookies for same-site requests and top-level navigations from other sites.
+# If your frontend is on a completely different domain/subdomain and you need cookies for ALL requests,
+# you might need 'None' along with SESSION_COOKIE_SECURE=True (requires HTTPS).
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+# Set to True if your application is served over HTTPS. Essential for 'SAMESITE=None'.
+app.config['SESSION_COOKIE_SECURE'] = False # Set to True in production with HTTPS (e.g., if using Render, Vercel, Netlify)
+
+# --- CORS Configuration ---
+# IMPORTANT: For production, replace "http://localhost:3000" with your specific frontend origin(s)
+# (e.g., "https://yourfrontend.com"). If you have multiple, list them: ["http://localhost:3000", "http://127.0.0.1:3000"]
+# 'supports_credentials=True' is essential for cookies/sessions to work across different origins.
+CORS(app, supports_credentials=True, origins=["http://localhost:3000", "http://127.0.0.1:5000"]) # Add your frontend's origin(s) here
+
+# --- Email Configuration ---
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+# IMPORTANT: Use environment variables for sensitive info in production
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', 'your-email@gmail.com')
+# This should be an app password if using Gmail with 2FA, not your regular email password
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', 'your-app-password') 
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME', 'your-email@gmail.com')
+
+mail = Mail(app)
 
 # --- Database Connection Pool Configuration ---
 db_config = {
     "host": "localhost",
     "user": "root",
-    "password": "1234",
+    "password": "1234", # IMPORTANT: Use environment variable or stronger password in production
     "database": "nitc_mp_db",
-    "autocommit": False
+    "autocommit": False # Keep autocommit False to manage transactions manually
 }
 
 try:
@@ -26,96 +69,393 @@ try:
         pool_size=5,
         **db_config
     )
-    print("Database connection pool created successfully.")
+    app.logger.info("Database connection pool created successfully.")
 except mysql.connector.Error as err:
-    print(f"Error creating database connection pool: {err}")
-    exit(1)
+    app.logger.critical(f"Error creating database connection pool: {err}")
+    exit(1) # Exit if database connection cannot be established
 
 # --- Helper Functions for Database Connection Management ---
 def get_db():
     if 'db' not in g:
         g.db = db_pool.get_connection()
-        g.cursor = g.db.cursor(dictionary=True)
+        g.cursor = g.db.cursor(dictionary=True) # Cursor returns rows as dictionaries
     return g.db
 
 @app.teardown_appcontext
 def close_db_connection(exception):
+    """Closes the database connection at the end of the request."""
     db = g.pop('db', None)
     if db is not None and db.is_connected():
+        app.logger.debug("Closing database connection.")
         g.cursor.close()
         db.close()
 
 # --- Cloudinary Configuration ---
+# IMPORTANT: Use environment variables for sensitive info in production
 cloudinary.config(
     cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME', 'dnihh3gox'),
     api_key=os.getenv('CLOUDINARY_API_KEY', '369298749656953'),
     api_secret=os.getenv('CLOUDINARY_API_SECRET', 'Ii-tTqA9hkgdr-cQGN1FLTOBue0')
 )
 
-# --- Existing Routes (Copy as is from your previous code) ---
+# --- OTP Helper Functions ---
+def generate_otp(length=6):
+    """Generate a secure random OTP (6 digits by default)"""
+    return ''.join(secrets.choice(string.digits) for _ in range(length))
+
+def send_otp_email(email, otp, name=None):
+    """Send OTP via email using Flask-Mail"""
+    try:
+        subject = "NITC Marketplace - Email Verification OTP"
+        
+        # HTML email template for better presentation
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }}
+                .container {{ max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+                .header {{ text-align: center; color: #333; margin-bottom: 30px; }}
+                .otp-code {{ font-size: 32px; font-weight: bold; color: #007bff; text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 8px; margin: 20px 0; letter-spacing: 3px; }}
+                .info {{ color: #666; margin: 20px 0; }}
+                .warning {{ color: #dc3545; font-size: 14px; margin-top: 20px; }}
+                .footer {{ margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #999; text-align: center; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🎓 NITC Marketplace</h1>
+                    <h2>Email Verification Required</h2>
+                </div>
+                
+                <p>Hello{' ' + name if name else ''},</p>
+                
+                <p class="info">Welcome to NITC Marketplace! To complete your registration, please verify your email address using the OTP below:</p>
+                
+                <div class="otp-code">{otp}</div>
+                
+                <p class="info">This OTP is valid for <strong>10 minutes</strong> only. Please enter it in the verification form to proceed with your signup.</p>
+                
+                <div class="warning">
+                    <strong>Security Notice:</strong>
+                    <ul>
+                        <li>Never share this OTP with anyone</li>
+                        <li>NITC Marketplace staff will never ask for your OTP</li>
+                        <li>If you didn't request this, please ignore this email</li>
+                    </ul>
+                </div>
+                
+                <div class="footer">
+                    <p>This email was sent from NITC Marketplace</p>
+                    <p>If you have any questions, please contact our support team</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        # Plain text version for email clients that don't render HTML
+        text_body = f"""
+        NITC Marketplace - Email Verification OTP
+        
+        Hello{' ' + name if name else ''},
+        
+        Welcome to NITC Marketplace! To complete your registration, please verify your email address.
+        
+        Your OTP is: {otp}
+        
+        This OTP is valid for 10 minutes only. Please enter it in the verification form to proceed with your signup.
+        
+        Security Notice:
+        - Never share this OTP with anyone
+        - NITC Marketplace staff will never ask for your OTP
+        - If you didn't request this, please ignore this email
+        
+        Best regards,
+        NITC Marketplace Team
+        """
+        
+        msg = Message(
+            subject=subject,
+            recipients=[email],
+            body=text_body,
+            html=html_body
+        )
+        
+        mail.send(msg)
+        app.logger.info(f"OTP email sent successfully to {email}")
+        return True
+        
+    except Exception as e:
+        app.logger.error(f"Error sending email to {email}: {e}", exc_info=True)
+        return False
+
+def store_otp(email, otp):
+    """Store OTP in database with an expiration time of 10 minutes."""
+    db_conn = get_db()
+    cursor = db_conn.cursor(dictionary=True)
+    
+    try:
+        # Delete any existing, pending OTP for this email to ensure only one is active
+        cursor.execute("DELETE FROM email_otp WHERE email = %s", (email,))
+        app.logger.debug(f"Deleted existing OTP for {email}")
+        
+        # Store new OTP with 10-minute expiration
+        expires_at = datetime.now() + timedelta(minutes=10)
+        cursor.execute(
+            "INSERT INTO email_otp (email, otp, expires_at) VALUES (%s, %s, %s)",
+            (email, otp, expires_at)
+        )
+        db_conn.commit() # Commit the transaction to save changes
+        app.logger.info(f"OTP stored successfully for {email}")
+        return True
+        
+    except mysql.connector.Error as err:
+        db_conn.rollback() # Rollback on error
+        app.logger.error(f"Database error storing OTP for {email}: {err}", exc_info=True)
+        return False
+
+def verify_otp(email, otp):
+    """Verify OTP from database, checking for expiration and correctness."""
+    db_conn = get_db()
+    cursor = db_conn.cursor(dictionary=True)
+    
+    try:
+        cursor.execute(
+            "SELECT otp, expires_at FROM email_otp WHERE email = %s",
+            (email,)
+        )
+        result = cursor.fetchone()
+        
+        if not result:
+            app.logger.warning(f"No OTP found for {email} or already used/expired.")
+            return False # No OTP found for this email
+            
+        stored_otp = result['otp']
+        expires_at = result['expires_at']
+        
+        # Check if OTP has expired
+        if datetime.now() > expires_at:
+            app.logger.warning(f"OTP for {email} has expired. Expiration time: {expires_at}")
+            # Clean up expired OTP
+            cursor.execute("DELETE FROM email_otp WHERE email = %s", (email,))
+            db_conn.commit()
+            return False
+            
+        # Verify if the provided OTP matches the stored one
+        if stored_otp == otp:
+            app.logger.info(f"OTP verified successfully for {email}.")
+            # Clean up used OTP immediately after successful verification
+            cursor.execute("DELETE FROM email_otp WHERE email = %s", (email,))
+            db_conn.commit()
+            return True
+            
+        app.logger.warning(f"Invalid OTP provided for {email}. Stored: {stored_otp}, Provided: {otp}")
+        return False # OTP does not match
+        
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error verifying OTP for {email}: {err}", exc_info=True)
+        return False
+
+# ---
+# ### OTP and Signup Flow Endpoints
+# ---
+
+@app.route("/send-otp", methods=["POST"])
+def send_otp_route():
+    """Endpoint to send an OTP to a user's email for registration."""
+    db_conn = get_db()
+    cursor = db_conn.cursor(dictionary=True)
+    data = request.json
+    email = data.get("email")
+
+    app.logger.debug(f"Received /send-otp request for email: {email}")
+
+    if not email:
+        return jsonify({"message": "Email is required."}), 400
+
+    try:
+        # Step 1: Check if the email exists in the `users` table.
+        # This assumes only pre-authorized NITC emails can sign up.
+        cursor.execute("SELECT name, password FROM users WHERE email=%s", (email,))
+        user = cursor.fetchone()
+
+        if not user:
+            app.logger.warning(f"Email {email} not found in users table or not authorized.")
+            return jsonify({"message": "Email not authorized for signup. Please use a registered NITC email."}), 403
+
+        # Step 2: Check if the user has already completed their signup (has a password).
+        if user.get("password") is not None and user.get("password") != '':
+            app.logger.info(f"User {email} already signed up. Redirecting to login.")
+            return jsonify({"message": "User already signed up. Please use login instead."}), 409
+
+        # Step 3: Generate and store the OTP.
+        otp = generate_otp()
+        
+        if store_otp(email, otp):
+            # Step 4: Send the OTP via email.
+            user_name = user.get('name') if user else None # Get user name if available for personalized email
+            if send_otp_email(email, otp, user_name):
+                app.logger.info(f"OTP successfully sent and stored for {email}.")
+                return jsonify({
+                    "message": "OTP sent successfully to your email. Please check your inbox.",
+                    "email": email # Return email to frontend for next steps
+                })
+            else:
+                app.logger.error(f"Failed to send OTP email for {email}.")
+                return jsonify({"message": "Failed to send OTP. Please try again."}), 500
+        else:
+            app.logger.error(f"Failed to store OTP for {email} in database.")
+            return jsonify({"message": "Failed to generate OTP. Please try again."}), 500
+
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error during OTP generation for {email}: {err}", exc_info=True)
+        return jsonify({"message": f"Database error: {err}"}), 500
+
+    except Exception as e:
+        app.logger.error(f"Unexpected error during OTP generation for {email}: {e}", exc_info=True)
+        return jsonify({"message": f"An unexpected error occurred: {e}"}), 500
+
+@app.route("/verify-otp", methods=["POST"])
+def verify_otp_route():
+    """Endpoint to verify the OTP entered by the user."""
+    data = request.json
+    email = data.get("email")
+    otp = data.get("otp")
+
+    app.logger.debug(f"Received /verify-otp request for email: {email}, OTP: {otp}")
+    # Log session state to debug persistence issues
+    app.logger.debug(f"Session before verification: otp_verified={session.get('otp_verified')}, verified_email={session.get('verified_email')}")
+
+    if not all([email, otp]):
+        return jsonify({"message": "Email and OTP are required."}), 400
+
+    try:
+        if verify_otp(email, otp):
+            # If OTP is valid, store verification status in session
+            session['verified_email'] = email
+            session['otp_verified'] = True
+            app.logger.info(f"OTP verified successfully for {email}. Session updated.")
+            app.logger.debug(f"Session after verification: otp_verified={session.get('otp_verified')}, verified_email={session.get('verified_email')}")
+            return jsonify({
+                "message": "OTP verified successfully! Please proceed to complete your signup details.",
+                "verified": True,
+                "email": email # Return email to frontend to pre-fill signup form
+            })
+        else:
+            app.logger.warning(f"OTP verification failed for {email}.")
+            return jsonify({
+                "message": "Invalid or expired OTP. Please try again.",
+                "verified": False
+            }), 400
+
+    except Exception as e:
+        app.logger.error(f"Error verifying OTP for {email}: {e}", exc_info=True)
+        return jsonify({"message": "An error occurred during OTP verification."}), 500
 
 @app.route("/signup", methods=["POST"])
 def signup():
+    """Endpoint for a user to complete their signup after OTP verification."""
     db_conn = get_db()
     cursor = db_conn.cursor(dictionary=True)
     data = request.json
+
     email = data.get("email")
     password = data.get("password")
     name = data.get("name")
-    contact = data.get("contact_number")
-    if not all([email, password, name, contact]):
-        return jsonify({"message": "Missing required fields."}), 400
+    contact_number = data.get("phone")  # Assuming frontend sends 'phone'
+
+    app.logger.debug(f"Received /signup request for email: {email}")
+    app.logger.debug(f"Session state for signup: OTP Verified: {session.get('otp_verified')}, Verified Email: {session.get('verified_email')}")
+
+    if not all([email, password, name, contact_number]):
+        app.logger.warning("Missing fields for signup.")
+        return jsonify({"message": "All fields are required."}), 400
+
+    # Step 1: Crucial check to ensure OTP was verified for this email in the current session.
+    # This prevents users from skipping OTP verification.
+    if 'otp_verified' not in session or not session.get('otp_verified') or session.get('verified_email') != email:
+        app.logger.warning(f"Signup attempt for {email} without proper OTP verification. "
+                           f"Session state: otp_verified={session.get('otp_verified')}, verified_email={session.get('verified_email')}")
+        return jsonify({"message": "OTP verification required before signup."}), 401
+
     try:
-        cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
-        user = cursor.fetchone()
-        if not user:
-            return jsonify({"message": "Email not authorized for signup. Please use a registered NITC email."}), 403
-        if user.get("password"):
-            return jsonify({"message": "User already signed up."}), 409
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        cursor.execute(
-            "UPDATE users SET name=%s, contact_number=%s, password=%s WHERE email=%s",
-            (name, contact, hashed_password, email)
-        )
-        db_conn.commit()
-        return jsonify({"message": "Signup successful!"})
+        # Step 2: Hash the password using bcrypt.
+        hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+        # Step 3: Update the `users` table with the new password, name, and contact number.
+        cursor.execute("""
+            UPDATE users
+            SET password = %s, name = %s, contact_number = %s
+            WHERE email = %s
+        """, (hashed_pw, name, contact_number, email))
+        db_conn.commit() # Commit the changes to the database
+
+        # Step 4: Clear session variables after successful signup to prevent reuse
+        session.pop('otp_verified', None)
+        session.pop('verified_email', None)
+        app.logger.info(f"Signup successful for {email}. Session cleared.")
+
+        return jsonify({"message": "Signup successful. You can now log in."}), 200
+
     except mysql.connector.Error as err:
-        db_conn.rollback()
-        app.logger.error(f"Database error during signup for {email}: {err}")
+        db_conn.rollback() # Rollback on database error
+        app.logger.error(f"Database error during signup for {email}: {err}", exc_info=True)
         return jsonify({"message": f"Database error during signup: {err}"}), 500
+
     except Exception as e:
-        db_conn.rollback()
-        app.logger.error(f"Unexpected error during signup for {email}: {e}")
+        app.logger.error(f"Unexpected error during signup for {email}: {e}", exc_info=True)
         return jsonify({"message": f"An unexpected error occurred during signup: {e}"}), 500
+
+# --- Other Placeholder Routes (add your actual application routes here) ---
 
 @app.route("/login", methods=["POST"])
 def login():
+    """Handles user login."""
     db_conn = get_db()
     cursor = db_conn.cursor(dictionary=True)
     data = request.json
     email = data.get("email")
     password = data.get("password")
+
     if not all([email, password]):
         return jsonify({"message": "Missing required fields."}), 400
+
     try:
-        cursor.execute("SELECT user_id, name, email, password FROM users WHERE email=%s AND password IS NOT NULL", (email,))
+        # Fetch user including the hashed password
+        cursor.execute("SELECT user_id, name, email, password, role FROM users WHERE email=%s", (email,))
         user = cursor.fetchone()
+
         if not user:
-            return jsonify({"message": "No such user or not signed up yet."}), 401
-        if user["password"] is None or not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
-            return jsonify({"message": "Incorrect password"}), 403
+            return jsonify({"message": "Invalid credentials or user not found."}), 401
+
+        # Check if password exists (i.e., user has completed signup)
+        if user["password"] is None:
+            return jsonify({"message": "Account not fully signed up. Please complete signup first."}), 403
+
+        # Verify the password using bcrypt (Crucial change here!)
+        # bcrypt.checkpw expects bytes for both password and hashed password
+        if not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
+            return jsonify({"message": "Incorrect password."}), 403
+
         return jsonify({
             "message": "Login successful!",
             "user_id": user["user_id"],
             "name": user["name"],
-            "email": user["email"]
+            "email": user["email"],
+            "is_admin": user["role"] == "admin" # Assuming 'role' column exists in 'users' table
         })
+
     except mysql.connector.Error as err:
         app.logger.error(f"Database error during login for {email}: {err}")
         return jsonify({"message": f"Database error during login: {err}"}), 500
+
     except Exception as e:
         app.logger.error(f"Unexpected error during login for {email}: {e}")
         return jsonify({"message": f"An unexpected error occurred during login: {e}"}), 500
+# ---------------------------------------------------------------------------------------------------
 
 @app.route('/items', methods=['GET'])
 def get_items():
@@ -135,19 +475,24 @@ def get_items():
         JOIN categories c ON i.category_id = c.category_id
         JOIN users u ON i.user_id = u.user_id
         """
-        where_clause = " WHERE i.is_sold = FALSE"
+        # Filter for only unsold and approved items
+        where_clause = " WHERE i.is_sold = FALSE AND i.is_approved = TRUE"
+        
         if category_id:
             cursor.execute(f"{base_query}{where_clause} AND i.category_id = %s", (category_id,))
         else:
             cursor.execute(f"{base_query}{where_clause}")
+        
         items = cursor.fetchall()
         return jsonify(items)
+
     except mysql.connector.Error as err:
         app.logger.error(f"Database error fetching items: {err}")
         return jsonify({"message": f"Database error fetching items: {err}"}), 500
     except Exception as e:
         app.logger.error(f"Unexpected error fetching items: {e}")
         return jsonify({"message": f"An unexpected error occurred fetching items: {e}"}), 500
+
 
 @app.route('/categories', methods=['GET'])
 def get_categories():
@@ -631,6 +976,127 @@ def delete_lost_found_item(item_id):
         db_conn.rollback()
         app.logger.error(f"An unexpected error occurred deleting lost/found item {item_id}: {e}")
         return jsonify({"message": f"An unexpected error occurred: {e}"}), 500
+@app.route('/admin/category-counts', methods=['GET'])
+def category_counts():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute('''
+            SELECT c.name AS category, COUNT(i.item_id) AS total_items
+            FROM categories c
+            LEFT JOIN items i ON c.category_id = i.category_id AND i.is_approved = TRUE
+            GROUP BY c.category_id
+        ''')
+        result = cursor.fetchall()
+        return jsonify(result)
+    except Exception as e:
+        print("Error fetching category counts:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/admin/users', methods=['GET'])
+def fetch_users():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT user_id, name, email, contact_number, is_disabled FROM users WHERE role = 'user'")
+        result = cursor.fetchall()
+        return jsonify(result)
+    except Exception as e:
+        print("Error fetching users:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+@app.route('/admin/disable-user', methods=['POST'])
+def disable_user():
+    data = request.get_json()
+    user_id = data.get('user_id')
+
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("UPDATE users SET is_disabled = TRUE WHERE user_id = %s", (user_id,))
+        db.commit()
+        return jsonify({'message': 'User disabled'})
+    except Exception as e:
+        print("Error disabling user:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+
+
+@app.route('/admin/pending-items', methods=['GET'])
+def get_pending_items():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute('''
+            SELECT i.item_id, i.title, i.description, i.price, u.name as seller, c.name as category
+            FROM items i
+            JOIN users u ON i.user_id = u.user_id
+            JOIN categories c ON i.category_id = c.category_id
+            WHERE i.is_approved = FALSE
+        ''')
+        result = cursor.fetchall()
+        return jsonify(result)
+    except Exception as e:
+        print("Error fetching pending items:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/admin/approve-item', methods=['POST'])
+def approve_item_post():
+    data = request.get_json()
+    item_id = data.get('item_id')
+
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("UPDATE items SET is_approved = TRUE WHERE item_id = %s", (item_id,))
+        db.commit()
+        return jsonify({'message': 'Item approved'})
+    except Exception as e:
+        print("Error approving item:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+@app.route('/admin/approve-all-items', methods=['PATCH'])
+def approve_all_items():
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("UPDATE items SET is_approved = TRUE WHERE is_approved = FALSE")
+        db.commit()
+        return jsonify({'message': 'All items approved'})
+    except Exception as e:
+        print("Error approving all items:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/admin/item-details/<int:item_id>', methods=['GET'])
+def get_item_details(item_id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    try:
+        query = """
+            SELECT 
+                items.item_id,
+                items.title,
+                items.description,
+                items.price,
+                items.quantity,
+                items.image_url,
+                items.item_condition,
+                items.created_at,
+                users.name AS uploaded_by,
+                categories.name AS category
+            FROM items
+            JOIN users ON items.user_id = users.user_id
+            JOIN categories ON items.category_id = categories.category_id
+            WHERE items.item_id = %s
+        """
+        cursor.execute(query, (item_id,))
+        item = cursor.fetchone()
+
+        if item:
+            return jsonify(item)
+        else:
+            return jsonify({'error': 'Item not found'}), 404
+    except Exception as e:
+        print("Error fetching item details:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

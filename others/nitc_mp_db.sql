@@ -106,3 +106,27 @@ CREATE TABLE nitc_mp_db.lost_found_items (
     resolved_at DATETIME, -- When the item was successfully returned/claimed
     FOREIGN KEY (user_id) REFERENCES nitc_mp_db.users(user_id)
 );
+
+--@block
+ALTER TABLE nitc_mp_db.users
+ADD COLUMN role ENUM('user', 'admin') NOT NULL DEFAULT 'user';
+--@block
+desc nitc_mp_db.users;
+--@block
+ALTER TABLE nitc_mp_db.users ADD COLUMN is_disabled BOOLEAN DEFAULT FALSE;
+--@block
+ALTER TABLE nitc_mp_db.items ADD COLUMN is_approved BOOLEAN DEFAULT FALSE;
+
+--@block
+UPDATE nitc_mp_db.users
+SET role = 'admin'
+WHERE email = 'chilakala_b230650cs@nitc.ac.in';
+
+----------------------------------------------------------------------------------------------------------------
+--@block
+CREATE TABLE IF NOT EXISTS nitc_mp_db.email_otp (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(100),
+    otp VARCHAR(6),
+    expires_at DATETIME
+);

@@ -7,6 +7,7 @@ import Sell from './sell';
 import Listings from './Listings';
 import Profile from './profile';
 import RulesAndRegulations from './RulesAndRegulations';
+import AdminDashboard from './AdminDashboard';
 
 // Existing New components
 import BuySellDashboard from './BuySellDashboard';
@@ -32,7 +33,7 @@ function App() {
         <Route path="/listings" element={<Listings />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/rules" element={<RulesAndRegulations />} />
-
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
         {/* Existing Marketplace Routes */}
         <Route path="/buy-sell" element={<BuySellDashboard />} />
 
