@@ -1,287 +1,406 @@
-/* src/AuthForm.css */
-
-/* --- AuthForm Specific Theme Variables --- */
-:root {
-    /* For AuthForm specific elements - Light Theme */
-    --auth-bg-color: rgba(255, 255, 255, 0.95); /* Slightly transparent white */
-    --auth-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    --auth-heading-color: #2c3e50;
-    --auth-input-border: #ced4da;
-    --auth-input-focus-border: #007bff;
-    --auth-button-bg: #007bff;
-    --auth-button-hover-bg: #0056b3;
-    --auth-button-text: white;
-    --auth-message-success-bg: #d4edda;
-    --auth-message-success-border: #c3e6cb;
-    --auth-message-error-bg: #f8d7da;
-    --auth-message-error-border: #f5c6cb;
-    --auth-toggle-btn-bg: #007bff;
-    --auth-toggle-btn-text: white;
-    --auth-toggle-btn-border: #007bff;
-    --auth-toggle-btn-hover-bg: #0056b3;
-
-    --tab-active-bg-light: #007bff;
-    --tab-active-text-light: white;
-    --tab-inactive-bg-light: #e9ecef;
-    --tab-inactive-text-light: #495057;
-
-    /* RGB values for box shadows */
-    --primary-color-rgb: 0, 123, 255; /* Blue */
+/* General Styling */
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f0f2f5; /* Light background */
+    color: #333;
 }
 
-[data-theme='dark'] {
-    /* For AuthForm specific elements - Dark Theme */
-    --auth-bg-color: rgba(52, 73, 94, 0.95); /* Slightly transparent dark blue */
-    --auth-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    --auth-heading-color: #ecf0f1;
-    --auth-input-border: #4a6375;
-    --auth-input-focus-border: #61dafb;
-    --auth-button-bg: #61dafb;
-    --auth-button-hover-bg: #21a1f1;
-    --auth-button-text: #2c3e50;
-    --auth-message-success-bg: #2ecc71;
-    --auth-message-success-border: #27ae60;
-    --auth-message-error-bg: #e74c3c;
-    --auth-message-error-border: #c0392b;
-    --auth-toggle-btn-bg: #61dafb;
-    --auth-toggle-btn-text: #2c3e50;
-    --auth-toggle-btn-border: #61dafb;
-    --auth-toggle-btn-hover-bg: #21a1f1;
-
-    --tab-active-bg-dark: #61dafb;
-    --tab-active-text-dark: #2c3e50;
-    --tab-inactive-bg-dark: #4a6375;
-    --tab-inactive-text-dark: #ecf0f1;
-
-    /* RGB values for box shadows */
-    --primary-color-dark-rgb: 97, 218, 251; /* Light blue */
+[data-theme='dark'] body {
+    background-color: #282c34; /* Dark background */
+    color: #f0f0f0;
 }
 
-/* --- Theme Toggle Button --- */
-.theme-toggle-button {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    padding: 10px 18px;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 2px solid var(--auth-toggle-btn-border);
-    background-color: var(--auth-toggle-btn-bg);
-    color: var(--auth-toggle-btn-text);
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+.app-background {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-size: cover;
+    background-position: center;
+    position: relative;
 }
 
-.theme-toggle-button:hover {
-    background-color: var(--auth-toggle-btn-hover-bg);
-    /* No change to text color, relying on --auth-toggle-btn-text directly */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-}
-
-[data-theme='dark'] .theme-toggle-button {
-    background-color: var(--auth-toggle-btn-bg);
-    color: var(--auth-toggle-btn-text);
-    border-color: var(--auth-toggle-btn-border);
-}
-
-/* --- Auth Container (Login/Signup Form Box) --- */
 .auth-container {
-    background-color: var(--auth-bg-color);
+    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white */
     padding: 40px;
-    border-radius: 15px;
-    box-shadow: var(--auth-box-shadow);
-    width: 100%;
-    max-width: 400px; /* Fixed width for the form box */
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     text-align: center;
-    animation: slideInRight 0.8s ease-out; /* Animation for the form box */
-    margin-right: 5%; /* Pushes the form to the right, making image visible */
-    /* For smaller screens, center it */
-    @media (max-width: 768px) {
-        margin-right: auto;
-        margin-left: auto;
-    }
+    max-width: 400px;
+    width: 90%;
+    backdrop-filter: blur(5px); /* Optional: Frosted glass effect */
+    -webkit-backdrop-filter: blur(5px); /* For Safari */
 }
 
-@keyframes slideInRight {
-    from { opacity: 0; transform: translateX(50px); }
-    to { opacity: 1; transform: translateX(0); }
+[data-theme='dark'] .auth-container {
+    background-color: rgba(40, 44, 52, 0.9); /* Darker transparent background */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
-.auth-container h2 {
-    font-size: 2.2em;
-    color: var(--auth-heading-color);
+h2 {
     margin-bottom: 30px;
-    font-weight: 700;
+    color: #007bff;
 }
 
-/* --- Tab Buttons (Login/Signup) --- */
+[data-theme='dark'] h2 {
+    color: #61dafb; /* A lighter blue for dark mode */
+}
+
+/* Tab buttons for Login/Signup */
 .tab {
     display: flex;
+    justify-content: center;
     margin-bottom: 25px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .tab button {
-    flex: 1;
-    padding: 12px 0;
+    background-color: #e9ecef;
     border: none;
-    background-color: var(--tab-inactive-bg-light);
-    color: var(--tab-inactive-text-light);
-    font-size: 1.1em;
-    font-weight: 500;
+    padding: 10px 20px;
     cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.tab button.active {
-    background-color: var(--tab-active-bg-light);
-    color: var(--tab-active-text-light);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
+    border-radius: 5px;
+    margin: 0 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    color: #555;
 }
 
 [data-theme='dark'] .tab button {
-    background-color: var(--tab-inactive-bg-dark);
-    color: var(--tab-inactive-text-dark);
+    background-color: #3a3f47;
+    color: #ccc;
+}
+
+.tab button.active {
+    background-color: #007bff;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
 }
 
 [data-theme='dark'] .tab button.active {
-    background-color: var(--tab-active-bg-dark);
-    color: var(--tab-active-text-dark);
+    background-color: #61dafb;
+    color: #282c34;
+    box-shadow: 0 2px 8px rgba(97, 218, 251, 0.3);
 }
 
-/* --- Form Inputs --- */
-.auth-form input {
-    width: calc(100% - 24px); /* Account for padding */
-    padding: 12px;
-    margin-bottom: 18px;
-    border: 1px solid var(--auth-input-border);
-    border-radius: 8px;
-    font-size: 1em;
-    background-color: var(--input-bg-light); /* Needs to be a general variable or specific to AuthForm input */
-    color: var(--text-color-light); /* Needs to be a general variable or specific to AuthForm input */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.auth-form input::placeholder {
-    color: var(--secondary-color); /* This should probably be a more general variable in App.css or define it here */
-    opacity: 0.8;
-}
-
-.auth-form input:focus {
-    outline: none;
-    border-color: var(--auth-input-focus-border);
-    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.25);
+/* Form fields */
+.auth-form input[type="email"],
+.auth-form input[type="password"],
+.auth-form input[type="text"] {
+    width: calc(100% - 20px);
+    padding: 12px 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box; /* Include padding in width */
 }
 
 [data-theme='dark'] .auth-form input {
-    background-color: var(--input-bg-dark); /* Needs to be a general variable or specific to AuthForm input */
-    color: var(--text-color-dark); /* Needs to be a general variable or specific to AuthForm input */
-    border-color: var(--auth-input-border);
+    background-color: #4a4f59;
+    border-color: #5a606b;
+    color: #f0f0f0;
 }
 
-/* --- Form Submit Button --- */
+.auth-form input::placeholder {
+    color: #888;
+}
+
+[data-theme='dark'] .auth-form input::placeholder {
+    color: #aaa;
+}
+
 .auth-form button[type="submit"] {
-    background-color: var(--auth-button-bg);
-    color: var(--auth-button-text);
-    padding: 14px 25px;
+    background-color: #28a745; /* Green for submit */
+    color: white;
+    padding: 12px 20px;
     border: none;
-    border-radius: 8px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 1.1em;
-    font-weight: 600;
+    font-size: 18px;
     width: 100%;
-    margin-top: 10px;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
-}
-
-.auth-form button[type="submit"]:hover {
-    background-color: var(--auth-button-hover-bg);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
-}
-
-.auth-form button[type="submit"]:active {
-    transform: translateY(0);
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 [data-theme='dark'] .auth-form button[type="submit"] {
-    background-color: var(--auth-button-bg);
-    color: var(--auth-button-text);
-    box-shadow: 0 4px 10px rgba(var(--primary-color-dark-rgb), 0.2);
+    background-color: #218838;
 }
 
-[data-theme='dark'] .auth-form button[type="submit"]:hover {
-    background-color: var(--auth-button-hover-bg);
-    box-shadow: 0 6px 15px rgba(var(--primary-color-dark-rgb), 0.3);
+.auth-form button[type="submit"]:hover:not(:disabled) {
+    background-color: #218838;
+    transform: translateY(-2px);
 }
 
-/* --- Message Box (Success/Error) --- */
+[data-theme='dark'] .auth-form button[type="submit"]:hover:not(:disabled) {
+    background-color: #1e7e34;
+}
+
+.auth-form button[type="submit"]:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-theme='dark'] .theme-toggle-button {
+    background-color: #3a3f47;
+    border-color: #5a606b;
+    color: #f0f0f0;
+}
+
+.theme-toggle-button:hover {
+    background-color: #e2e6ea;
+}
+
+[data-theme='dark'] .theme-toggle-button:hover {
+    background-color: #4a4f59;
+}
+
+/* Messages */
 .message-box {
-    margin-top: 25px;
-    padding: 15px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-align: center;
-    animation: slideInUp 0.5s ease-out;
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
 }
 
 .message-box.success {
-    background-color: var(--auth-message-success-bg);
-    border: 1px solid var(--auth-message-success-border);
-    /* Assuming --success-color will be defined in App.css */
-    color: var(--success-color);
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
 }
 
 .message-box.error {
-    background-color: var(--auth-message-error-bg);
-    border: 1px solid var(--auth-message-error-border);
-    /* Assuming --error-color will be defined in App.css */
-    color: var(--error-color);
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
 }
 
-@keyframes slideInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Admin Specific */
+.admin-banner {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #ffc107;
+    color: #333;
+    border-radius: 5px;
+    font-weight: bold;
 }
 
-/* --- Responsive Adjustments for AuthForm --- */
-@media (max-width: 768px) {
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .modal {
+    background-color: #3a3f47;
+    color: #f0f0f0;
+}
+
+.modal h3 {
+    margin-top: 0;
+    color: #007bff;
+}
+
+[data-theme='dark'] .modal h3 {
+    color: #61dafb;
+}
+
+.modal-buttons button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 10px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+[data-theme='dark'] .modal-buttons button {
+    background-color: #61dafb;
+    color: #282c34;
+}
+
+.modal-buttons button:hover {
+    background-color: #0056b3;
+}
+
+[data-theme='dark'] .modal-buttons button:hover {
+    background-color: #38b1d6;
+}
+
+/* OTP Specific Styles */
+.otp-section {
+    margin-bottom: 15px;
+}
+
+.otp-input-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.otp-input {
+    flex-grow: 1;
+    text-align: center;
+    letter-spacing: 5px;
+}
+
+.verify-otp-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    white-space: nowrap; /* Prevent button text from wrapping */
+}
+
+[data-theme='dark'] .verify-otp-btn {
+    background-color: #61dafb;
+    color: #282c34;
+}
+
+.verify-otp-btn:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+[data-theme='dark'] .verify-otp-btn:hover:not(:disabled) {
+    background-color: #38b1d6;
+}
+
+.verify-otp-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.otp-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.resend-otp-btn,
+.change-email-btn {
+    background-color: #6c757d;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+[data-theme='dark'] .resend-otp-btn,
+[data-theme='dark'] .change-email-btn {
+    background-color: #5a606b;
+    color: #f0f0f0;
+}
+
+.resend-otp-btn:hover:not(:disabled),
+.change-email-btn:hover:not(:disabled) {
+    background-color: #5a6268;
+}
+
+[data-theme='dark'] .resend-otp-btn:hover:not(:disabled),
+[data-theme='dark'] .change-email-btn:hover:not(:disabled) {
+    background-color: #4a4f59;
+}
+
+.resend-otp-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.otp-instructions {
+    margin-top: 20px;
+    background-color: #e7f3ff;
+    border: 1px solid #cce5ff;
+    border-left: 5px solid #007bff;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: left;
+    font-size: 14px;
+    color: #004085;
+}
+
+[data-theme='dark'] .otp-instructions {
+    background-color: #2a3a4a;
+    border-color: #3d5f7f;
+    border-left-color: #61dafb;
+    color: #b3d4f5;
+}
+
+.otp-instructions p {
+    margin: 5px 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
     .auth-container {
-        margin-right: 0; /* Remove side margin */
-        padding: 30px;
-        max-width: 90%; /* Allow it to take more width */
-    }
-    .auth-container h2 {
-        font-size: 1.8em;
-    }
-    .tab button {
-        font-size: 1em;
-        padding: 10px 0;
-    }
-    .auth-form input,
-    .auth-form button[type="submit"] {
-        padding: 10px;
-        font-size: 0.95em;
+        padding: 20px;
+        margin: 10px;
     }
     .theme-toggle-button {
-        top: 15px;
-        right: 15px;
-        padding: 8px 14px;
-        font-size: 0.9em;
+        top: 10px;
+        right: 10px;
+        padding: 6px 12px;
+        font-size: 12px;
     }
-}
-
-@media (max-width: 480px) {
-    .auth-container {
-        padding: 25px;
+    .otp-input-container {
+        flex-direction: column;
+        align-items: stretch;
     }
-    .auth-container h2 {
-        font-size: 1.6em;
+    .verify-otp-btn {
+        width: 100%;
+        margin-top: 10px;
+    }
+    .otp-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .resend-otp-btn,
+    .change-email-btn {
+        width: 100%;
     }
 }
 /* Admin Modal Overlay and Modal */

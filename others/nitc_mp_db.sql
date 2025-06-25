@@ -113,8 +113,31 @@ CREATE TABLE nitc_mp_db.lost_found_items (
 ALTER TABLE nitc_mp_db.users
 ADD COLUMN role ENUM('user', 'admin') NOT NULL DEFAULT 'user';
 --@block
-desc users;
+desc nitc_mp_db.users;
 --@block
-ALTER TABLE users ADD COLUMN is_disabled BOOLEAN DEFAULT FALSE;
+ALTER TABLE nitc_mp_db.users ADD COLUMN is_disabled BOOLEAN DEFAULT FALSE;
 --@block
-ALTER TABLE items ADD COLUMN is_approved BOOLEAN DEFAULT FALSE;
+ALTER TABLE nitc_mp_db.items ADD COLUMN is_approved BOOLEAN DEFAULT FALSE;
+
+--@block
+UPDATE nitc_mp_db.users
+SET role = 'admin'
+WHERE email = 'chilakala_b230650cs@nitc.ac.in';
+
+----------------------------------------------------------------------------------------------------------------
+--@block
+CREATE TABLE IF NOT EXISTS nitc_mp_db.email_otp (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(100),
+    otp VARCHAR(6),
+    expires_at DATETIME
+);
+--@block
+select *FROM users limit 100;
+--@block
+UPDATE users
+SET password = NULL
+WHERE email = 'yangala_b231346cs@nitc.ac.in';
+
+--@block
+SELECT * from users where email='yangala_b231346cs@nitc.ac.in';

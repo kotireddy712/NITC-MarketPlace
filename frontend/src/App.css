@@ -1,351 +1,297 @@
-/* src/App.css */
-
-/* --- Global Styles & Theme Variables --- */
+/* ================= Global Theme Variables ================= */
 :root {
-    --primary-color: #007bff; /* Blue */
-    --secondary-color: #6c757d; /* Grey */
-    --success-color: #28a745; /* Green */
-    --error-color: #dc3545; /* Red */
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --error-color: #dc3545;
 
-    --background-color-light: #f0f2f5;
-    --text-color-light: #34495e;
-    --card-bg-light: #ffffff;
-    --border-color-light: #e0e6ed;
-    --input-bg-light: #ffffff;
-    --button-bg-light: #007bff;
-    --button-hover-bg-light: #0056b3;
-    --button-text-light: white;
-    --tab-active-bg-light: #007bff;
-    --tab-active-text-light: white;
-    --tab-inactive-bg-light: #e9ecef;
-    --tab-inactive-text-light: #495057;
+  --background-color-light: #f0f2f5;
+  --text-color-light: #34495e;
+  --card-bg-light: #ffffff;
+  --border-color-light: #e0e6ed;
+  --input-bg-light: #ffffff;
+  --button-bg-light: #007bff;
+  --button-hover-bg-light: #0056b3;
+  --button-text-light: #ffffff;
+  --tab-active-bg-light: #007bff;
+  --tab-active-text-light: #ffffff;
+  --tab-inactive-bg-light: #e9ecef;
+  --tab-inactive-text-light: #495057;
 
-    /* For AuthForm specific elements */
-    --auth-bg-color: rgba(255, 255, 255, 0.95); /* Slightly transparent white */
-    --auth-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    --auth-heading-color: #2c3e50;
-    --auth-input-border: #ced4da;
-    --auth-input-focus-border: #007bff;
-    --auth-button-bg: #007bff;
-    --auth-button-hover-bg: #0056b3;
-    --auth-button-text: white;
-    --auth-message-success-bg: #d4edda;
-    --auth-message-success-border: #c3e6cb;
-    --auth-message-error-bg: #f8d7da;
-    --auth-message-error-border: #f5c6cb;
-    --auth-toggle-btn-bg: #007bff;
-    --auth-toggle-btn-text: white;
-    --auth-toggle-btn-border: #007bff;
-    --auth-toggle-btn-hover-bg: #0056b3;
-
-    /* RGB values for box shadows (used in AuthForm.js) */
-    --primary-color-rgb: 0, 123, 255;
+  --auth-bg-color: rgba(255, 255, 255, 0.95);
+  --auth-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  --auth-heading-color: #2c3e50;
+  --auth-input-border: #ced4da;
+  --auth-input-focus-border: #007bff;
+  --auth-button-bg: #007bff;
+  --auth-button-hover-bg: #0056b3;
+  --auth-button-text: #ffffff;
+  --auth-message-success-bg: #d4edda;
+  --auth-message-success-border: #c3e6cb;
+  --auth-message-error-bg: #f8d7da;
+  --auth-message-error-border: #f5c6cb;
+  --auth-toggle-btn-bg: #007bff;
+  --auth-toggle-btn-text: #ffffff;
+  --auth-toggle-btn-border: #007bff;
+  --auth-toggle-btn-hover-bg: #0056b3;
+  --primary-color-rgb: 0, 123, 255;
 }
 
 [data-theme='dark'] {
-    --primary-color: #61dafb; /* Light blue */
-    --secondary-color: #bdc3c7; /* Lighter grey */
-    --success-color: #2ecc71; /* Darker green */
-    --error-color: #e74c3c; /* Darker red */
+  --primary-color: #61dafb;
+  --secondary-color: #bdc3c7;
+  --success-color: #2ecc71;
+  --error-color: #e74c3c;
 
-    --background-color-dark: #2c3e50;
-    --text-color-dark: #ecf0f1;
-    --card-bg-dark: #34495e;
-    --border-color-dark: #4a6375;
-    --input-bg-dark: #3a5061;
-    --button-bg-dark: #61dafb;
-    --button-hover-bg-dark: #21a1f1;
-    --button-text-dark: #2c3e50;
-    --tab-active-bg-dark: #61dafb;
-    --tab-active-text-dark: #2c3e50;
-    --tab-inactive-bg-dark: #4a6375;
-    --tab-inactive-text-dark: #ecf0f1;
+  --background-color-dark: #2c3e50;
+  --text-color-dark: #ecf0f1;
+  --card-bg-dark: #34495e;
+  --border-color-dark: #4a6375;
+  --input-bg-dark: #3a5061;
+  --button-bg-dark: #61dafb;
+  --button-hover-bg-dark: #21a1f1;
+  --button-text-dark: #2c3e50;
+  --tab-active-bg-dark: #61dafb;
+  --tab-active-text-dark: #2c3e50;
+  --tab-inactive-bg-dark: #4a6375;
+  --tab-inactive-text-dark: #ecf0f1;
 
-    /* For AuthForm specific elements */
-    --auth-bg-color: rgba(52, 73, 94, 0.95); /* Slightly transparent dark blue */
-    --auth-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    --auth-heading-color: #ecf0f1;
-    --auth-input-border: #4a6375;
-    --auth-input-focus-border: #61dafb;
-    --auth-button-bg: #61dafb;
-    --auth-button-hover-bg: #21a1f1;
-    --auth-button-text: #2c3e50;
-    --auth-message-success-bg: #2ecc71;
-    --auth-message-success-border: #27ae60;
-    --auth-message-error-bg: #e74c3c;
-    --auth-message-error-border: #c0392b;
-    --auth-toggle-btn-bg: #61dafb;
-    --auth-toggle-btn-text: #2c3e50;
-    --auth-toggle-btn-border: #61dafb;
-    --auth-toggle-btn-hover-bg: #21a1f1;
-
-    /* RGB values for box shadows (used in AuthForm.js) */
-    --primary-color-dark-rgb: 97, 218, 251;
+  --auth-bg-color: rgba(52, 73, 94, 0.95);
+  --auth-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --auth-heading-color: #ecf0f1;
+  --auth-input-border: #4a6375;
+  --auth-input-focus-border: #61dafb;
+  --auth-button-bg: #61dafb;
+  --auth-button-hover-bg: #21a1f1;
+  --auth-button-text: #2c3e50;
+  --auth-message-success-bg: #2ecc71;
+  --auth-message-success-border: #27ae60;
+  --auth-message-error-bg: #e74c3c;
+  --auth-message-error-border: #c0392b;
+  --auth-toggle-btn-bg: #61dafb;
+  --auth-toggle-btn-text: #2c3e50;
+  --auth-toggle-btn-border: #61dafb;
+  --auth-toggle-btn-hover-bg: #21a1f1;
+  --primary-color-dark-rgb: 97, 218, 251;
 }
 
-/* Apply theme variables */
+/* ================= Global Base ================= */
 body {
-    background-color: var(--background-color-light); /* Default light theme */
-    color: var(--text-color-light);
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    min-height: 100vh; /* Ensure full viewport height */
-    overflow-x: hidden; /* Prevent horizontal scroll */
+  background-color: var(--background-color-light);
+  color: var(--text-color-light);
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 [data-theme='dark'] body {
-    background-color: var(--background-color-dark);
-    color: var(--text-color-dark);
+  background-color: var(--background-color-dark);
+  color: var(--text-color-dark);
 }
 
-/* --- Global Background Container for AuthForm Page --- */
+/* ================= Layouts ================= */
 .app-background {
-    /* The actual background-image url() is set inline in AuthForm.js */
-    background-size: cover; /* Cover the entire area */
-    background-position: center; /* Center the image */
-    background-repeat: no-repeat;
-    background-attachment: fixed; /* Makes the background fixed while content scrolls (if any) */
-    min-height: 100vh;
-    display: flex;
-    justify-content: flex-end; /* Align content to the right */
-    align-items: center;
-    padding: 20px; /* Some padding from the edges */
-    box-sizing: border-box;
-    position: relative; /* For absolute positioning of children */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  position: relative;
 }
 
-/* --- Theme Toggle Button --- */
+/* ================= Theme Toggle ================= */
 .theme-toggle-button {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    padding: 10px 18px;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 2px solid var(--auth-toggle-btn-border);
-    background-color: var(--auth-toggle-btn-bg);
-    color: var(--auth-toggle-btn-text);
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 10px 18px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid var(--auth-toggle-btn-border);
+  background-color: var(--auth-toggle-btn-bg);
+  color: var(--auth-toggle-btn-text);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .theme-toggle-button:hover {
-    background-color: var(--auth-toggle-btn-hover-bg);
-    color: var(--button-text-color, white); /* Ensure text color changes on hover */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  background-color: var(--auth-toggle-btn-hover-bg);
+  color: var(--button-text-light);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
-[data-theme='dark'] .theme-toggle-button {
-    background-color: var(--auth-toggle-btn-bg);
-    color: var(--auth-toggle-btn-text);
-    border-color: var(--auth-toggle-btn-border);
-}
-
-
-/* --- Auth Container (Login/Signup Form Box) --- */
+/* ================= Auth Container ================= */
 .auth-container {
-    background-color: var(--auth-bg-color);
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: var(--auth-box-shadow);
-    width: 100%;
-    max-width: 400px; /* Fixed width for the form box */
-    text-align: center;
-    animation: slideInRight 0.8s ease-out; /* Animation for the form box */
-    margin-right: 5%; /* Pushes the form to the right, making image visible */
-    /* For smaller screens, center it */
-    @media (max-width: 768px) {
-        margin-right: auto;
-        margin-left: auto;
-    }
+  background-color: var(--auth-bg-color);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: var(--auth-box-shadow);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  animation: slideInRight 0.8s ease-out;
+  margin-right: 5%;
 }
 
 @keyframes slideInRight {
-    from { opacity: 0; transform: translateX(50px); }
-    to { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translateX(50px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
+/* ================= Auth Header ================= */
 .auth-container h2 {
-    font-size: 2.2em;
-    color: var(--auth-heading-color);
-    margin-bottom: 30px;
-    font-weight: 700;
+  font-size: 2.2em;
+  color: var(--auth-heading-color);
+  margin-bottom: 30px;
+  font-weight: 700;
 }
 
-/* --- Tab Buttons (Login/Signup) --- */
+/* ================= Tab Buttons ================= */
 .tab {
-    display: flex;
-    margin-bottom: 25px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  margin-bottom: 25px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .tab button {
-    flex: 1;
-    padding: 12px 0;
-    border: none;
-    background-color: var(--tab-inactive-bg-light);
-    color: var(--tab-inactive-text-light);
-    font-size: 1.1em;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  flex: 1;
+  padding: 12px 0;
+  border: none;
+  background-color: var(--tab-inactive-bg-light);
+  color: var(--tab-inactive-text-light);
+  font-size: 1.1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .tab button.active {
-    background-color: var(--tab-active-bg-light);
-    color: var(--tab-active-text-light);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  background-color: var(--tab-active-bg-light);
+  color: var(--tab-active-text-light);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-[data-theme='dark'] .tab button {
-    background-color: var(--tab-inactive-bg-dark);
-    color: var(--tab-inactive-text-dark);
-}
-
-[data-theme='dark'] .tab button.active {
-    background-color: var(--tab-active-bg-dark);
-    color: var(--tab-active-text-dark);
-}
-
-/* --- Form Inputs --- */
+/* ================= Form Inputs ================= */
 .auth-form input {
-    width: calc(100% - 24px); /* Account for padding */
-    padding: 12px;
-    margin-bottom: 18px;
-    border: 1px solid var(--auth-input-border);
-    border-radius: 8px;
-    font-size: 1em;
-    background-color: var(--input-bg-light);
-    color: var(--text-color-light);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 18px;
+  border: 1px solid var(--auth-input-border);
+  border-radius: 8px;
+  font-size: 1em;
+  background-color: var(--input-bg-light);
+  color: var(--text-color-light);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .auth-form input::placeholder {
-    color: var(--secondary-color);
-    opacity: 0.8;
+  color: var(--secondary-color);
+  opacity: 0.8;
 }
 
 .auth-form input:focus {
-    outline: none;
-    border-color: var(--auth-input-focus-border);
-    /* Using RGB variables for shadow, ensure they are defined in :root for light/dark theme */
-    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.25);
+  outline: none;
+  border-color: var(--auth-input-focus-border);
+  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.25);
 }
 
-[data-theme='dark'] .auth-form input {
-    background-color: var(--input-bg-dark);
-    color: var(--text-color-dark);
-    border-color: var(--auth-input-border);
-}
-
-/* --- Form Submit Button --- */
+/* ================= Submit Button ================= */
 .auth-form button[type="submit"] {
-    background-color: var(--auth-button-bg);
-    color: var(--auth-button-text);
-    padding: 14px 25px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1.1em;
-    font-weight: 600;
-    width: 100%;
-    margin-top: 10px;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+  background-color: var(--auth-button-bg);
+  color: var(--auth-button-text);
+  padding: 14px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1em;
+  font-weight: 600;
+  width: 100%;
+  margin-top: 10px;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
 }
 
 .auth-form button[type="submit"]:hover {
-    background-color: var(--auth-button-hover-bg);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+  background-color: var(--auth-button-hover-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
 }
 
-.auth-form button[type="submit"]:active {
-    transform: translateY(0);
-}
-
-[data-theme='dark'] .auth-form button[type="submit"] {
-    background-color: var(--auth-button-bg);
-    color: var(--auth-button-text);
-    /* Using RGB variables for shadow, ensure they are defined in :root for dark theme */
-    box-shadow: 0 4px 10px rgba(var(--primary-color-dark-rgb), 0.2);
-}
-
-[data-theme='dark'] .auth-form button[type="submit"]:hover {
-    background-color: var(--auth-button-hover-bg);
-    box-shadow: 0 6px 15px rgba(var(--primary-color-dark-rgb), 0.3);
-}
-
-
-/* --- Message Box (Success/Error) --- */
+/* ================= Message Boxes ================= */
 .message-box {
-    margin-top: 25px;
-    padding: 15px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-align: center;
-    animation: slideInUp 0.5s ease-out;
-}
-
-.message-box.success {
-    background-color: var(--auth-message-success-bg);
-    border: 1px solid var(--auth-message-success-border);
-    color: var(--success-color);
-}
-
-.message-box.error {
-    background-color: var(--auth-message-error-bg);
-    border: 1px solid var(--auth-message-error-border);
-    color: var(--error-color);
+  margin-top: 25px;
+  padding: 15px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+  animation: slideInUp 0.5s ease-out;
 }
 
 @keyframes slideInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- Responsive Adjustments for AuthForm --- */
+.message-box.success {
+  background-color: var(--auth-message-success-bg);
+  border: 1px solid var(--auth-message-success-border);
+  color: var(--success-color);
+}
+
+.message-box.error {
+  background-color: var(--auth-message-error-bg);
+  border: 1px solid var(--auth-message-error-border);
+  color: var(--error-color);
+}
+
+/* ================= Responsive ================= */
 @media (max-width: 768px) {
-    .app-background {
-        justify-content: center; /* Center the form on smaller screens */
-        padding: 15px;
-    }
-    .auth-container {
-        margin-right: 0; /* Remove side margin */
-        padding: 30px;
-        max-width: 90%; /* Allow it to take more width */
-    }
-    .auth-container h2 {
-        font-size: 1.8em;
-    }
-    .tab button {
-        font-size: 1em;
-        padding: 10px 0;
-    }
-    .auth-form input,
-    .auth-form button[type="submit"] {
-        padding: 10px;
-        font-size: 0.95em;
-    }
-    .theme-toggle-button {
-        top: 15px;
-        right: 15px;
-        padding: 8px 14px;
-        font-size: 0.9em;
-    }
+  .app-background {
+    justify-content: center;
+    padding: 15px;
+  }
+  .auth-container {
+    margin-right: 0;
+    padding: 30px;
+    max-width: 90%;
+  }
+  .auth-container h2 {
+    font-size: 1.8em;
+  }
+  .tab button {
+    font-size: 1em;
+    padding: 10px 0;
+  }
+  .auth-form input,
+  .auth-form button[type="submit"] {
+    padding: 10px;
+    font-size: 0.95em;
+  }
+  .theme-toggle-button {
+    top: 15px;
+    right: 15px;
+    padding: 8px 14px;
+    font-size: 0.9em;
+  }
 }
 
 @media (max-width: 480px) {
-    .auth-container {
-        padding: 25px;
-    }
-    .auth-container h2 {
-        font-size: 1.6em;
-    }
+  .auth-container {
+    padding: 25px;
+  }
+  .auth-container h2 {
+    font-size: 1.6em;
+  }
 }
