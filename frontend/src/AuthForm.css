@@ -1,209 +1,87 @@
-/* General Styling */
-body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-        sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background-color: #f0f2f5; /* Light background */
-    color: #333;
-}
+/* authform.css */
 
-[data-theme='dark'] body {
-    background-color: #282c34; /* Dark background */
-    color: #f0f0f0;
-}
-
-.app-background {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-size: cover;
-    background-position: center;
-    position: relative;
-}
-
+/* --- Auth Container (Login/Signup Form Box) --- */
 .auth-container {
-    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white */
+    background-color: var(--auth-container-bg);
     padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    text-align: center;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(var(--auth-box-shadow-rgb), 0.2);
+    width: 100%;
     max-width: 400px;
-    width: 90%;
-    backdrop-filter: blur(5px); /* Optional: Frosted glass effect */
-    -webkit-backdrop-filter: blur(5px); /* For Safari */
+    text-align: center;
+    backdrop-filter: blur(8px); /* Modern frosted glass effect */
+    -webkit-backdrop-filter: blur(8px);
+    animation: slideInRight var(--transition-medium) ease-out; /* Slide in animation */
+    margin-right: 5%; /* Pushes the form to the right for background visibility */
 }
 
+/* Dark mode specific adjustments for shadow and background */
 [data-theme='dark'] .auth-container {
-    background-color: rgba(40, 44, 52, 0.9); /* Darker transparent background */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 10px 30px rgba(var(--auth-box-shadow-rgb), 0.4);
 }
 
-h2 {
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.auth-container h2 {
+    font-size: 2.4em;
+    color: var(--primary-color); /* Matches primary theme color */
     margin-bottom: 30px;
-    color: #007bff;
+    font-weight: 700;
 }
 
-[data-theme='dark'] h2 {
-    color: #61dafb; /* A lighter blue for dark mode */
-}
-
-/* Tab buttons for Login/Signup */
+/* --- Tab Buttons (Login/Signup) --- */
 .tab {
     display: flex;
     justify-content: center;
     margin-bottom: 25px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: inset 0 0 5px rgba(var(--auth-box-shadow-rgb), 0.1);
 }
 
 .tab button {
-    background-color: #e9ecef;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 5px;
-    margin: 0 5px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    color: #555;
-}
-
-[data-theme='dark'] .tab button {
-    background-color: #3a3f47;
-    color: #ccc;
+    flex: 1;
+    padding: 12px 0;
+    background-color: var(--tab-inactive-bg);
+    color: var(--tab-inactive-text);
+    font-size: 1.1em;
+    font-weight: 500;
 }
 
 .tab button.active {
-    background-color: #007bff;
-    color: white;
-    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+    background-color: var(--tab-active-bg);
+    color: var(--tab-active-text);
+    box-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.3);
 }
 
-[data-theme='dark'] .tab button.active {
-    background-color: #61dafb;
-    color: #282c34;
-    box-shadow: 0 2px 8px rgba(97, 218, 251, 0.3);
+/* --- Form Inputs (inherits global input styles, but can override) --- */
+.auth-form input {
+    width: calc(100% - 24px); /* Account for padding from global input */
+    margin-bottom: 18px;
 }
 
-/* Form fields */
-.auth-form input[type="email"],
-.auth-form input[type="password"],
-.auth-form input[type="text"] {
-    width: calc(100% - 20px);
-    padding: 12px 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-    box-sizing: border-box; /* Include padding in width */
-}
-
-[data-theme='dark'] .auth-form input {
-    background-color: #4a4f59;
-    border-color: #5a606b;
-    color: #f0f0f0;
-}
-
-.auth-form input::placeholder {
-    color: #888;
-}
-
-[data-theme='dark'] .auth-form input::placeholder {
-    color: #aaa;
-}
-
+/* --- Form Submit Button --- */
 .auth-form button[type="submit"] {
-    background-color: #28a745; /* Green for submit */
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 18px;
+    background-color: var(--button-success-bg); /* Use accent color for auth submit */
+    color: var(--button-text-color);
+    padding: 14px 25px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
     width: 100%;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-[data-theme='dark'] .auth-form button[type="submit"] {
-    background-color: #218838;
+    margin-top: 10px;
+    box-shadow: 0 4px 10px rgba(var(--accent-color-rgb), 0.2); /* Shadow with accent color */
 }
 
 .auth-form button[type="submit"]:hover:not(:disabled) {
-    background-color: #218838;
-    transform: translateY(-2px);
+    background-color: var(--button-success-hover-bg);
+    box-shadow: 0 6px 15px rgba(var(--accent-color-rgb), 0.3);
 }
 
-[data-theme='dark'] .auth-form button[type="submit"]:hover:not(:disabled) {
-    background-color: #1e7e34;
-}
-
-.auth-form button[type="submit"]:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
-
-/* Theme Toggle Button */
-.theme-toggle-button {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    padding: 8px 15px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #333;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-[data-theme='dark'] .theme-toggle-button {
-    background-color: #3a3f47;
-    border-color: #5a606b;
-    color: #f0f0f0;
-}
-
-.theme-toggle-button:hover {
-    background-color: #e2e6ea;
-}
-
-[data-theme='dark'] .theme-toggle-button:hover {
-    background-color: #4a4f59;
-}
-
-/* Messages */
-.message-box {
-    margin-top: 20px;
-    padding: 10px;
-    border-radius: 5px;
-    font-weight: bold;
-}
-
-.message-box.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.message-box.error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-/* Admin Specific */
-.admin-banner {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #ffc107;
-    color: #333;
-    border-radius: 5px;
-    font-weight: bold;
-}
-
+/* --- Modal Styles --- */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -215,56 +93,41 @@ h2 {
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    backdrop-filter: blur(3px); /* Subtle blur for modal overlay */
 }
 
 .modal {
-    background: white;
+    background: var(--modal-background);
     padding: 30px;
-    border-radius: 10px;
+    border-radius: 15px;
     text-align: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme='dark'] .modal {
-    background-color: #3a3f47;
-    color: #f0f0f0;
+    box-shadow: var(--shadow-medium);
+    transition: background-color var(--transition-medium), color var(--transition-medium);
 }
 
 .modal h3 {
     margin-top: 0;
-    color: #007bff;
-}
-
-[data-theme='dark'] .modal h3 {
-    color: #61dafb;
+    color: var(--primary-color);
+    font-size: 1.8em;
+    margin-bottom: 20px;
 }
 
 .modal-buttons button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 0 10px;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
+    background-color: var(--button-primary-bg);
+    color: var(--button-text-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin: 0 8px;
+    font-size: 1em;
+    box-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.2);
 }
 
-[data-theme='dark'] .modal-buttons button {
-    background-color: #61dafb;
-    color: #282c34;
+.modal-buttons button:hover:not(:disabled) {
+    background-color: var(--button-primary-hover-bg);
+    box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
 }
 
-.modal-buttons button:hover {
-    background-color: #0056b3;
-}
-
-[data-theme='dark'] .modal-buttons button:hover {
-    background-color: #38b1d6;
-}
-
-/* OTP Specific Styles */
+/* --- OTP Specific Styles --- */
 .otp-section {
     margin-bottom: 15px;
 }
@@ -280,111 +143,74 @@ h2 {
     flex-grow: 1;
     text-align: center;
     letter-spacing: 5px;
+    font-weight: bold;
 }
 
 .verify-otp-btn {
-    background-color: #007bff;
-    color: white;
+    background-color: var(--button-primary-bg);
+    color: var(--button-text-color);
     padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-    white-space: nowrap; /* Prevent button text from wrapping */
-}
-
-[data-theme='dark'] .verify-otp-btn {
-    background-color: #61dafb;
-    color: #282c34;
+    border-radius: 8px;
+    font-size: 1em;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.2);
 }
 
 .verify-otp-btn:hover:not(:disabled) {
-    background-color: #0056b3;
-}
-
-[data-theme='dark'] .verify-otp-btn:hover:not(:disabled) {
-    background-color: #38b1d6;
-}
-
-.verify-otp-btn:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
+    background-color: var(--button-primary-hover-bg);
+    box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
 }
 
 .otp-actions {
     display: flex;
     justify-content: space-between;
     margin-top: 10px;
+    gap: 10px; /* Add gap for spacing between buttons */
 }
 
 .resend-otp-btn,
 .change-email-btn {
-    background-color: #6c757d;
-    color: white;
+    background-color: var(--button-secondary-bg);
+    color: var(--button-text-color);
     padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-}
-
-[data-theme='dark'] .resend-otp-btn,
-[data-theme='dark'] .change-email-btn {
-    background-color: #5a606b;
-    color: #f0f0f0;
+    border-radius: 8px;
+    font-size: 0.9em;
 }
 
 .resend-otp-btn:hover:not(:disabled),
 .change-email-btn:hover:not(:disabled) {
-    background-color: #5a6268;
-}
-
-[data-theme='dark'] .resend-otp-btn:hover:not(:disabled),
-[data-theme='dark'] .change-email-btn:hover:not(:disabled) {
-    background-color: #4a4f59;
-}
-
-.resend-otp-btn:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
+    background-color: var(--button-secondary-hover-bg);
 }
 
 .otp-instructions {
     margin-top: 20px;
-    background-color: #e7f3ff;
-    border: 1px solid #cce5ff;
-    border-left: 5px solid #007bff;
+    background-color: var(--otp-instruction-bg);
+    border: 1px solid var(--otp-instruction-bg);
+    border-left: 5px solid var(--primary-color);
     padding: 15px;
-    border-radius: 5px;
+    border-radius: 8px;
     text-align: left;
-    font-size: 14px;
-    color: #004085;
-}
-
-[data-theme='dark'] .otp-instructions {
-    background-color: #2a3a4a;
-    border-color: #3d5f7f;
-    border-left-color: #61dafb;
-    color: #b3d4f5;
+    font-size: 0.9em;
+    color: var(--otp-instruction-text);
+    transition: background-color var(--transition-medium), color var(--transition-medium), border-color var(--transition-medium);
 }
 
 .otp-instructions p {
     margin: 5px 0;
 }
 
-/* Responsive Adjustments */
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 30px;
+        margin: 20px; /* Center with margin auto on smaller screens */
+    }
+}
+
 @media (max-width: 600px) {
     .auth-container {
         padding: 20px;
         margin: 10px;
-    }
-    .theme-toggle-button {
-        top: 10px;
-        right: 10px;
-        padding: 6px 12px;
-        font-size: 12px;
     }
     .otp-input-container {
         flex-direction: column;
@@ -403,3 +229,71 @@ h2 {
         width: 100%;
     }
 }
+
+/* Existing CSS (keep your current styles) */
+/* ... */
+
+/* --- Updated Styles for Owl Animation --- */
+
+.auth-container {
+    position: relative;
+    /* ... existing styles ... */
+}
+
+.owl-emoji {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    top: -90px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    transition: all 0.3s ease-in-out; /* Smooth general transitions */
+}
+
+.owl-eye .eyelid {
+    transition: transform 0.3s ease-out; /* Smooth eyelid movement */
+    transform-origin: center; /* Important for rotation */
+}
+
+/* Initial state and when password is being entered: eyes closed */
+.owl-eyes-closed .eyelid-top {
+    transform: rotateX(0deg); /* Eyelids cover eyes */
+}
+.owl-eyes-closed .eyelid-bottom {
+    transform: rotateX(0deg); /* Eyelids cover eyes */
+}
+.owl-eyes-closed .eye-pupil {
+    opacity: 0; /* Hide pupils when eyes are closed */
+    transition: opacity 0.3s;
+}
+
+
+/* State: eyes open (when typing email) */
+.owl-eyes-open .eyelid-top {
+    transform: rotateX(90deg); /* Rotate to open */
+}
+.owl-eyes-open .eyelid-bottom {
+    transform: rotateX(-90deg); /* Rotate to open */
+}
+.owl-eyes-open .eye-pupil {
+    opacity: 1;
+    transition: opacity 0.3s 0.1s; /* Slight delay for pupil fade-in */
+}
+
+/* Remove the 'looking' animation if you want just closed/open */
+/* If you want a slight movement when open, you can add an animation to owl-eyes-open */
+/*
+.owl-eyes-open {
+    animation: owl-subtle-blink 4s infinite ease-in-out;
+}
+
+@keyframes owl-subtle-blink {
+    0%, 20%, 40%, 100% {
+        transform: translateX(-50%) rotateZ(0deg);
+    }
+    10%, 30% {
+        transform: translateX(-50%) rotateZ(1deg); // Subtle tilt
+    }
+}
+*/

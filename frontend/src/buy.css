@@ -1,123 +1,128 @@
-src/Buy.css */
+/* src/Buy.css */
 
 .buy-page-container {
     max-width: 1200px;
     margin: 40px auto;
-    padding: 20px;
-    background-color: var(--background-color); /* Use theme variable if available */
-    color: var(--text-color); /* Use theme variable if available */
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px; /* Increased padding */
+    background-color: var(--card-background); /* Use card background */
+    color: var(--text-color);
+    border-radius: 15px; /* Consistent border-radius */
+    box-shadow: var(--shadow-medium); /* Consistent shadow */
     text-align: center;
 }
 
 .buy-page-container h2 {
-    color: var(--primary-color); /* Or just a standard color */
-    margin-bottom: 30px;
+    color: var(--primary-color);
+    margin-bottom: 35px; /* More space below heading */
+    font-size: 2.2em;
 }
 
 .category-selection {
     margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; /* Allow wrapping */
+    gap: 15px;
 }
 
 .category-selection label {
     font-size: 1.1em;
-    margin-right: 10px;
-    font-weight: bold;
+    font-weight: 600;
+    color: var(--heading-color);
 }
 
 .category-selection select {
     padding: 10px 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 8px; /* Consistent border-radius */
+    background-color: var(--input-background);
     color: var(--text-color);
     font-size: 1em;
-    cursor: pointer;
-    min-width: 200px;
+    min-width: 220px; /* Slightly wider */
 }
 
-.category-selection select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
+/* --- Message States (Loading, Error, No Items) --- */
 .loading-message,
 .error-message,
 .no-items-message {
     font-size: 1.1em;
     padding: 20px;
-    margin-top: 20px;
-    border-radius: 5px;
+    margin-top: 25px;
+    border-radius: 10px; /* Larger radius for messages */
+    font-weight: 500;
 }
 
 .loading-message {
-    color: #007bff;
-    background-color: #e6f7ff;
+    color: var(--primary-color);
+    background-color: #e6f7ff; /* Light blue tint */
+}
+[data-theme='dark'] .loading-message {
+    background-color: #004085;
 }
 
 .error-message {
-    color: #dc3545;
-    background-color: #ffe6e6;
+    color: var(--danger-color);
+    background-color: #ffe6e6; /* Light red tint */
+}
+[data-theme='dark'] .error-message {
+    background-color: #721c24;
 }
 
 .no-items-message {
-    color: #6c757d;
-    background-color: #f8f9fa;
+    color: var(--text-color-secondary);
+    background-color: var(--medium-light-grey); /* Lighter grey tint */
+}
+[data-theme='dark'] .no-items-message {
+    background-color: var(--medium-grey);
 }
 
+/* --- Items Grid --- */
 .items-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Slightly larger min-width */
+    gap: 30px; /* Increased gap */
     padding: 20px 0;
 }
 
+/* --- Item Card --- */
 .item-card {
-    background-color: var(--card-bg); /* Use theme variable for card background */
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    @extend .card-base; /* Inherit global card styles */
+    padding: 25px; /* Increased padding */
     text-align: left;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.item-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 .item-image {
     width: 100%;
-    height: 200px;
+    height: 220px; /* Slightly taller images */
     object-fit: cover;
     border-radius: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 18px;
 }
 
 .item-title {
-    font-size: 1.4em;
+    font-size: 1.5em; /* Larger title */
     margin-bottom: 10px;
     color: var(--heading-color);
+    font-weight: 600;
 }
 
 .item-description {
     font-size: 0.95em;
     color: var(--text-color-secondary);
-    margin-bottom: 10px;
-    flex-grow: 1; /* Allows description to take up available space */
+    margin-bottom: 12px;
+    flex-grow: 1;
+    line-height: 1.5;
 }
 
 .item-price {
-    font-size: 1.2em;
+    font-size: 1.3em; /* Larger price */
     font-weight: bold;
-    color: #28a745; /* Green for price */
-    margin-bottom: 5px;
+    color: var(--accent-color); /* Use accent color for price */
+    margin-bottom: 8px;
 }
 
 .item-quantity,
@@ -127,133 +132,115 @@ src/Buy.css */
 .item-posted-date {
     font-size: 0.9em;
     color: var(--text-color-secondary);
-    margin-bottom: 3px;
+    margin-bottom: 5px;
+    line-height: 1.4;
 }
-
-.buy-now-button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    margin-top: 15px;
-    width: 100%;
-    transition: background-color 0.2s;
-}
-
-.buy-now-button:hover {
-    background-color: #0056b3;
-}
-
-.back-to-dashboard-button {
-    background-color: #6c757d;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    margin-top: 30px;
-    transition: background-color 0.2s;
-}
-
-.back-to-dashboard-button:hover {
-    background-color: #5a6268;
-}
-
-/* Basic theme variables if you have them in App.css or index.css */
-/* Example:
-:root {
-    --background-color: #f4f7f6;
-    --text-color: #333;
-    --primary-color: #007bff;
-    --border-color: #e0e0e0;
-    --input-bg: #fff;
-    --card-bg: #fff;
-    --heading-color: #2c3e50;
-    --text-color-secondary: #555;
-}
-
-[data-theme='dark'] {
-    --background-color: #2c3e50;
-    --text-color: #f4f7f6;
-    --primary-color: #61dafb;
-    --border-color: #4a6375;
-    --input-bg: #3a5061;
-    --card-bg: #34495e;
-    --heading-color: #ecf0f1;
-    --text-color-secondary: #bdc3c7;
-}
-/* src/Buy.css */
-
-/* ... (previous styles) ... */
 
 .item-sold-status {
-    font-size: 0.9em;
+    font-size: 1em; /* Larger status text */
     font-weight: bold;
     margin-bottom: 10px;
+    color: var(--danger-color); /* Red for SOLD status */
 }
 
 .item-card.sold-item {
-    opacity: 0.7; /* Visually dim sold items */
-    border: 1px dashed var(--border-color-alt); /* Optional: dashed border */
+    opacity: 0.6; /* More prominent dimming */
+    border: 2px dashed var(--border-color); /* Dashed border for sold items */
 }
 
-.item-card.sold-item .item-sold-status {
-    color: #dc3545; /* Red for SOLD status */
+/* --- Buttons for Item Card --- */
+.buy-now-button {
+    background-color: var(--button-primary-bg);
+    color: var(--button-text-color);
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 1em;
+    margin-top: 20px; /* More space */
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(var(--primary-color-rgb), 0.2);
+}
+
+.buy-now-button:hover:not(:disabled) {
+    background-color: var(--button-primary-hover-bg);
+    box-shadow: 0 6px 15px rgba(var(--primary-color-rgb), 0.3);
 }
 
 .contact-seller-button {
-    background-color: #28a745; /* Green color for contact */
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.95em;
+    background-color: var(--button-success-bg);
+    color: var(--button-text-color);
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 1em;
     margin-top: 15px;
     width: 100%;
-    transition: background-color 0.2s;
+    box-shadow: 0 4px 10px rgba(var(--accent-color-rgb), 0.2);
 }
 
-.contact-seller-button:hover {
-    background-color: #218838;
+.contact-seller-button:hover:not(:disabled) {
+    background-color: var(--button-success-hover-bg);
+    box-shadow: 0 6px 15px rgba(var(--accent-color-rgb), 0.3);
 }
 
+/* --- Contact Details Box --- */
 .contact-details {
-    margin-top: 15px;
-    padding: 10px;
-    background-color: var(--details-bg); /* Use a lighter background for details */
-    border: 1px solid var(--details-border);
-    border-radius: 5px;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--medium-light-grey); /* Lighter background for details */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     font-size: 0.9em;
     text-align: center;
+    transition: background-color var(--transition-medium);
+}
+[data-theme='dark'] .contact-details {
+    background-color: var(--medium-grey);
+    border-color: var(--medium-grey);
 }
 
 .contact-details h4 {
     margin-top: 0;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     color: var(--heading-color);
+    font-size: 1.1em;
 }
 
 .contact-details p {
-    margin: 3px 0;
+    margin: 4px 0;
     color: var(--text-color-secondary);
 }
 
-/* Add these variables to your :root and [data-theme='dark'] in App.css or similar */
-/*
-:root {
-    --border-color-alt: #bbb;
-    --details-bg: #e9ecef;
-    --details-border: #ced4da;
+/* --- Back to Dashboard Button --- */
+.back-to-dashboard-button {
+    background-color: var(--button-secondary-bg);
+    color: var(--button-text-color);
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1em;
+    margin-top: 40px;
+    display: inline-block;
 }
 
-[data-theme='dark'] {
-    --border-color-alt: #666;
-    --details-bg: #4a5c6c;
-    --details-border: #607d8b;
+.back-to-dashboard-button:hover:not(:disabled) {
+    background-color: var(--button-secondary-hover-bg);
 }
-*/
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .buy-page-container {
+        padding: 20px;
+        margin: 30px 15px;
+    }
+    .buy-page-container h2 {
+        font-size: 1.8em;
+    }
+    .items-grid {
+        grid-template-columns: 1fr; /* Stack items on small screens */
+        gap: 20px;
+    }
+    .item-card {
+        padding: 20px;
+    }
+    .item-title {
+        font-size: 1.3em;
+    }
+}

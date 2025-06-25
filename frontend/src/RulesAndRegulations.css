@@ -16,6 +16,35 @@
   margin-bottom: 30px;
 }
 
+.important-warning {
+  color: red;
+  font-weight: bold;
+  background-color: #ffebee; /* Optional: a light red background */
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  border: 1px solid #e57373; /* Optional: a light red border */
+}
+
+.important-warning strong {
+  color: red;
+}
+
+.caution-notice {
+  color: #E67E22; /* A nice orange color */
+  font-weight: bold;
+  background-color: #FEF5E7; /* Optional: a light orange/yellow background */
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 15px; /* Space above the caution */
+  margin-bottom: 20px; /* Space below the caution */
+  border: 1px solid #F39C12; /* Optional: a light orange border */
+}
+
+.caution-notice strong {
+  color: #D35400; /* A slightly darker orange for the strong text within, or use #E67E22 to match */
+}
+
 .rules-content h2 {
   color: #004085; /* Darker blue for subheadings */
   margin-top: 25px;
@@ -71,62 +100,12 @@
   .rules-content h2 {
     font-size: 1.2em;
   }
-}
-/* src/components/RulesAndRegulations.css */
-
-/* ... (your existing styles for .rules-container, h1, .important-warning, h2, etc.) ... */
-
-.important-warning {
-  color: red;
-  font-weight: bold;
-  background-color: #ffebee; /* Optional: a light red background */
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-  border: 1px solid #e57373; /* Optional: a light red border */
-}
-
-.important-warning strong {
-    color: red;
-}
-
-/* ✅ ADDED STYLE FOR THE NEW CAUTION TEXT */
-.caution-notice {
-  color: #E67E22; /* A nice orange color */
-  font-weight: bold;
-  background-color: #FEF5E7; /* Optional: a light orange/yellow background */
-  padding: 10px;
-  border-radius: 4px;
-  margin-top: 15px; /* Space above the caution */
-  margin-bottom: 20px; /* Space below the caution */
-  border: 1px solid #F39C12; /* Optional: a light orange border */
-}
-
-.caution-notice strong {
-    color: #D35400; /* A slightly darker orange for the strong text within, or use #E67E22 to match */
-}
-
-
-.rules-content h2 {
-  color: #004085;
-  margin-top: 25px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 5px;
-}
-
-/* ... (rest of your CSS, including .rules-content p, li, ul, .back-button, media queries, etc.) ... */
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  /* ... (your existing responsive styles) ... */
 
   .important-warning {
     padding: 8px;
     font-size: 0.95em;
   }
 
-  /* ✅ ADDED RESPONSIVE STYLE FOR CAUTION */
   .caution-notice {
     padding: 8px;
     font-size: 0.95em;

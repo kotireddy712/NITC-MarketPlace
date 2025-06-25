@@ -1,148 +1,205 @@
 /* src/MyListings.css */
 .my-listings-container {
-    padding: 20px;
-    max-width: 1200px; /* Maximum width for the entire listings section */
-    margin: 20px auto; /* Center the container */
-    font-family: sans-serif;
+  padding: 20px;
+  max-width: 1200px; /* Maximum width for the entire listings section */
+  margin: 20px auto; /* Center the container */
+  font-family: 'Inter', sans-serif; /* Consistent font-family */
+  color: #333; /* Consistent text color */
 }
 
 .my-listings-container h2 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 30px;
+  text-align: center;
+  color: #2c3e50; /* Consistent title color */
+  margin-bottom: 30px;
+  font-size: 2.2em; /* Slightly larger title */
+  font-weight: 700;
 }
 
-.loading-message, .error-message {
-    text-align: center;
-    font-size: 1.2em;
-    padding: 20px;
+.loading-message,
+.error-message {
+  text-align: center;
+  font-size: 1.2em;
+  padding: 20px;
+  margin-bottom: 20px; /* Add margin for consistency */
+  border-radius: 8px; /* Rounded corners for messages */
 }
 
 .error-message {
-    color: red;
+  color: #721c24; /* Consistent error text color */
+  background-color: #f8d7da; /* Consistent error background */
+  border: 1px solid #f5c6cb; /* Consistent error border */
 }
 
 /* --- GRID CONTAINER FOR THE LISTING CARDS --- */
 .listings-grid {
-    display: grid; /* This is crucial for the grid layout */
-    /* This creates responsive columns:
+  display: grid; /* This is crucial for the grid layout */
+  /* This creates responsive columns:
        - 'auto-fill': Fills the row with as many columns as possible.
        - 'minmax(280px, 1fr)': Each column (card) will be at least 280px wide.
-                                If there's extra space, columns will expand equally (1fr).
-    */
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px; /* Space between the cards */
+                               If there's extra space, columns will expand equally (1fr).
+  */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px; /* Slightly increased space between the cards for better visual separation */
 }
 
 /* --- INDIVIDUAL LISTING CARD STYLING --- */
 .listing-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    /* Flexbox for INTERNAL layout of the card (image over text over buttons) */
-    display: flex;
-    flex-direction: column; /* Stacks card content vertically (image, then text, then actions) */
+  border: 1px solid #e0e0e0; /* Softer border color */
+  border-radius: 10px; /* More rounded corners */
+  padding: 20px; /* Increased padding */
+  background-color: #ffffff; /* Explicit white background */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Softer shadow */
+  /* Flexbox for INTERNAL layout of the card (image over text over buttons) */
+  display: flex;
+  flex-direction: column; /* Stacks card content vertically (image, then text, then actions) */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Add transition for hover */
+}
+
+.listing-card:hover {
+  transform: translateY(-5px); /* Lift card on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* More pronounced shadow on hover */
 }
 
 .listing-image {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-bottom: 10px;
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px; /* More rounded image corners */
+  margin-bottom: 15px; /* Increased margin below image */
+  border: 1px solid #eee; /* Light border for images */
 }
 
 .listing-card h3 {
-    margin-top: 0;
-    margin-bottom: 8px;
-    font-size: 1.3em;
-    color: #0056b3;
+  margin-top: 0;
+  margin-bottom: 10px; /* Consistent margin */
+  font-size: 1.6em; /* Larger, more prominent title */
+  color: #34495e; /* Consistent heading color */
+  font-weight: 600;
 }
 
 .listing-card p {
-    margin: 4px 0;
-    font-size: 0.95em;
-    color: #555;
-    /* flex-grow: 1; /* Allows text content to take up available space if cards have varying text length */
+  margin: 4px 0;
+  font-size: 0.95em;
+  color: #555;
+  line-height: 1.5; /* Improved readability */
+  flex-grow: 1; /* Allows text content to take up available space if cards have varying text length */
 }
 
 .status-sold {
-    color: #d9534f; /* Red for sold */
-    font-weight: bold;
+  color: #dc3545; /* Consistent red for "sold" */
+  font-weight: bold;
 }
 
 .status-available {
-    color: #5cb85c; /* Green for available */
-    font-weight: bold;
+  color: #28a745; /* Consistent green for "available" */
+  font-weight: bold;
 }
 
 .listing-actions {
-    margin-top: auto; /* Pushes buttons to the bottom of the card */
-    padding-top: 10px; /* Space above buttons */
-    display: flex;
-    flex-direction: column; /* Stack buttons vertically INSIDE the card */
-    gap: 8px; /* Space between buttons within the card */
+  margin-top: auto; /* Pushes buttons to the bottom of the card */
+  padding-top: 15px; /* More space above buttons */
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically INSIDE the card */
+  gap: 10px; /* Consistent space between buttons within the card */
 }
 
 .listing-actions button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.2s ease;
+  padding: 12px 15px; /* Slightly larger padding for buttons */
+  border: none;
+  border-radius: 8px; /* More rounded buttons */
+  cursor: pointer;
+  font-size: 1em; /* Slightly larger font for buttons */
+  transition: background-color 0.3s ease, transform 0.1s ease; /* Consistent transition */
+  font-weight: 500; /* Medium font weight */
 }
 
 .status-toggle-button {
-    background-color: #f0ad4e; /* Orange */
-    color: white;
+  background-color: #ffc107; /* Consistent orange/yellow for actions */
+  color: #333; /* Darker text for contrast on yellow */
 }
 .status-toggle-button:hover {
-    background-color: #ec971f;
+  background-color: #e0a800;
 }
 
 .delete-button {
-    background-color: #d9534f; /* Red */
-    color: white;
+  background-color: #dc3545; /* Consistent red */
+  color: white;
 }
 .delete-button:hover {
-    background-color: #c9302c;
+  background-color: #c82333;
+}
+
+.listing-actions button:active {
+  transform: translateY(1px); /* Consistent active state */
 }
 
 .back-dashboard-button {
-    display: block; /* Make it a block to center with margin auto */
-    width: fit-content; /* Adjust width to content */
-    margin: 30px auto 10px; /* Center horizontally, add space */
-    padding: 12px 25px;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    text-align: center;
-    border: none;
-    cursor: pointer;
+  display: block; /* Make it a block to center with margin auto */
+  width: fit-content; /* Adjust width to content */
+  margin: 40px auto 20px; /* Increased top margin, consistent bottom margin */
+  padding: 14px 25px; /* Larger padding for the main back button */
+  background-color: #6c757d; /* Consistent grey for back button */
+  color: white;
+  text-decoration: none;
+  border-radius: 8px; /* Consistent border radius */
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  font-size: 1.05em; /* Slightly larger font for the main back button */
+  transition: background-color 0.3s ease; /* Consistent transition */
 }
 .back-dashboard-button:hover {
-    background-color: #0056b3;
+  background-color: #5a6268;
 }
 
 .message-box {
-    padding: 12px 20px;
-    margin: 15px 0;
-    border-radius: 5px;
-    font-weight: 600;
+  padding: 12px 20px;
+  margin: 15px 0;
+  border-radius: 8px; /* Consistent border radius */
+  font-weight: 500; /* Consistent font weight */
+  text-align: center; /* Center align messages */
 }
 
 .message-box.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
 }
 
-.message-box.error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .my-listings-container {
+    padding: 15px;
+    margin: 15px auto;
+  }
+
+  .my-listings-container h2 {
+    font-size: 1.8em;
+  }
+
+  .listings-grid {
+    grid-template-columns: 1fr; /* Single column layout */
+    gap: 20px; /* Slightly reduced gap for smaller screens */
+  }
+
+  .listing-card {
+    padding: 15px;
+    width: 95%; /* Adjust width for better fit on small screens */
+    margin: 0 auto; /* Center cards */
+  }
+
+  .listing-image {
+    height: 150px; /* Slightly smaller image height */
+  }
+
+  .listing-actions button {
+    padding: 10px 12px; /* Adjust button padding */
+    font-size: 0.95em;
+  }
+
+  .back-dashboard-button {
+    padding: 12px 20px;
+    font-size: 1em;
+    width: 90%; /* Wider button on small screens */
+  }
 }

@@ -1,17 +1,17 @@
 /* src/Dashboard.css */
 
-/* --- General Dashboard Container --- */
+/* --- Dashboard Container --- */
 .dashboard-container {
-    max-width: 1000px; /* Optimal reading width */
-    margin: 60px auto; /* More vertical space */
-    padding: 45px; /* Generous internal padding */
-    background-color: var(--dashboard-bg-color, #ffffff);
-    color: var(--text-color, #333);
+    max-width: 1000px;
+    margin: 60px auto;
+    padding: 45px;
+    background-color: var(--card-background); /* Use card background variable */
+    color: var(--text-color);
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-medium); /* Use medium shadow */
     text-align: center;
     font-family: 'Poppins', sans-serif;
-    animation: fadeInScale 0.8s ease-out;
+    animation: fadeInScale var(--transition-medium) ease-out;
 }
 
 @keyframes fadeInScale {
@@ -22,11 +22,11 @@
 /* --- Dashboard Title --- */
 .dashboard-title {
     font-size: 2.8em;
-    color: var(--primary-color, #2c3e50);
+    color: var(--dashboard-primary-heading); /* Specific heading color */
     margin-bottom: 50px;
     font-weight: 700;
     letter-spacing: 0.8px;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
+    text-shadow: 1px 1px 3px rgba(var(--auth-box-shadow-rgb), 0.08);
     line-height: 1.3;
 }
 
@@ -40,12 +40,8 @@
 
 /* --- Individual Action Cards --- */
 .card {
-    background-color: var(--card-bg, #f8f9fa);
-    border: 1px solid var(--card-border-color, #e9ecef);
-    border-radius: 12px;
+    @extend .card-base; /* Inherit global card styles */
     padding: 35px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -53,148 +49,179 @@
     min-height: 200px;
 }
 
-.card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-}
-
 .card h3 {
     font-size: 1.8em;
-    color: var(--heading-color, #34495e);
+    color: var(--heading-color);
     margin-bottom: 30px;
     font-weight: 600;
 }
 
 .card button {
-    background-color: var(--button-bg, #007bff);
-    color: var(--button-text-color, white);
+    background-color: var(--button-primary-bg);
+    color: var(--button-text-color);
     padding: 15px 30px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+    border-radius: 10px; /* Slightly larger border-radius for buttons */
     font-size: 1.1em;
     font-weight: 500;
     letter-spacing: 0.5px;
-    transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
     width: 100%;
-    max-width: 220px;
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+    max-width: 250px; /* Slightly wider max-width */
+    box-shadow: 0 4px 10px rgba(var(--primary-color-rgb), 0.2);
 }
 
-.card button:hover {
-    background-color: var(--button-hover-bg, #0056b3);
+.card button:hover:not(:disabled) {
+    background-color: var(--button-primary-hover-bg);
     transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
-}
-
-.card button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+    box-shadow: 0 6px 15px rgba(var(--primary-color-rgb), 0.3);
 }
 
 /* --- Logout Button --- */
 .logout-button {
-    background-color: var(--logout-button-bg, #dc3545);
-    color: var(--button-text-color, white);
+    background-color: var(--button-danger-bg);
+    color: var(--button-text-color);
     padding: 14px 30px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+    border-radius: 10px;
     font-size: 1.1em;
     font-weight: 500;
+    margin-top: 30px; /* Add some space below cards */
+    box-shadow: 0 4px 10px rgba(var(--danger-color-rgb, 220, 53, 69), 0.2); /* Dynamic shadow for danger button */
 }
 
-/* ✅ Fixed Profile Button - Top Right */
+.logout-button:hover:not(:disabled) {
+    background-color: var(--button-danger-hover-bg);
+    box-shadow: 0 6px 15px rgba(var(--danger-color-rgb, 220, 53, 69), 0.3);
+}
+
+/* --- Profile Button (Fixed Top Right) --- */
 .profile-button {
-    position: fixed; /* 🔥 Fixed instead of absolute */
+    position: fixed;
     top: 20px;
     right: 20px;
     cursor: pointer;
-    z-index: 1000; /* Ensure it's on top */
+    z-index: 1000;
+    background: var(--card-background); /* Match app background or make it blend */
+    border-radius: 50%;
+    padding: 5px; /* Padding around image */
+    box-shadow: var(--shadow-light); /* Add a subtle shadow */
+    transition: all var(--transition-fast);
+}
+
+.profile-button:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-medium);
 }
 
 .profile-button img {
-    width: 40px;
-    height: 40px;
+    width: 45px; /* Slightly larger */
+    height: 45px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #444;
-    transition: transform 0.2s ease;
+    border: 3px solid var(--primary-color); /* Primary color border */
+    transition: border-color var(--transition-fast);
 }
 
 .profile-button:hover img {
-    transform: scale(1.05);
-    border-color: #007bff;
+    border-color: var(--primary-color-hover); /* Darken border on hover */
 }
-/* Add this to your Dashboard.css file */
 
-/* ... your existing styles for .dashboard-container, .actions, .card, .logout-button etc. ... */
-
+/* --- Secondary Actions (e.g., Rules & Regulations) --- */
 .dashboard-secondary-actions {
-  margin-top: 20px; /* Add some space above this section */
-  margin-bottom: 20px; /* Add some space below this section */
-  text-align: center; /* Center the button(s) within this div */
+    margin-top: 40px;
+    margin-bottom: 30px;
+    text-align: center;
 }
 
 .rules-regulations-button {
-  background-color: #007bff; /* Example: Blue background */
-  color: white;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1em;
-  text-decoration: none; /* If you ever make it an <a> tag */
-  transition: background-color 0.3s ease;
-  display: inline-block; /* Or 'block' if you want it to take full width and center with margin auto */
+    background-color: var(--button-primary-bg);
+    color: var(--button-text-color);
+    padding: 14px 30px;
+    border-radius: 10px;
+    font-size: 1.05em;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 4px 10px rgba(var(--primary-color-rgb), 0.2);
 }
 
-.rules-regulations-button:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+.rules-regulations-button:hover:not(:disabled) {
+    background-color: var(--button-primary-hover-bg);
+    box-shadow: 0 6px 15px rgba(var(--primary-color-rgb), 0.3);
 }
 
-/* Ensure logout button still has its space if needed */
-.logout-button {
-  /* ... your existing logout button styles ... */
-  margin-top: 10px; /* Adjust if the new section pushes it too close or too far */
-}
- /* ** EXTRA */
-/* // ** // ** */
+/* --- Main Actions (Additional buttons, if any) --- */
 .main-actions {
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
-  margin-top: 2rem;
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 
 .main-action-button {
-  padding: 1rem 2rem;
-  font-size: 1.2rem;
-  border-radius: 10px;
-  cursor: pointer;
-  border: none;
-  background-color: #4CAF50;
-  color: white;
-  transition: background-color 0.3s ease;
+    padding: 16px 30px;
+    font-size: 1.2em;
+    border-radius: 10px;
+    background-color: var(--button-success-bg);
+    color: var(--button-text-color);
+    box-shadow: 0 4px 10px rgba(var(--accent-color-rgb), 0.2);
 }
 
-.main-action-button:hover {
-  background-color: #388e3c;
+.main-action-button:hover:not(:disabled) {
+    background-color: var(--button-success-hover-bg);
+    box-shadow: 0 6px 15px rgba(var(--accent-color-rgb), 0.3);
 }
 
 .return-button {
-  background-color: #555;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 1rem;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+    background-color: var(--button-secondary-bg);
+    color: var(--button-text-color);
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1em;
+    margin-top: 20px; /* Add space from other elements */
+    display: inline-block; /* For centering */
 }
 
-.return-button:hover {
-  background-color: #333;
+.return-button:hover:not(:disabled) {
+    background-color: var(--button-secondary-hover-bg);
 }
 
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 30px;
+        margin: 40px 20px;
+    }
+    .dashboard-title {
+        font-size: 2.2em;
+        margin-bottom: 30px;
+    }
+    .actions {
+        grid-template-columns: 1fr; /* Stack cards on small screens */
+        gap: 25px;
+    }
+    .card {
+        padding: 25px;
+    }
+    .main-actions {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    .main-action-button,
+    .rules-regulations-button,
+    .logout-button,
+    .return-button {
+        width: 90%; /* Make buttons wider on small screens */
+        max-width: 300px;
+    }
+}
 
+@media (max-width: 480px) {
+    .dashboard-container {
+        padding: 20px;
+        margin: 30px 15px;
+    }
+    .dashboard-title {
+        font-size: 1.8em;
+        margin-bottom: 25px;
+    }
+}

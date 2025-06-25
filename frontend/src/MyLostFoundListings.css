@@ -112,7 +112,8 @@
   font-weight: bold;
 }
 
-.status-claimed, .status-returned {
+.status-claimed,
+.status-returned {
   color: #28a745; /* Green */
   font-weight: bold;
 }

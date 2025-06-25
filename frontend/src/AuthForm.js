@@ -392,6 +392,26 @@ function AuthForm() {
                         <button onClick={() => handleAdminChoice('user')}>User</button>
                     </div>
                 )}
+
+                {/* ⭐ NEW: Back to Home Button ⭐ */}
+                <button 
+                    onClick={() => navigate('/')} 
+                    className="back-to-home-btn"
+                    style={{ 
+                        marginTop: '20px', 
+                        padding: '10px 20px', 
+                        backgroundColor: '#6c757d', /* A neutral grey */
+                        color: 'white', 
+                        border: 'none', 
+                        borderRadius: '5px', 
+                        cursor: 'pointer',
+                        fontSize: '1em',
+                        transition: 'background-color 0.3s ease',
+                    }}
+                >
+                    Back to Home
+                </button>
+                {/* ⭐ END NEW ⭐ */}
             </div>
         </div>
     );

@@ -121,8 +121,10 @@ ALTER TABLE nitc_mp_db.items ADD COLUMN is_approved BOOLEAN DEFAULT FALSE;
 UPDATE nitc_mp_db.users
 SET role = 'admin'
 WHERE email = 'chilakala_b230650cs@nitc.ac.in';
-
-----------------------------------------------------------------------------------------------------------------
+--@block
+UPDATE nitc_mp_db.users
+SET password = NULL
+WHERE user_id =44;
 --@block
 CREATE TABLE IF NOT EXISTS nitc_mp_db.email_otp (
     id INT AUTO_INCREMENT PRIMARY KEY,
