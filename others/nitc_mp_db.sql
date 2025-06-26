@@ -132,3 +132,15 @@ CREATE TABLE IF NOT EXISTS nitc_mp_db.email_otp (
     otp VARCHAR(6),
     expires_at DATETIME
 );
+
+--@block
+CREATE TABLE nitc_mp_db.feedback (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(100) NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  message TEXT NOT NULL,
+  submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+--@block
+DROP TABLE nitc_mp_db.feedback;

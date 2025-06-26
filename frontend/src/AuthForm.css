@@ -1,54 +1,74 @@
-/* authform.css */
+/* ---------------- Root Variables ---------------- */
+:root {
+    --primary-color: #4a90e2;
+    --primary-color-rgb: 74, 144, 226;
+    --accent-color: #28a745;
+    --accent-color-rgb: 40, 167, 69;
 
-/* --- Auth Container (Login/Signup Form Box) --- */
+    --auth-container-bg: rgba(255, 255, 255, 0.75);
+    --auth-box-shadow: rgba(0, 0, 0, 0.25);
+
+    --tab-inactive-bg: #f0f0f0;
+    --tab-inactive-text: #555;
+    --tab-active-bg: var(--primary-color);
+    --tab-active-text: #fff;
+
+    --button-text-color: #fff;
+    --button-success-bg: var(--accent-color);
+    --button-success-hover-bg: #218838;
+
+    --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.2);
+    --transition-medium: 0.3s;
+}
+
+/* ---------------- Body Background ---------------- */
+
+
+/* ---------------- Auth Container ---------------- */
 .auth-container {
     background-color: var(--auth-container-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 18px;
+    box-shadow: 0 10px 30px var(--auth-box-shadow);
     padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(var(--auth-box-shadow-rgb), 0.2);
-    width: 100%;
-    max-width: 400px;
+    max-width: 420px;
+    width: 90%;
     text-align: center;
-    backdrop-filter: blur(8px); /* Modern frosted glass effect */
-    -webkit-backdrop-filter: blur(8px);
-    animation: slideInRight var(--transition-medium) ease-out; /* Slide in animation */
-    margin-right: 5%; /* Pushes the form to the right for background visibility */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: fadeIn 0.8s ease;
 }
 
-/* Dark mode specific adjustments for shadow and background */
-[data-theme='dark'] .auth-container {
-    box-shadow: 0 10px 30px rgba(var(--auth-box-shadow-rgb), 0.4);
-}
-
-@keyframes slideInRight {
-    from { opacity: 0; transform: translateX(50px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-
+/* ---------------- Heading ---------------- */
 .auth-container h2 {
-    font-size: 2.4em;
-    color: var(--primary-color); /* Matches primary theme color */
-    margin-bottom: 30px;
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    font-size: 2em;
     font-weight: 700;
 }
 
-/* --- Tab Buttons (Login/Signup) --- */
+/* ---------------- Tabs ---------------- */
 .tab {
     display: flex;
     justify-content: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: inset 0 0 5px rgba(var(--auth-box-shadow-rgb), 0.1);
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 .tab button {
     flex: 1;
-    padding: 12px 0;
+    padding: 10px 0;
     background-color: var(--tab-inactive-bg);
     color: var(--tab-inactive-text);
-    font-size: 1.1em;
-    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color var(--transition-medium);
 }
 
 .tab button.active {
@@ -57,31 +77,56 @@
     box-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.3);
 }
 
-/* --- Form Inputs (inherits global input styles, but can override) --- */
+/* ---------------- Form Inputs ---------------- */
 .auth-form input {
-    width: calc(100% - 24px); /* Account for padding from global input */
+    width: 90%;
+    padding: 12px 15px;
     margin-bottom: 18px;
-}
-
-/* --- Form Submit Button --- */
-.auth-form button[type="submit"] {
-    background-color: var(--button-success-bg); /* Use accent color for auth submit */
-    color: var(--button-text-color);
-    padding: 14px 25px;
+    border: 1px solid #ccc;
     border-radius: 8px;
-    font-size: 1.1em;
-    font-weight: 600;
+    outline: none;
+    font-size: 1em;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(4px);
+    transition: border-color var(--transition-medium);
+}
+
+.auth-form input:focus {
+    border-color: var(--primary-color);
+}
+
+/* ---------------- Submit Button ---------------- */
+.auth-form button {
     width: 100%;
-    margin-top: 10px;
-    box-shadow: 0 4px 10px rgba(var(--accent-color-rgb), 0.2); /* Shadow with accent color */
+    padding: 12px;
+    background-color: var(--button-success-bg);
+    color: var(--button-text-color);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(var(--accent-color-rgb), 0.3);
+    transition: background-color var(--transition-medium), box-shadow var(--transition-medium);
 }
 
-.auth-form button[type="submit"]:hover:not(:disabled) {
+.auth-form button:hover {
     background-color: var(--button-success-hover-bg);
-    box-shadow: 0 6px 15px rgba(var(--accent-color-rgb), 0.3);
+    box-shadow: 0 6px 16px rgba(var(--accent-color-rgb), 0.4);
 }
 
-/* --- Modal Styles --- */
+/* ---------------- Animation ---------------- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+/* ---------------- Modal Overlay (Optional) ---------------- */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -93,16 +138,17 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    backdrop-filter: blur(3px); /* Subtle blur for modal overlay */
+    backdrop-filter: blur(3px);
 }
 
+/* ---------------- Modal Box ---------------- */
 .modal {
-    background: var(--modal-background);
+    background: rgba(255, 255, 255, 0.85);
     padding: 30px;
     border-radius: 15px;
     text-align: center;
     box-shadow: var(--shadow-medium);
-    transition: background-color var(--transition-medium), color var(--transition-medium);
+    backdrop-filter: blur(8px);
 }
 
 .modal h3 {
@@ -113,187 +159,97 @@
 }
 
 .modal-buttons button {
-    background-color: var(--button-primary-bg);
+    background-color: var(--primary-color);
     color: var(--button-text-color);
     padding: 10px 20px;
     border-radius: 8px;
     margin: 0 8px;
     font-size: 1em;
-    box-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.2);
+    border: none;
+    cursor: pointer;
+    transition: background-color var(--transition-medium);
 }
 
-.modal-buttons button:hover:not(:disabled) {
-    background-color: var(--button-primary-hover-bg);
-    box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
+.modal-buttons button:hover {
+    background-color: #0069d9;
 }
 
-/* --- OTP Specific Styles --- */
-.otp-section {
-    margin-bottom: 15px;
-}
-
-.otp-input-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-    align-items: center;
-}
-
-.otp-input {
-    flex-grow: 1;
-    text-align: center;
-    letter-spacing: 5px;
-    font-weight: bold;
-}
-
-.verify-otp-btn {
-    background-color: var(--button-primary-bg);
-    color: var(--button-text-color);
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 1em;
-    white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.2);
-}
-
-.verify-otp-btn:hover:not(:disabled) {
-    background-color: var(--button-primary-hover-bg);
-    box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
-}
-
-.otp-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-    gap: 10px; /* Add gap for spacing between buttons */
-}
-
-.resend-otp-btn,
-.change-email-btn {
-    background-color: var(--button-secondary-bg);
-    color: var(--button-text-color);
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 0.9em;
-}
-
-.resend-otp-btn:hover:not(:disabled),
-.change-email-btn:hover:not(:disabled) {
-    background-color: var(--button-secondary-hover-bg);
-}
-
-.otp-instructions {
-    margin-top: 20px;
-    background-color: var(--otp-instruction-bg);
-    border: 1px solid var(--otp-instruction-bg);
-    border-left: 5px solid var(--primary-color);
-    padding: 15px;
-    border-radius: 8px;
-    text-align: left;
-    font-size: 0.9em;
-    color: var(--otp-instruction-text);
-    transition: background-color var(--transition-medium), color var(--transition-medium), border-color var(--transition-medium);
-}
-
-.otp-instructions p {
-    margin: 5px 0;
-}
-
-/* --- Responsive Adjustments --- */
+/* ---------------- Responsive ---------------- */
 @media (max-width: 768px) {
     .auth-container {
         padding: 30px;
-        margin: 20px; /* Center with margin auto on smaller screens */
     }
 }
 
 @media (max-width: 600px) {
     .auth-container {
         padding: 20px;
-        margin: 10px;
-    }
-    .otp-input-container {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .verify-otp-btn {
-        width: 100%;
-        margin-top: 10px;
-    }
-    .otp-actions {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .resend-otp-btn,
-    .change-email-btn {
-        width: 100%;
     }
 }
-
-/* Existing CSS (keep your current styles) */
-/* ... */
-
-/* --- Updated Styles for Owl Animation --- */
-
-.auth-container {
-    position: relative;
-    /* ... existing styles ... */
-}
-
-.owl-emoji {
-    width: 80px;
-    height: 80px;
-    position: absolute;
-    top: -90px;
+.admin-choice {
+    position: fixed;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-    transition: all 0.3s ease-in-out; /* Smooth general transitions */
+    transform: translate(-50%, -50%);
+    width: 350px;
+    background: rgba(0, 0, 0, 0.4);  /* Dark transparent background */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 30px;
+    text-align: center;
+    color: white;
+    z-index: 999;
 }
 
-.owl-eye .eyelid {
-    transition: transform 0.3s ease-out; /* Smooth eyelid movement */
-    transform-origin: center; /* Important for rotation */
+.admin-choice h2 {
+    margin-bottom: 10px;
+    color: #00ff7f;
 }
 
-/* Initial state and when password is being entered: eyes closed */
-.owl-eyes-closed .eyelid-top {
-    transform: rotateX(0deg); /* Eyelids cover eyes */
-}
-.owl-eyes-closed .eyelid-bottom {
-    transform: rotateX(0deg); /* Eyelids cover eyes */
-}
-.owl-eyes-closed .eye-pupil {
-    opacity: 0; /* Hide pupils when eyes are closed */
-    transition: opacity 0.3s;
+.admin-choice p {
+    margin-bottom: 20px;
 }
 
-
-/* State: eyes open (when typing email) */
-.owl-eyes-open .eyelid-top {
-    transform: rotateX(90deg); /* Rotate to open */
-}
-.owl-eyes-open .eyelid-bottom {
-    transform: rotateX(-90deg); /* Rotate to open */
-}
-.owl-eyes-open .eye-pupil {
-    opacity: 1;
-    transition: opacity 0.3s 0.1s; /* Slight delay for pupil fade-in */
+.choice-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
-/* Remove the 'looking' animation if you want just closed/open */
-/* If you want a slight movement when open, you can add an animation to owl-eyes-open */
-/*
-.owl-eyes-open {
-    animation: owl-subtle-blink 4s infinite ease-in-out;
+.choice-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s ease;
 }
 
-@keyframes owl-subtle-blink {
-    0%, 20%, 40%, 100% {
-        transform: translateX(-50%) rotateZ(0deg);
-    }
-    10%, 30% {
-        transform: translateX(-50%) rotateZ(1deg); // Subtle tilt
-    }
+.choice-buttons button:hover {
+    background-color: rgba(0, 255, 127, 0.7);
+    color: black;
+    transform: scale(1.05);
 }
-*/
+
+.back-btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+.back-btn:hover {
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    transform: scale(1.05);
+}

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './AuthForm.css'; // Assuming your CSS is here
-import backgroundImage from './p1.png'; // Assuming your background image is here
+//import backgroundImage from './p1.png'; // Assuming your background image is here
 
 // Set axios to send cookies with all requests globally.
 // This is CRUCIAL for session persistence between your frontend and Flask backend.
@@ -264,7 +264,7 @@ function AuthForm() {
     };
 
     return (
-        <div className="app-background" style={{ backgroundImage: `url(${backgroundImage})` }}>
+        <div>
             <button id="toggle-theme" onClick={handleToggleTheme} className="theme-toggle-button">
                 {darkMode ? 'Light Mode' : 'Dark Mode'}
             </button>
@@ -385,13 +385,20 @@ function AuthForm() {
                 </form>
 
                 {/* Admin Choice after Login */}
-                {showAdminChoice && (
-                    <div className="admin-choice">
-                        <p>Proceed as:</p>
-                        <button onClick={() => handleAdminChoice('admin')}>Admin</button>
-                        <button onClick={() => handleAdminChoice('user')}>User</button>
-                    </div>
-                )}
+{showAdminChoice && (
+  <div className="admin-choice">
+    <h2>Login Successful!</h2>
+    <p>Proceed as:</p>
+    <div className="choice-buttons">
+      <button onClick={() => handleAdminChoice('admin')}>Admin</button>
+      <button onClick={() => handleAdminChoice('user')}>User</button>
+    </div>
+    <button className="back-btn" onClick={() => setShowAdminChoice(false)}>
+      Back
+    </button>
+  </div>
+)}
+
 
                 {/* ⭐ NEW: Back to Home Button ⭐ */}
                 <button 

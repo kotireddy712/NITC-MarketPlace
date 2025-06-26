@@ -1,217 +1,189 @@
-/* src/Dashboard.css */
-
-/* --- Dashboard Container --- */
+/* ========== Dashboard Container ========== */
 .dashboard-container {
     max-width: 1000px;
     margin: 60px auto;
-    padding: 45px;
-    background-color: var(--card-background); /* Use card background variable */
-    color: var(--text-color);
-    border-radius: 15px;
-    box-shadow: var(--shadow-medium); /* Use medium shadow */
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    color: #333;
     text-align: center;
     font-family: 'Poppins', sans-serif;
-    animation: fadeInScale var(--transition-medium) ease-out;
 }
 
-@keyframes fadeInScale {
-    from { opacity: 0; transform: translateY(30px) scale(0.98); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-/* --- Dashboard Title --- */
+/* ========== Dashboard Title ========== */
 .dashboard-title {
-    font-size: 2.8em;
-    color: var(--dashboard-primary-heading); /* Specific heading color */
-    margin-bottom: 50px;
+    font-size: 2.6em;
+    color: #00a86b;
+    margin-bottom: 40px;
     font-weight: 700;
-    letter-spacing: 0.8px;
-    text-shadow: 1px 1px 3px rgba(var(--auth-box-shadow-rgb), 0.08);
-    line-height: 1.3;
 }
 
-/* --- Actions Grid --- */
+/* ========== Actions Grid ========== */
 .actions {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 35px;
-    margin-bottom: 50px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
 }
 
-/* --- Individual Action Cards --- */
+/* ========== Cards ========== */
 .card {
-    @extend .card-base; /* Inherit global card styles */
-    padding: 35px;
+    background-color: #f9f9f9;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 28px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    min-height: 200px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .card h3 {
-    font-size: 1.8em;
-    color: var(--heading-color);
-    margin-bottom: 30px;
+    font-size: 1.7em;
+    color: #00a86b;
+    margin-bottom: 20px;
     font-weight: 600;
 }
 
-.card button {
-    background-color: var(--button-primary-bg);
-    color: var(--button-text-color);
-    padding: 15px 30px;
-    border-radius: 10px; /* Slightly larger border-radius for buttons */
-    font-size: 1.1em;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    width: 100%;
-    max-width: 250px; /* Slightly wider max-width */
-    box-shadow: 0 4px 10px rgba(var(--primary-color-rgb), 0.2);
+/* ========== Buttons ========== */
+.card button,
+.rules-regulations-button,
+.main-action-button,
+.logout-button,
+.return-button {
+    padding: 12px 24px;
+    font-size: 1em;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
 }
 
-.card button:hover:not(:disabled) {
-    background-color: var(--button-primary-hover-bg);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(var(--primary-color-rgb), 0.3);
+/* --- Primary Button --- */
+.card button,
+.rules-regulations-button,
+.main-action-button {
+    background-color: #00a86b;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 168, 107, 0.2);
+}
+
+.card button:hover,
+.rules-regulations-button:hover,
+.main-action-button:hover {
+    background-color: #008f5a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 168, 107, 0.3);
 }
 
 /* --- Logout Button --- */
 .logout-button {
-    background-color: var(--button-danger-bg);
-    color: var(--button-text-color);
-    padding: 14px 30px;
-    border-radius: 10px;
-    font-size: 1.1em;
-    font-weight: 500;
-    margin-top: 30px; /* Add some space below cards */
-    box-shadow: 0 4px 10px rgba(var(--danger-color-rgb, 220, 53, 69), 0.2); /* Dynamic shadow for danger button */
+    background-color: #e63946;
+    color: white;
+    box-shadow: 0 4px 12px rgba(230, 57, 70, 0.2);
 }
 
-.logout-button:hover:not(:disabled) {
-    background-color: var(--button-danger-hover-bg);
-    box-shadow: 0 6px 15px rgba(var(--danger-color-rgb, 220, 53, 69), 0.3);
+.logout-button:hover {
+    background-color: #c42735;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(230, 57, 70, 0.3);
 }
 
-/* --- Profile Button (Fixed Top Right) --- */
+/* --- Return Button (Secondary) --- */
+.return-button {
+    background-color: #888;
+    color: white;
+}
+
+.return-button:hover {
+    background-color: #666;
+    transform: translateY(-2px);
+}
+
+/* ========== Profile Button ========== */
 .profile-button {
     position: fixed;
     top: 20px;
     right: 20px;
-    cursor: pointer;
-    z-index: 1000;
-    background: var(--card-background); /* Match app background or make it blend */
+    background-color: #f9f9f9;
     border-radius: 50%;
-    padding: 5px; /* Padding around image */
-    box-shadow: var(--shadow-light); /* Add a subtle shadow */
-    transition: all var(--transition-fast);
+    padding: 5px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.3s;
+    z-index: 1000;
 }
 
 .profile-button:hover {
     transform: scale(1.05);
-    box-shadow: var(--shadow-medium);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .profile-button img {
-    width: 45px; /* Slightly larger */
-    height: 45px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid var(--primary-color); /* Primary color border */
-    transition: border-color var(--transition-fast);
+    border: 2px solid #00a86b;
 }
 
-.profile-button:hover img {
-    border-color: var(--primary-color-hover); /* Darken border on hover */
-}
-
-/* --- Secondary Actions (e.g., Rules & Regulations) --- */
+/* ========== Secondary Actions ========== */
 .dashboard-secondary-actions {
-    margin-top: 40px;
-    margin-bottom: 30px;
+    margin-top: 30px;
+    margin-bottom: 20px;
     text-align: center;
 }
 
-.rules-regulations-button {
-    background-color: var(--button-primary-bg);
-    color: var(--button-text-color);
-    padding: 14px 30px;
-    border-radius: 10px;
-    font-size: 1.05em;
-    text-decoration: none;
-    display: inline-block;
-    box-shadow: 0 4px 10px rgba(var(--primary-color-rgb), 0.2);
-}
-
-.rules-regulations-button:hover:not(:disabled) {
-    background-color: var(--button-primary-hover-bg);
-    box-shadow: 0 6px 15px rgba(var(--primary-color-rgb), 0.3);
-}
-
-/* --- Main Actions (Additional buttons, if any) --- */
+/* ========== Main Actions ========== */
 .main-actions {
     display: flex;
-    gap: 25px;
+    gap: 20px;
     justify-content: center;
-    margin-top: 30px;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    margin-top: 20px;
+    flex-wrap: wrap;
 }
 
-.main-action-button {
-    padding: 16px 30px;
-    font-size: 1.2em;
-    border-radius: 10px;
-    background-color: var(--button-success-bg);
-    color: var(--button-text-color);
-    box-shadow: 0 4px 10px rgba(var(--accent-color-rgb), 0.2);
-}
-
-.main-action-button:hover:not(:disabled) {
-    background-color: var(--button-success-hover-bg);
-    box-shadow: 0 6px 15px rgba(var(--accent-color-rgb), 0.3);
-}
-
-.return-button {
-    background-color: var(--button-secondary-bg);
-    color: var(--button-text-color);
-    padding: 12px 25px;
-    border-radius: 8px;
-    font-size: 1em;
-    margin-top: 20px; /* Add space from other elements */
-    display: inline-block; /* For centering */
-}
-
-.return-button:hover:not(:disabled) {
-    background-color: var(--button-secondary-hover-bg);
-}
-
-/* --- Responsive Adjustments --- */
+/* ========== Responsive Design ========== */
 @media (max-width: 768px) {
     .dashboard-container {
-        padding: 30px;
+        padding: 25px;
         margin: 40px 20px;
     }
+
     .dashboard-title {
         font-size: 2.2em;
         margin-bottom: 30px;
     }
+
     .actions {
-        grid-template-columns: 1fr; /* Stack cards on small screens */
+        grid-template-columns: 1fr;
         gap: 25px;
     }
+
     .card {
-        padding: 25px;
+        padding: 22px;
     }
+
     .main-actions {
         flex-direction: column;
         align-items: center;
         gap: 15px;
     }
+
     .main-action-button,
     .rules-regulations-button,
     .logout-button,
     .return-button {
-        width: 90%; /* Make buttons wider on small screens */
-        max-width: 300px;
+        width: 90%;
+        max-width: 280px;
     }
 }
 
@@ -220,6 +192,7 @@
         padding: 20px;
         margin: 30px 15px;
     }
+
     .dashboard-title {
         font-size: 1.8em;
         margin-bottom: 25px;

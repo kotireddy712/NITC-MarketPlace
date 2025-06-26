@@ -101,11 +101,15 @@ const LandingPage = () => {
 
       <footer className="landing-footer">
         <div className="footer-links">
-          <div onClick={() => navigate('/nitc-info')}>National Institute of Technology Calicut</div>
+<div 
+    onClick={() => window.open('https://nitc.ac.in/', '_blank')} 
+    className="nitc-link">
+    National Institute of Technology Calicut
+</div>
           <div onClick={() => navigate('/terms')}>Terms of Use</div>
           <div onClick={() => navigate('/accessibility')}>Accessibility Statement</div>
           <div onClick={() => navigate('/about-site')}>About the Site</div>
-          <div onClick={() => navigate('/feedback-info')}>Feedback</div>
+          {/* <div onClick={() => navigate('/feedback-info')}>Feedback</div> */}
           <div onClick={() => navigate('/credits')}>Credits</div>
         </div>
         <p className="copyright">&copy; 2025 NITC Marketplace. All rights reserved.</p>
