@@ -1,297 +1,300 @@
 /* ================= Global Theme Variables ================= */
 :root {
-  --primary-color: #007bff;
-  --secondary-color: #6c757d;
-  --success-color: #28a745;
-  --error-color: #dc3545;
+    /* Colors */
+    --primary-color: #007bff; /* Vibrant Blue */
+    --secondary-color: #6c757d; /* Muted Grey */
+    --accent-color: #28a745; /* Success Green */
+    --danger-color: #dc3545; /* Alert Red */
 
-  --background-color-light: #f0f2f5;
-  --text-color-light: #34495e;
-  --card-bg-light: #ffffff;
-  --border-color-light: #e0e6ed;
-  --input-bg-light: #ffffff;
-  --button-bg-light: #007bff;
-  --button-hover-bg-light: #0056b3;
-  --button-text-light: #ffffff;
-  --tab-active-bg-light: #007bff;
-  --tab-active-text-light: #ffffff;
-  --tab-inactive-bg-light: #e9ecef;
-  --tab-inactive-text-light: #495057;
+    /* Grayscale Palette */
+    --white: #ffffff;
+    --light-grey: #f0f2f5;
+    --medium-light-grey: #e9ecef;
+    --medium-grey: #ced4da;
+    --dark-grey: #34495e;
+    --extra-dark-grey: #2c3e50;
 
-  --auth-bg-color: rgba(255, 255, 255, 0.95);
-  --auth-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  --auth-heading-color: #2c3e50;
-  --auth-input-border: #ced4da;
-  --auth-input-focus-border: #007bff;
-  --auth-button-bg: #007bff;
-  --auth-button-hover-bg: #0056b3;
-  --auth-button-text: #ffffff;
-  --auth-message-success-bg: #d4edda;
-  --auth-message-success-border: #c3e6cb;
-  --auth-message-error-bg: #f8d7da;
-  --auth-message-error-border: #f5c6cb;
-  --auth-toggle-btn-bg: #007bff;
-  --auth-toggle-btn-text: #ffffff;
-  --auth-toggle-btn-border: #007bff;
-  --auth-toggle-btn-hover-bg: #0056b3;
-  --primary-color-rgb: 0, 123, 255;
+    /* Backgrounds */
+    --background-color: var(--light-grey);
+    --card-background: var(--white);
+    --input-background: var(--white);
+    --modal-background: var(--white);
+    --message-success-bg: #d4edda;
+    --message-error-bg: #f8d7da;
+    --otp-instruction-bg: #e7f3ff;
+
+    /* Text Colors */
+    --text-color: var(--dark-grey);
+    --text-color-secondary: #555;
+    --heading-color: var(--extra-dark-grey);
+    --placeholder-color: #888;
+    --message-success-text: #155724;
+    --message-error-text: #721c24;
+    --otp-instruction-text: #004085;
+
+    /* Borders & Shadows */
+    --border-color: var(--medium-grey);
+    --card-border-color: #e9ecef;
+    --input-border: #ccc;
+    --focus-border: var(--primary-color);
+    --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.15);
+    --shadow-heavy: 0 15px 40px rgba(0, 0, 0, 0.2);
+
+    /* Button Colors */
+    --button-primary-bg: var(--primary-color);
+    --button-primary-hover-bg: #0056b3;
+    --button-success-bg: var(--accent-color);
+    --button-success-hover-bg: #218838;
+    --button-secondary-bg: var(--secondary-color);
+    --button-secondary-hover-bg: #5a6268;
+    --button-danger-bg: var(--danger-color);
+    --button-danger-hover-bg: #c82333;
+    --button-text-color: var(--white);
+    --button-disabled-bg: #cccccc;
+
+    /* Specific Component Values - Auth Form */
+    --auth-container-bg: rgba(255, 255, 255, 0.9);
+    --auth-box-shadow-rgb: 0, 0, 0; /* For dynamic shadows */
+    --tab-inactive-bg: #e9ecef;
+    --tab-inactive-text: #555;
+    --tab-active-bg: var(--primary-color);
+    --tab-active-text: var(--white);
+
+    /* Specific Component Values - Dashboard */
+    --dashboard-primary-heading: #2c3e50;
+
+    /* Transitions */
+    --transition-fast: 0.2s ease-in-out;
+    --transition-medium: 0.3s ease-in-out;
+    --transition-slow: 0.4s ease-in-out;
+
+    /* RGB values for dynamic shadows */
+    --primary-color-rgb: 0, 123, 255;
+    --accent-color-rgb: 40, 167, 69;
+    --light-blue-rgb: 97, 218, 251; /* for dark theme primary */
 }
 
+/* --- Dark Mode Variables --- */
 [data-theme='dark'] {
-  --primary-color: #61dafb;
-  --secondary-color: #bdc3c7;
-  --success-color: #2ecc71;
-  --error-color: #e74c3c;
+    /* Colors */
+    --primary-color: #61dafb; /* Light Blue */
+    --secondary-color: #bdc3c7; /* Lighter Grey */
+    --accent-color: #2ecc71; /* Darker Green */
+    --danger-color: #e74c3c; /* Darker Red */
 
-  --background-color-dark: #2c3e50;
-  --text-color-dark: #ecf0f1;
-  --card-bg-dark: #34495e;
-  --border-color-dark: #4a6375;
-  --input-bg-dark: #3a5061;
-  --button-bg-dark: #61dafb;
-  --button-hover-bg-dark: #21a1f1;
-  --button-text-dark: #2c3e50;
-  --tab-active-bg-dark: #61dafb;
-  --tab-active-text-dark: #2c3e50;
-  --tab-inactive-bg-dark: #4a6375;
-  --tab-inactive-text-dark: #ecf0f1;
+    /* Grayscale Palette */
+    --white: #2c3e50; /* Acts as dark white */
+    --light-grey: #282c34; /* Darker background */
+    --medium-light-grey: #3a3f47;
+    --medium-grey: #5a606b;
+    --dark-grey: #ecf0f1; /* Light text for dark mode */
+    --extra-dark-grey: #f0f0f0; /* Lighter text for dark mode */
 
-  --auth-bg-color: rgba(52, 73, 94, 0.95);
-  --auth-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  --auth-heading-color: #ecf0f1;
-  --auth-input-border: #4a6375;
-  --auth-input-focus-border: #61dafb;
-  --auth-button-bg: #61dafb;
-  --auth-button-hover-bg: #21a1f1;
-  --auth-button-text: #2c3e50;
-  --auth-message-success-bg: #2ecc71;
-  --auth-message-success-border: #27ae60;
-  --auth-message-error-bg: #e74c3c;
-  --auth-message-error-border: #c0392b;
-  --auth-toggle-btn-bg: #61dafb;
-  --auth-toggle-btn-text: #2c3e50;
-  --auth-toggle-btn-border: #61dafb;
-  --auth-toggle-btn-hover-bg: #21a1f1;
-  --primary-color-dark-rgb: 97, 218, 251;
+    /* Backgrounds */
+    --background-color: var(--light-grey);
+    --card-background: #34495e;
+    --input-background: #4a4f59;
+    --modal-background: #3a3f47;
+    --message-success-bg: #218838;
+    --message-error-bg: #c0392b;
+    --otp-instruction-bg: #2a3a4a;
+
+    /* Text Colors */
+    --text-color: var(--dark-grey);
+    --text-color-secondary: #bdc3c7;
+    --heading-color: var(--extra-dark-grey);
+    --placeholder-color: #aaa;
+    --message-success-text: #d4edda;
+    --message-error-text: #f8d7da;
+    --otp-instruction-text: #b3d4f5;
+
+    /* Borders & Shadows */
+    --border-color: #4a6375;
+    --card-border-color: #4a6375;
+    --input-border: #5a606b;
+    --focus-border: var(--primary-color);
+    --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.3);
+    --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.4);
+    --shadow-heavy: 0 15px 40px rgba(0, 0, 0, 0.5);
+
+    /* Button Colors */
+    --button-primary-bg: var(--primary-color);
+    --button-primary-hover-bg: #38b1d6;
+    --button-success-bg: #218838;
+    --button-success-hover-bg: #1e7e34;
+    --button-secondary-bg: #5a606b;
+    --button-secondary-hover-bg: #4a4f59;
+    --button-danger-bg: #e74c3c;
+    --button-danger-hover-bg: #c0392b;
+    --button-text-color: var(--extra-dark-grey); /* For primary/accent buttons */
+    --button-disabled-bg: #555;
+
+    /* Specific Component Values - Auth Form */
+    --auth-container-bg: rgba(40, 44, 52, 0.9);
+    --auth-box-shadow-rgb: 0, 0, 0; /* Still black for shadow, just darker */
+    --tab-inactive-bg: #3a3f47;
+    --tab-inactive-text: #ccc;
+    --tab-active-bg: var(--primary-color);
+    --tab-active-text: #282c34;
+
+    /* Specific Component Values - Dashboard */
+    --dashboard-primary-heading: #ecf0f1;
+
+    /* RGB values for dynamic shadows */
+    --primary-color-rgb: 97, 218, 251; /* for dark theme primary */
+    --accent-color-rgb: 46, 204, 113; /* For dark theme green */
 }
 
-/* ================= Global Base ================= */
+/* --- Base Body Styles --- */
 body {
-  background-color: var(--background-color-light);
-  color: var(--text-color-light);
-  font-family: 'Poppins', sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  min-height: 100vh;
-  overflow-x: hidden;
+    margin: 0;
+    font-family: 'Poppins', sans-serif; /* Consistent font */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background-color var(--transition-medium), color var(--transition-medium);
+    box-sizing: border-box; /* Global box-sizing */
 }
 
-[data-theme='dark'] body {
-  background-color: var(--background-color-dark);
-  color: var(--text-color-dark);
+/* --- Global Button Base Styles --- */
+button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: background-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-/* ================= Layouts ================= */
-.app-background {
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  min-height: 100vh;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 20px;
-  box-sizing: border-box;
-  position: relative;
+button:hover:not(:disabled) {
+    transform: translateY(-2px);
 }
 
-/* ================= Theme Toggle ================= */
-.theme-toggle-button {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
-  padding: 10px 18px;
-  border-radius: 25px;
-  font-weight: 600;
-  cursor: pointer;
-  border: 2px solid var(--auth-toggle-btn-border);
-  background-color: var(--auth-toggle-btn-bg);
-  color: var(--auth-toggle-btn-text);
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+button:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(var(--auth-box-shadow-rgb), 0.2);
 }
 
-.theme-toggle-button:hover {
-  background-color: var(--auth-toggle-btn-hover-bg);
-  color: var(--button-text-light);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+button:disabled {
+    background-color: var(--button-disabled-bg) !important;
+    cursor: not-allowed;
+    box-shadow: none !important;
+    transform: none !important;
 }
 
-/* ================= Auth Container ================= */
-.auth-container {
-  background-color: var(--auth-bg-color);
-  padding: 40px;
-  border-radius: 15px;
-  box-shadow: var(--auth-box-shadow);
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-  animation: slideInRight 0.8s ease-out;
-  margin-right: 5%;
+/* --- Global Input Base Styles --- */
+input, select, textarea {
+    padding: 12px 10px;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 1em;
+    background-color: var(--input-background);
+    color: var(--text-color);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    box-sizing: border-box; /* Inherit box-sizing */
 }
 
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(50px); }
-  to { opacity: 1; transform: translateX(0); }
+input::placeholder, textarea::placeholder {
+    color: var(--placeholder-color);
 }
 
-/* ================= Auth Header ================= */
-.auth-container h2 {
-  font-size: 2.2em;
-  color: var(--auth-heading-color);
-  margin-bottom: 30px;
-  font-weight: 700;
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--focus-border);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.25);
 }
 
-/* ================= Tab Buttons ================= */
-.tab {
-  display: flex;
-  margin-bottom: 25px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+/* --- Global Card Base Styles --- */
+.card-base {
+    background-color: var(--card-background);
+    border: 1px solid var(--card-border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-light);
+    transition: transform var(--transition-medium), box-shadow var(--transition-medium);
 }
 
-.tab button {
-  flex: 1;
-  padding: 12px 0;
-  border: none;
-  background-color: var(--tab-inactive-bg-light);
-  color: var(--tab-inactive-text-light);
-  font-size: 1.1em;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.card-base:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
 }
 
-.tab button.active {
-  background-color: var(--tab-active-bg-light);
-  color: var(--tab-active-text-light);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-/* ================= Form Inputs ================= */
-.auth-form input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 18px;
-  border: 1px solid var(--auth-input-border);
-  border-radius: 8px;
-  font-size: 1em;
-  background-color: var(--input-bg-light);
-  color: var(--text-color-light);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.auth-form input::placeholder {
-  color: var(--secondary-color);
-  opacity: 0.8;
-}
-
-.auth-form input:focus {
-  outline: none;
-  border-color: var(--auth-input-focus-border);
-  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.25);
-}
-
-/* ================= Submit Button ================= */
-.auth-form button[type="submit"] {
-  background-color: var(--auth-button-bg);
-  color: var(--auth-button-text);
-  padding: 14px 25px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1.1em;
-  font-weight: 600;
-  width: 100%;
-  margin-top: 10px;
-  transition: background-color 0.3s ease, transform 0.1s ease;
-  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
-}
-
-.auth-form button[type="submit"]:hover {
-  background-color: var(--auth-button-hover-bg);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
-}
-
-/* ================= Message Boxes ================= */
+/* --- Global Message Box Styles --- */
 .message-box {
-  margin-top: 25px;
-  padding: 15px;
-  border-radius: 8px;
-  font-weight: 600;
-  text-align: center;
-  animation: slideInUp 0.5s ease-out;
-}
-
-@keyframes slideInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+    margin-top: 20px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 0.95em;
 }
 
 .message-box.success {
-  background-color: var(--auth-message-success-bg);
-  border: 1px solid var(--auth-message-success-border);
-  color: var(--success-color);
+    background-color: var(--message-success-bg);
+    color: var(--message-success-text);
+    border: 1px solid var(--message-success-bg); /* Use same color for subtle border */
 }
 
 .message-box.error {
-  background-color: var(--auth-message-error-bg);
-  border: 1px solid var(--auth-message-error-border);
-  color: var(--error-color);
+    background-color: var(--message-error-bg);
+    color: var(--message-error-text);
+    border: 1px solid var(--message-error-bg);
 }
 
-/* ================= Responsive ================= */
+/* --- Global App Background Container (for full page backgrounds) --- */
+.app-background {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    justify-content: flex-end; /* Align content to the right */
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* --- Theme Toggle Button (Global) --- */
+.theme-toggle-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    padding: 10px 18px;
+    border-radius: 25px;
+    font-weight: 600;
+    background-color: var(--button-primary-bg);
+    color: var(--button-text-color);
+    border: 2px solid var(--button-primary-bg); /* Match border to button color */
+    box-shadow: 0 4px 10px rgba(var(--primary-color-rgb), 0.2);
+}
+
+.theme-toggle-button:hover {
+    background-color: var(--button-primary-hover-bg);
+    border-color: var(--button-primary-hover-bg);
+    box-shadow: 0 6px 15px rgba(var(--primary-color-rgb), 0.3);
+}
+
+/* --- Global Heading Styles --- */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--heading-color);
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+/* --- Responsive Adjustments (General) --- */
 @media (max-width: 768px) {
-  .app-background {
-    justify-content: center;
-    padding: 15px;
-  }
-  .auth-container {
-    margin-right: 0;
-    padding: 30px;
-    max-width: 90%;
-  }
-  .auth-container h2 {
-    font-size: 1.8em;
-  }
-  .tab button {
-    font-size: 1em;
-    padding: 10px 0;
-  }
-  .auth-form input,
-  .auth-form button[type="submit"] {
-    padding: 10px;
-    font-size: 0.95em;
-  }
-  .theme-toggle-button {
-    top: 15px;
-    right: 15px;
-    padding: 8px 14px;
-    font-size: 0.9em;
-  }
-}
+    .app-background {
+        justify-content: center; /* Center content on smaller screens */
+    }
 
-@media (max-width: 480px) {
-  .auth-container {
-    padding: 25px;
-  }
-  .auth-container h2 {
-    font-size: 1.6em;
-  }
+    .theme-toggle-button {
+        top: 15px;
+        right: 15px;
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
 }

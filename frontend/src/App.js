@@ -11,22 +11,36 @@ import AdminDashboard from './AdminDashboard';
 
 // Existing New components
 import BuySellDashboard from './BuySellDashboard';
-// No longer needed to import UnderConstruction for my-listings route
-// import UnderConstruction from './UnderConstruction';
 
-// New components for Lost & Found
+// Lost & Found components
 import LostFoundDashboard from './LostFoundDashboard';
 import LostFoundForm from './LostFoundForm';
 import LostFoundListings from './LostFoundListings';
-import MyLostFoundListings from './MyLostFoundListings'; // ✅ NEW: Import the new component
+import MyLostFoundListings from './MyLostFoundListings';
 
-import './App.css';
+// Import the LandingPage and UnderConstruction components
+import LandingPage from './LandingPage';
+import UnderConstruction from './UnderConstruction'; 
+import TermsOfUse from './TermsOfUse';
+import Announcements from './Announcements';
+import Contact from './Contact';
+import News from './News';
+import Accessibility from './Accessibility';
+import About from './About';
+import Credits from './Credits';
+
+import './App.css'; // Your main app CSS
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<AuthForm />} />
+        {/* Landing Page as the initial root path */}
+        <Route path="/" element={<LandingPage />} />
+        {/* AuthForm is now accessed via /login */}
+        <Route path="/login" element={<AuthForm />} /> 
+
+        {/* Core Application Routes (accessible after login) */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/buy" element={<Buy />} />
         <Route path="/sell" element={<Sell />} />
@@ -34,14 +48,25 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/rules" element={<RulesAndRegulations />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        {/* Existing Marketplace Routes */}
         <Route path="/buy-sell" element={<BuySellDashboard />} />
 
         {/* Lost & Found Routes */}
         <Route path="/lost-found" element={<LostFoundDashboard />} />
         <Route path="/lost-found/list" element={<LostFoundForm />} />
         <Route path="/lost-found/all" element={<LostFoundListings />} />
-        <Route path="/lost-found/my-listings" element={<MyLostFoundListings />} /> {/* ✅ UPDATED ROUTE */}
+        <Route path="/lost-found/my-listings" element={<MyLostFoundListings />} />
+
+        {/* Routes for informational pages (Under Construction) */}
+        <Route path="/news" element={<News/>} />
+        <Route path="/announcements" element={<Announcements />} />
+        <Route path="/contact" element={<Contact/>} />
+        <Route path="/nitc-info" element={<UnderConstruction />} /> 
+      <Route path="/terms" element={<TermsOfUse />} />
+        <Route path="/accessibility" element={<Accessibility />} />
+        <Route path="/about-site" element={<About/>} />
+        {/* <Route path="/feedback-info" element={<UnderConstruction />} />  */}
+        <Route path="/credits" element={<Credits />} />
+
       </Routes>
     </Router>
   );

@@ -1,90 +1,109 @@
 /* src/Sell.css */
 .sell-item-container {
-    max-width: 600px;
+    max-width: 650px; /* Slightly wider container */
     margin: 40px auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
+    padding: 30px; /* Increased padding */
+    background-color: var(--card-background); /* Use card background */
+    border-radius: 15px; /* Consistent border-radius */
+    box-shadow: var(--shadow-medium); /* Consistent shadow */
+    color: var(--text-color);
 }
 
 .sell-item-container h2 {
     text-align: center;
-    color: #333;
-    margin-bottom: 25px;
+    color: var(--primary-color);
+    margin-bottom: 30px;
+    font-size: 2.2em;
 }
 
 .sell-item-container .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px; /* More space between form groups */
 }
 
 .sell-item-container label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
+    margin-bottom: 8px; /* More space below label */
+    font-weight: 600;
+    color: var(--heading-color);
+    font-size: 1.05em;
 }
 
 .sell-item-container input[type="text"],
 .sell-item-container input[type="number"],
 .sell-item-container textarea,
 .sell-item-container select {
-    width: calc(100% - 20px); /* Adjust for padding */
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box; /* Include padding in width */
-    font-size: 16px;
+    width: 100%; /* Full width */
+    padding: 12px; /* Increased padding */
+    border: 1px solid var(--input-border);
+    border-radius: 8px; /* Consistent border-radius */
+    background-color: var(--input-background);
+    color: var(--text-color);
+    font-size: 1em;
 }
 
 .sell-item-container textarea {
+    min-height: 100px; /* Min height for textarea */
     resize: vertical;
 }
 
 .sell-item-container button[type="submit"] {
-    background-color: #28a745;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 17px;
+    background-color: var(--button-success-bg);
+    color: var(--button-text-color);
+    padding: 14px 25px; /* Increased padding */
+    border-radius: 10px; /* Consistent button radius */
+    font-size: 1.1em;
+    font-weight: 600;
     width: 100%;
-    margin-top: 20px;
-    transition: background-color 0.2s;
+    margin-top: 25px; /* More space above submit button */
+    box-shadow: 0 4px 10px rgba(var(--accent-color-rgb), 0.2);
 }
 
 .sell-item-container button[type="submit"]:hover:not(:disabled) {
-    background-color: #218838;
-}
-
-.sell-item-container button[type="submit"]:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
+    background-color: var(--button-success-hover-bg);
+    box-shadow: 0 6px 15px rgba(var(--accent-color-rgb), 0.3);
 }
 
 .sell-item-container .error-message {
-    color: red;
+    color: var(--danger-color);
     text-align: center;
-    margin-bottom: 15px;
+    margin-top: 15px; /* Position error message better */
+    margin-bottom: 0; /* Remove bottom margin if success/error message follows */
+    padding: 10px;
+    background-color: var(--message-error-bg);
+    border-radius: 8px;
+    font-size: 0.95em;
 }
 
 .sell-item-container .back-button {
     display: block;
     width: 100%;
-    padding: 10px;
-    margin-top: 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    padding: 12px;
+    margin-top: 20px; /* Space from submit button */
+    background-color: var(--button-secondary-bg);
+    color: var(--button-text-color);
+    border-radius: 10px;
     text-align: center;
-    font-size: 16px;
+    font-size: 1.1em;
     text-decoration: none;
+    font-weight: 500;
 }
 
-.sell-item-container .back-button:hover {
-    background-color: #0056b3;
+.sell-item-container .back-button:hover:not(:disabled) {
+    background-color: var(--button-secondary-hover-bg);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .sell-item-container {
+        padding: 20px;
+        margin: 30px 15px;
+    }
+    .sell-item-container h2 {
+        font-size: 1.8em;
+    }
+    .sell-item-container button[type="submit"],
+    .sell-item-container .back-button {
+        padding: 12px 15px;
+        font-size: 1em;
+    }
 }

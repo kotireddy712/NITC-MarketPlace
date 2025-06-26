@@ -13,11 +13,6 @@ import secrets
 import string
 from functools import wraps
 import logging # Import logging module
-from dotenv import load_dotenv
-load_dotenv()
-
-
-
 
 app = Flask(__name__)
 
@@ -44,8 +39,7 @@ app.config['SESSION_COOKIE_SECURE'] = False # Set to True in production with HTT
 # IMPORTANT: For production, replace "http://localhost:3000" with your specific frontend origin(s)
 # (e.g., "https://yourfrontend.com"). If you have multiple, list them: ["http://localhost:3000", "http://127.0.0.1:3000"]
 # 'supports_credentials=True' is essential for cookies/sessions to work across different origins.
-CORS(app, supports_credentials=True, origins=["http://localhost:3000", "http://127.0.0.1:5000"]) # Add your frontend's origin(s) here
-
+CORS(app, supports_credentials=True, origins=["http://localhost:3000"]) # REMOVED http://127.0.0.1:5000 from here
 # --- Email Configuration ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -416,51 +410,6 @@ def signup():
 
 # --- Other Placeholder Routes (add your actual application routes here) ---
 
-# @app.route("/login", methods=["POST"])
-# def login():
-#     """Handles user login."""
-#     db_conn = get_db()
-#     cursor = db_conn.cursor(dictionary=True)
-#     data = request.json
-#     email = data.get("email")
-#     password = data.get("password")
-
-#     if not all([email, password]):
-#         return jsonify({"message": "Missing required fields."}), 400
-
-#     try:
-#         # Fetch user including the hashed password
-#         cursor.execute("SELECT user_id, name, email, password, role FROM users WHERE email=%s", (email,))
-#         user = cursor.fetchone()
-
-#         if not user:
-#             return jsonify({"message": "Invalid credentials or user not found."}), 401
-
-#         # Check if password exists (i.e., user has completed signup)
-#         if user["password"] is None:
-#             return jsonify({"message": "Account not fully signed up. Please complete signup first."}), 403
-
-#         # Verify the password using bcrypt (Crucial change here!)
-#         # bcrypt.checkpw expects bytes for both password and hashed password
-#         if not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
-#             return jsonify({"message": "Incorrect password."}), 403
-
-#         return jsonify({
-#             "message": "Login successful!",
-#             "user_id": user["user_id"],
-#             "name": user["name"],
-#             "email": user["email"],
-#             "is_admin": user["role"] == "admin" # Assuming 'role' column exists in 'users' table
-#         })
-
-#     except mysql.connector.Error as err:
-#         app.logger.error(f"Database error during login for {email}: {err}")
-#         return jsonify({"message": f"Database error during login: {err}"}), 500
-
-#     except Exception as e:
-#         app.logger.error(f"Unexpected error during login for {email}: {e}")
-#         return jsonify({"message": f"An unexpected error occurred during login: {e}"}), 500
-
 @app.route("/login", methods=["POST"])
 def login():
     """Handles user login."""
@@ -474,25 +423,19 @@ def login():
         return jsonify({"message": "Missing required fields."}), 400
 
     try:
-        # Fetch user including the hashed password and is_disabled status
-        cursor.execute(
-            "SELECT user_id, name, email, password, role, is_disabled FROM users WHERE email=%s",
-            (email,)
-        )
+        # Fetch user including the hashed password
+        cursor.execute("SELECT user_id, name, email, password, role FROM users WHERE email=%s", (email,))
         user = cursor.fetchone()
 
         if not user:
             return jsonify({"message": "Invalid credentials or user not found."}), 401
 
-        # Check if account is disabled
-        if user.get("is_disabled") == 1:
-            return jsonify({"message": "Account is disabled. Please contact support."}), 403
-
         # Check if password exists (i.e., user has completed signup)
         if user["password"] is None:
             return jsonify({"message": "Account not fully signed up. Please complete signup first."}), 403
 
-        # Verify the password using bcrypt
+        # Verify the password using bcrypt (Crucial change here!)
+        # bcrypt.checkpw expects bytes for both password and hashed password
         if not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
             return jsonify({"message": "Incorrect password."}), 403
 
@@ -501,7 +444,7 @@ def login():
             "user_id": user["user_id"],
             "name": user["name"],
             "email": user["email"],
-            "is_admin": user["role"] == "admin"
+            "role": user["role"] # Assuming 'role' column exists in 'users' table
         })
 
     except mysql.connector.Error as err:
@@ -511,7 +454,6 @@ def login():
     except Exception as e:
         app.logger.error(f"Unexpected error during login for {email}: {e}")
         return jsonify({"message": f"An unexpected error occurred during login: {e}"}), 500
-
 # ---------------------------------------------------------------------------------------------------
 
 @app.route('/items', methods=['GET'])
@@ -1049,85 +991,32 @@ def category_counts():
     except Exception as e:
         print("Error fetching category counts:", e)
         return jsonify({'error': 'Internal server error'}), 500
-    finally:
-        cursor.close()
 
 @app.route('/admin/users', methods=['GET'])
 def fetch_users():
     db = get_db()
     cursor = db.cursor(dictionary=True)
     try:
-        # Assuming 'role' column exists in your users table
         cursor.execute("SELECT user_id, name, email, contact_number, is_disabled FROM users WHERE role = 'user'")
         result = cursor.fetchall()
         return jsonify(result)
     except Exception as e:
         print("Error fetching users:", e)
         return jsonify({'error': 'Internal server error'}), 500
-    finally:
-        cursor.close()
-
-# Route to disable a user
 @app.route('/admin/disable-user', methods=['POST'])
 def disable_user():
     data = request.get_json()
     user_id = data.get('user_id')
 
-    if not user_id:
-        return jsonify({'error': 'User ID is required'}), 400
-
     db = get_db()
     cursor = db.cursor()
     try:
-        # Optional: Add a check here to prevent disabling admin users
-        cursor.execute("SELECT role FROM users WHERE user_id = %s", (user_id,))
-        user_info = cursor.fetchone()
-        if user_info and user_info[0] == 'admin': # user_info[0] is the role if not dictionary cursor
-             return jsonify({'error': 'Cannot disable admin users'}), 403
-
         cursor.execute("UPDATE users SET is_disabled = TRUE WHERE user_id = %s", (user_id,))
         db.commit()
-        return jsonify({'message': 'User disabled successfully'})
+        return jsonify({'message': 'User disabled'})
     except Exception as e:
         print("Error disabling user:", e)
-        # Rollback in case of error
-        if db.is_connected(): # Check if connection is still valid before rollback
-            db.rollback()
         return jsonify({'error': 'Internal server error'}), 500
-    finally:
-        cursor.close()
-
-
-# Route to enable a user
-@app.route('/admin/enable-user', methods=['POST'])
-def enable_user():
-    data = request.get_json()
-    user_id = data.get('user_id')
-
-    if not user_id:
-        return jsonify({'error': 'User ID is required'}), 400
-
-    db = get_db()
-    cursor = db.cursor(dictionary=True) # Use dictionary=True for easier access to 'role'
-    try:
-        cursor.execute("SELECT role FROM users WHERE user_id = %s", (user_id,))
-        user = cursor.fetchone()
-
-        if user is None:
-            return jsonify({'error': 'User not found'}), 404
-        if user['role'] == 'admin':
-            return jsonify({'error': 'Cannot enable admin users'}), 403
-
-        cursor.execute("UPDATE users SET is_disabled = FALSE WHERE user_id = %s", (user_id,))
-        db.commit()
-        return jsonify({'message': 'User enabled successfully'})
-    except Exception as e:
-        print("Error enabling user:", e)
-        if db.is_connected():
-            db.rollback()
-        return jsonify({'error': 'Internal server error'}), 500
-    finally:
-        cursor.close()
 
 
 @app.route('/admin/pending-items', methods=['GET'])
@@ -1147,31 +1036,21 @@ def get_pending_items():
     except Exception as e:
         print("Error fetching pending items:", e)
         return jsonify({'error': 'Internal server error'}), 500
-    finally:
-        cursor.close()
 
 @app.route('/admin/approve-item', methods=['POST'])
 def approve_item_post():
     data = request.get_json()
     item_id = data.get('item_id')
 
-    if not item_id:
-        return jsonify({'error': 'Item ID is required'}), 400
-
     db = get_db()
     cursor = db.cursor()
     try:
         cursor.execute("UPDATE items SET is_approved = TRUE WHERE item_id = %s", (item_id,))
         db.commit()
-        return jsonify({'message': 'Item approved successfully'})
+        return jsonify({'message': 'Item approved'})
     except Exception as e:
         print("Error approving item:", e)
-        if db.is_connected():
-            db.rollback()
         return jsonify({'error': 'Internal server error'}), 500
-    finally:
-        cursor.close()
-
 @app.route('/admin/approve-all-items', methods=['PATCH'])
 def approve_all_items():
     db = get_db()
@@ -1179,14 +1058,10 @@ def approve_all_items():
     try:
         cursor.execute("UPDATE items SET is_approved = TRUE WHERE is_approved = FALSE")
         db.commit()
-        return jsonify({'message': 'All items approved successfully'})
+        return jsonify({'message': 'All items approved'})
     except Exception as e:
         print("Error approving all items:", e)
-        if db.is_connected():
-            db.rollback()
         return jsonify({'error': 'Internal server error'}), 500
-    finally:
-        cursor.close()
 
 @app.route('/admin/item-details/<int:item_id>', methods=['GET'])
 def get_item_details(item_id):
@@ -1194,7 +1069,7 @@ def get_item_details(item_id):
     cursor = db.cursor(dictionary=True)
     try:
         query = """
-            SELECT
+            SELECT 
                 items.item_id,
                 items.title,
                 items.description,
@@ -1220,8 +1095,7 @@ def get_item_details(item_id):
     except Exception as e:
         print("Error fetching item details:", e)
         return jsonify({'error': 'Internal server error'}), 500
-    finally:
-        cursor.close()
-        
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

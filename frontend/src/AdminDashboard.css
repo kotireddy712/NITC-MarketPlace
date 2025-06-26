@@ -133,15 +133,7 @@
   background-color: #1d4ed8;
 }
 
-.btn-submit {
-  background-color: #2563eb;
-}
-
-.btn-submit:hover {
-  background-color: #1d4ed8;
-}
-
-/* ========== Modal ========== */
+/* Modal */
 .item-details-modal {
   position: fixed;
   top: 50%;
@@ -274,4 +266,16 @@
   .admin-card {
     padding: 0.8rem;
   }
+}
+.btn-enable {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.btn-enable:hover {
+  background-color: #45a049;
 }

@@ -1,0 +1,516 @@
+/* src/LandingPage.css */
+
+/* Google Fonts - Inter for clean look, Playfair Display for title accent (optional) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap');
+
+:root {
+  /* ⭐⭐ UPDATED: New Formal Color Palette ⭐⭐ */
+  --primary-color: #0A4C84; /* Deep Navy Blue */
+  --secondary-color: #4A90E2; /* Professional Sky Blue */
+  --text-dark: #333D47; /* Charcoal Grey */
+  --text-light: #6C7A89; /* Medium Grey */
+  --background-light: #F7F9FC; /* Very Light Blue-Grey */
+  --card-background: #FFFFFF; /* Pure White */
+  --border-color: #E6E9ED; /* Light Grey Border */
+  --shadow-subtle: rgba(0, 0, 0, 0.04);
+  --shadow-medium: rgba(0, 0, 0, 0.1);
+
+  /* Colors for the header gradient animation (kept as is) */
+  --color1: #1a73e8; /* Blue */
+  --color2: #34a853; /* Green */
+  --color3: #8e44ad; /* Purple */
+  --color4: #00bcd4; /* Cyan */
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* ⭐ UPDATED: Subtle Linear Gradient Background ⭐ */
+  background: linear-gradient(to bottom, var(--background-light), #EBF2FA); /* Gentle transition for depth */
+  color: var(--text-dark); /* ⭐ UPDATED ⭐ */
+  line-height: 1.7;
+}
+
+.landing-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Keyframes for smooth color cycle (kept as is) */
+@keyframes colorCycle {
+  0% { background-position: 0% 0%; }
+  25% { background-position: 100% 0%; }
+  50% { background-position: 0% 100%; }
+  75% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+/* Header (kept mostly as is for animation) */
+.landing-header {
+  background: linear-gradient(135deg, var(--color1), var(--color2), var(--color3), var(--color4));
+  background-size: 400% 400%;
+  animation: colorCycle 20s ease infinite;
+  color: #ffffff;
+  padding: 25px 40px;
+  box-shadow: 0 4px 15px var(--shadow-medium);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; 
+  gap: 20px;
+}
+
+.header-content {
+  flex-grow: 1;
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  text-align: center; 
+}
+
+.logo-title-group {
+  display: flex;
+  align-items: center; 
+  gap: 15px; 
+  margin-bottom: 5px; 
+  flex-wrap: wrap; 
+  justify-content: center; 
+}
+
+.site-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8em;
+  margin: 0; 
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  white-space: nowrap; 
+}
+
+.site-title:hover {
+  transform: scale(1.02);
+}
+
+.nitc-logo {
+  width: 100px; 
+  height: auto; 
+  max-width: 100%; 
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
+  transition: transform 0.3s ease;
+}
+
+.nitc-logo:hover {
+  transform: scale(1.05);
+}
+
+.landing-nav {
+  /* No specific background, blends with header */
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 30px; 
+  flex-wrap: wrap; 
+  justify-content: center; 
+}
+
+.landing-nav li div {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1.05em;
+  cursor: pointer;
+  padding: 8px 0;
+  position: relative;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.landing-nav li div::after {
+  content: '';
+  position: absolute;
+  left: 50%; 
+  transform: translateX(-50%); 
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background-color: #ffffff;
+  transition: width 0.3s ease;
+}
+
+.landing-nav li div:hover {
+  color: #e3f2fd; 
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5); 
+}
+
+.landing-nav li div:hover::after {
+  width: 100%;
+}
+
+/* Main Content Area */
+.landing-main-content {
+  display: flex;
+  flex: 1;
+  padding: 40px;
+  gap: 40px; 
+  max-width: 1300px;
+  margin: 0 auto;
+  flex-wrap: wrap; 
+}
+
+.main-sections {
+  flex: 3; 
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  min-width: 60%; 
+}
+
+/* Sections Styling */
+.hero-section, .about-section, .vision-section, .mission-section, .features-section {
+  background-color: var(--card-background); /* ⭐ UPDATED ⭐ */
+  padding: 35px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px var(--shadow-subtle); /* ⭐ UPDATED ⭐ */
+  border: 1px solid var(--border-color); /* ⭐ UPDATED ⭐ */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-section:hover, .about-section:hover, .vision-section:hover, .mission-section:hover, .features-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px var(--shadow-medium); /* ⭐ UPDATED ⭐ */
+}
+
+h2 {
+  color: var(--primary-color); /* ⭐ UPDATED ⭐ */
+  font-size: 2.2em;
+  margin-top: 0;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--border-color); /* ⭐ UPDATED ⭐ */
+  padding-bottom: 10px;
+  font-weight: 700;
+}
+
+h3 {
+  color: var(--secondary-color); /* ⭐ UPDATED ⭐ */
+  font-size: 1.6em;
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.hero-section p, .about-section p, .vision-section p, .mission-section p {
+  font-size: 1.1em;
+  color: var(--text-dark); /* ⭐ UPDATED ⭐ */
+}
+
+.vision-mission-container {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.vision-section, .mission-section {
+  flex: 1; 
+  min-width: 300px; 
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.features-list li {
+  background-color: #f0f7ff; /* ⭐ UPDATED: Lighter blue background for features ⭐ */
+  padding: 15px 20px;
+  border-left: 5px solid var(--secondary-color); /* ⭐ UPDATED ⭐ */
+  border-radius: 8px;
+  font-weight: 500;
+  color: var(--text-dark); /* ⭐ UPDATED ⭐ */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 8px var(--shadow-subtle); /* ⭐ UPDATED ⭐ */
+}
+
+.features-list li span {
+  font-size: 1.5em; 
+}
+
+/* Explore Button */
+.explore-button-container {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.explore-button {
+  background: linear-gradient(45deg, var(--secondary-color), #2178d6); /* ⭐ UPDATED: Gradient with primary color family ⭐ */
+  color: white;
+  padding: 18px 45px;
+  border: none;
+  border-radius: 35px;
+  font-size: 1.3em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(74, 144, 226, 0.25); /* ⭐ UPDATED ⭐ */
+  letter-spacing: 0.5px;
+  outline: none; 
+}
+
+.explore-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(74, 144, 226, 0.4); /* ⭐ UPDATED ⭐ */
+  background: linear-gradient(45deg, #2178d6, #165691); /* ⭐ UPDATED ⭐ */
+}
+
+.explore-button:active {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3); /* ⭐ UPDATED ⭐ */
+}
+
+/* Sidebar */
+.landing-sidebar {
+  flex: 1; 
+  background-color: var(--card-background); /* ⭐ UPDATED ⭐ */
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px var(--shadow-subtle); /* ⭐ UPDATED ⭐ */
+  border: 1px solid var(--border-color); /* ⭐ UPDATED ⭐ */
+  align-self: flex-start; 
+  min-width: 300px; 
+}
+
+.landing-sidebar h3 {
+  color: var(--primary-color); /* ⭐ UPDATED ⭐ */
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 1.4em;
+  border-bottom: 2px solid var(--border-color); /* ⭐ UPDATED ⭐ */
+  padding-bottom: 10px;
+  font-weight: 600;
+}
+
+.landing-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.landing-sidebar li {
+  margin-bottom: 12px;
+  color: var(--text-dark); /* ⭐ UPDATED ⭐ */
+  font-size: 1.05em;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.2s ease;
+  padding: 5px 0;
+}
+
+.landing-sidebar li:hover {
+  color: var(--primary-color); /* ⭐ UPDATED ⭐ */
+  transform: translateX(5px);
+}
+
+.landing-sidebar p {
+  font-size: 0.95em;
+  color: var(--text-light); /* ⭐ UPDATED ⭐ */
+  margin-bottom: 15px;
+}
+
+.link-text {
+  color: var(--primary-color); /* ⭐ UPDATED ⭐ */
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.link-text:hover {
+  color: var(--secondary-color); /* ⭐ UPDATED ⭐ */
+}
+
+/* Footer */
+.landing-footer {
+  background-color: var(--text-dark); /* ⭐ UPDATED: Dark Footer for contrast ⭐ */
+  color: #ffffff;
+  text-align: center;
+  padding: 30px 20px;
+  font-size: 0.9em;
+  margin-top: auto; 
+  box-shadow: 0 -4px 15px var(--shadow-medium); /* ⭐ UPDATED ⭐ */
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px 30px; 
+  margin-bottom: 20px;
+}
+
+.footer-links div {
+  color: #e0e0e0;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.2s ease;
+  font-size: 1em;
+  position: relative;
+  padding-bottom: 3px;
+}
+
+.footer-links div::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 1px;
+  background-color: #e0e0e0;
+  transition: width 0.3s ease;
+}
+
+.footer-links div:hover {
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.footer-links div:hover::after {
+  width: 100%;
+}
+
+.copyright {
+  margin: 0;
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .landing-main-content {
+    flex-direction: column;
+    padding: 30px;
+    gap: 30px;
+  }
+
+  .main-sections, .landing-sidebar {
+    min-width: unset; 
+    width: 100%; 
+  }
+
+  .landing-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .logo-title-group {
+    flex-direction: column; 
+    gap: 5px; 
+  }
+
+  .nav-list {
+    margin-top: 15px;
+    gap: 20px;
+  }
+
+  .site-title {
+    font-size: 2.5em;
+  }
+
+  .nitc-logo {
+    width: 80px; 
+  }
+
+  h2 {
+    font-size: 1.8em;
+  }
+}
+
+@media (max-width: 768px) {
+  .landing-header {
+    padding: 15px;
+  }
+
+  .site-title {
+    font-size: 2.2em;
+  }
+
+  .nav-list {
+    flex-direction: column; 
+    align-items: center;
+    gap: 10px;
+  }
+
+  .landing-nav li div {
+    font-size: 1em;
+    padding: 5px 0;
+  }
+
+  .landing-main-content {
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .hero-section, .about-section, .vision-section, .mission-section, .features-section, .landing-sidebar {
+    padding: 25px;
+  }
+
+  h2 {
+    font-size: 1.6em;
+  }
+
+  h3 {
+    font-size: 1.3em;
+  }
+
+  .hero-section p, .about-section p, .vision-section p, .mission-section p {
+    font-size: 1em;
+  }
+
+  .explore-button {
+    padding: 15px 30px;
+    font-size: 1.1em;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-title {
+    font-size: 1.8em;
+  }
+
+  .nitc-logo {
+    width: 60px; 
+  }
+
+  .landing-main-content {
+    padding: 15px;
+  }
+
+  h2 {
+    font-size: 1.4em;
+  }
+
+  h3 {
+    font-size: 1.2em;
+  }
+
+  .explore-button {
+    padding: 12px 25px;
+    font-size: 1em;
+  }
+
+  .features-list {
+    grid-template-columns: 1fr; 
+  }
+}
