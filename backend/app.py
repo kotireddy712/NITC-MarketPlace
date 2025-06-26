@@ -1222,6 +1222,47 @@ def get_item_details(item_id):
         return jsonify({'error': 'Internal server error'}), 500
     finally:
         cursor.close()
+@app.route('/admin/delete-user/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
+        db.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({'error': 'User not found'}), 404
+
+        return jsonify({'message': 'User deleted successfully'}), 200
+    except Exception as e:
+        print("Error deleting user:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+    finally:
+        cursor.close()
+@app.route('/admin/delete-users', methods=['POST'])
+def delete_users():
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        data = request.get_json()
+        user_ids = data.get('user_ids')
+
+        if not user_ids or not isinstance(user_ids, list):
+            return jsonify({'error': 'Invalid or missing user_ids'}), 400
+
+        format_strings = ','.join(['%s'] * len(user_ids))
+        cursor.execute(f"DELETE FROM users WHERE user_id IN ({format_strings})", tuple(user_ids))
+        db.commit()
+
+        return jsonify({'message': f'{cursor.rowcount} users deleted successfully'}), 200
+
+    except Exception as e:
+        print('Error deleting users:', e)
+        return jsonify({'error': 'Internal server error'}), 500
+    finally:
+        cursor.close()
+
+
         
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

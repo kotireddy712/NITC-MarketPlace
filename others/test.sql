@@ -61,4 +61,4 @@ SET role = 'admin'
 WHERE email = 'vakiti_b231314cs@nitc.ac.in';
 
 --@block
-SELECT *from users where email='vakiti_b231314cs@nitc.ac.in';
+SELECT *from users;
