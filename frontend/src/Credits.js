@@ -1,11 +1,18 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import kotiImg from './koti.jpg';
 import reddyImg from './reddy.jpg';
-
 
 const Credits = () => {
   return (
     <div style={styles.container}>
+      {/* Home Button */}
+      <div style={styles.homeButtonContainer}>
+        <Link to="/" style={styles.homeButton}>
+          🏠 Home
+        </Link>
+      </div>
+
       <h1 style={styles.heading}>Credits & Acknowledgements</h1>
 
       <p style={styles.text}>
@@ -82,12 +89,27 @@ const styles = {
     backgroundColor: '#fefefe',
     borderRadius: '15px',
     boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
-    textAlign: 'center',
+    position: 'relative', // Make relative for absolute positioning of home button
+  },
+  homeButtonContainer: {
+    position: 'absolute',
+    top: '20px',
+    right: '20px',
+  },
+  homeButton: {
+    backgroundColor: '#004080',
+    color: '#fff',
+    padding: '10px 18px',
+    borderRadius: '8px',
+    textDecoration: 'none',
+    fontSize: '1em',
+    transition: 'background-color 0.3s',
   },
   heading: {
     color: '#004080',
     fontSize: '2.7em',
     marginBottom: '20px',
+    textAlign: 'center',
   },
   subheading: {
     color: '#004080',

@@ -124,7 +124,8 @@ WHERE email = 'chilakala_b230650cs@nitc.ac.in';
 --@block
 UPDATE nitc_mp_db.users
 SET password = NULL
-WHERE user_id =44;
+WHERE user_id =44; 
+-- // ** 8830
 --@block
 CREATE TABLE IF NOT EXISTS nitc_mp_db.email_otp (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -134,13 +135,21 @@ CREATE TABLE IF NOT EXISTS nitc_mp_db.email_otp (
 );
 
 --@block
-CREATE TABLE nitc_mp_db.feedback (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  email VARCHAR(100) NOT NULL,
-  name VARCHAR(100) NOT NULL,
-  message TEXT NOT NULL,
-  submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS nitc_mp_db.feedback (
+    feedback_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_name VARCHAR(255) NOT NULL,
+    user_email VARCHAR(255) NOT NULL,
+    user_contact_number VARCHAR(20), -- Can be NULL if not found or desired
+    feedback_text TEXT NOT NULL,
+    submission_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+--@block
+ALTER TABLE nitc_mp_db.feedback
+ADD COLUMN user_id INT AFTER feedback_id;
 
 --@block
-DROP TABLE nitc_mp_db.feedback;
+ALTER TABLE nitc_mp_db.feedback
+ADD CONSTRAINT fk_user_id
+FOREIGN KEY (user_id) REFERENCES users(user_id)
+ON DELETE CASCADE;
+

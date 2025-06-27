@@ -1222,6 +1222,119 @@ def get_item_details(item_id):
         return jsonify({'error': 'Internal server error'}), 500
     finally:
         cursor.close()
+@app.route('/admin/delete-user/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
+        db.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({'error': 'User not found'}), 404
+
+        return jsonify({'message': 'User deleted successfully'}), 200
+    except Exception as e:
+        print("Error deleting user:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+    finally:
+        cursor.close()
+@app.route('/admin/delete-users', methods=['POST'])
+def delete_users():
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        data = request.get_json()
+        user_ids = data.get('user_ids')
+
+        if not user_ids or not isinstance(user_ids, list):
+            return jsonify({'error': 'Invalid or missing user_ids'}), 400
+
+        format_strings = ','.join(['%s'] * len(user_ids))
+        cursor.execute(f"DELETE FROM users WHERE user_id IN ({format_strings})", tuple(user_ids))
+        db.commit()
+
+        return jsonify({'message': f'{cursor.rowcount} users deleted successfully'}), 200
+
+    except Exception as e:
+        print('Error deleting users:', e)
+        return jsonify({'error': 'Internal server error'}), 500
+    finally:
+        cursor.close()
+
+# --- Feedback Submission Route (Replace your existing /api/feedback route with this) ---
+@app.route('/api/feedback', methods=['POST'])
+def submit_feedback():
+    """
+    Receives feedback text from the frontend, retrieves user details (user_id, name, email, contact_number)
+    from the 'users' table based on the provided user_email, and stores all information
+    in the 'feedback' table.
+    """
+    app.logger.debug("Received request to /api/feedback")
+    if not request.is_json:
+        app.logger.warning("Feedback submission failed: Missing JSON in request")
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    data = request.get_json()
+    feedback_text = data.get('feedback', '').strip()
+    user_email_from_frontend = data.get('user_email') # This is sent from frontend localStorage
+
+    if not feedback_text:
+        app.logger.warning("Feedback submission failed: Feedback text is empty")
+        return jsonify({"msg": "Feedback cannot be empty"}), 400
+
+    if not user_email_from_frontend:
+        app.logger.warning("Feedback submission failed: User email is missing from frontend data")
+        return jsonify({"msg": "User email is required to submit feedback"}), 400
+
+    db = None
+    cursor = None
+    user_id = None # Initialize user_id
+    user_name = "Anonymous User" # Default name if not found
+    user_contact_number = None # Default contact number if not found
+
+    try:
+        db = get_db()
+        cursor = g.cursor
+
+        # 1. Fetch user's ID, name, and contact number from the 'users' table
+        sql_fetch_user_details = "SELECT user_id, name, contact_number FROM users WHERE email = %s"
+        cursor.execute(sql_fetch_user_details, (user_email_from_frontend,))
+        user_record = cursor.fetchone()
+
+        if user_record:
+            user_id = user_record.get('user_id')
+            user_name = user_record.get('name') or "Anonymous User"
+            user_contact_number = user_record.get('contact_number')
+            app.logger.debug(f"Found user details: ID={user_id}, Name='{user_name}', Contact='{user_contact_number}' for email '{user_email_from_frontend}'")
+        else:
+            app.logger.warning(f"User details not found for email: {user_email_from_frontend}. Using default 'Anonymous User', no ID/contact.")
+
+        # 2. Insert feedback into the 'feedback' table
+        # Include user_id in the INSERT statement
+        sql_insert_feedback = """
+            INSERT INTO feedback (user_id, user_name, user_email, user_contact_number, feedback_text)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(sql_insert_feedback, (user_id, user_name, user_email_from_frontend, user_contact_number, feedback_text))
+        db.commit() # Commit the transaction
+
+        feedback_id = cursor.lastrowid
+        app.logger.info(f"Feedback received and stored successfully. ID: {feedback_id}, User: {user_name} ({user_email_from_frontend}), Contact: {user_contact_number}")
+        return jsonify({"msg": "Feedback received successfully!", "feedback_id": feedback_id}), 200
+
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error during feedback submission: {err}")
+        if db:
+            db.rollback() # Rollback on error
+        return jsonify({"msg": f"Database error: {err}"}), 500
+    except Exception as e:
+        app.logger.error(f"An unexpected error occurred during feedback submission: {e}")
+        if db:
+            db.rollback() # Rollback on any other error
+        return jsonify({"msg": f"An unexpected error occurred: {e}"}), 500
+
+# ... (Rest of your app.py code, including @app.route('/api/user/<email>')) ...
         
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

@@ -1,8 +1,16 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // Import Link for navigation
 
 const TermsOfUse = () => {
   return (
     <div style={styles.container}>
+      {/* Home Button */}
+      <div style={styles.homeButtonContainer}>
+        <Link to="/" style={styles.homeButton}>
+          🏠 Home
+        </Link>
+      </div>
+
       <h1 style={styles.title}>NITC Marketplace – Terms & Regulations</h1>
 
       <p style={styles.paragraph}>
@@ -121,6 +129,21 @@ const styles = {
     lineHeight: 1.8,
     color: '#333',
     fontFamily: 'Segoe UI, sans-serif',
+    position: 'relative', // Added for home button positioning
+  },
+  homeButtonContainer: {
+    position: 'absolute',
+    top: '20px',
+    right: '20px',
+  },
+  homeButton: {
+    backgroundColor: '#0066cc',
+    color: '#fff',
+    padding: '10px 18px',
+    borderRadius: '8px',
+    textDecoration: 'none',
+    fontSize: '1em',
+    transition: 'background-color 0.3s',
   },
   title: {
     textAlign: 'center',

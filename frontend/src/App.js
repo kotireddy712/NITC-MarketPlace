@@ -20,7 +20,7 @@ import MyLostFoundListings from './MyLostFoundListings';
 
 // Import the LandingPage and UnderConstruction components
 import LandingPage from './LandingPage';
-import UnderConstruction from './UnderConstruction'; 
+import UnderConstruction from './UnderConstruction';
 import TermsOfUse from './TermsOfUse';
 import Announcements from './Announcements';
 import Contact from './Contact';
@@ -30,6 +30,7 @@ import About from './About';
 import Credits from './Credits';
 
 import './App.css'; // Your main app CSS
+import './FeedbackModal.css'; // <--- NEW: Import the FeedbackModal CSS
 
 function App() {
   return (
@@ -38,7 +39,7 @@ function App() {
         {/* Landing Page as the initial root path */}
         <Route path="/" element={<LandingPage />} />
         {/* AuthForm is now accessed via /login */}
-        <Route path="/login" element={<AuthForm />} /> 
+        <Route path="/login" element={<AuthForm />} />
 
         {/* Core Application Routes (accessible after login) */}
         <Route path="/dashboard" element={<Dashboard />} />
@@ -60,8 +61,8 @@ function App() {
         <Route path="/news" element={<News/>} />
         <Route path="/announcements" element={<Announcements />} />
         <Route path="/contact" element={<Contact/>} />
-        <Route path="/nitc-info" element={<UnderConstruction />} /> 
-      <Route path="/terms" element={<TermsOfUse />} />
+        <Route path="/nitc-info" element={<UnderConstruction />} />
+        <Route path="/terms" element={<TermsOfUse />} />
         <Route path="/accessibility" element={<Accessibility />} />
         <Route path="/about-site" element={<About/>} />
         {/* <Route path="/feedback-info" element={<UnderConstruction />} />  */}
