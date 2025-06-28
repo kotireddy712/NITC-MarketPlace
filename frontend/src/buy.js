@@ -113,6 +113,12 @@ export default function Buy() {
                             <img src={item.image_url} alt={item.title} className="item-image" />
                         )}
                         <h3 className="item-title">{item.title}</h3>
+                        <p
+  className={`item-approved ${item.is_approved ? 'approved' : 'not-approved'}`}
+>
+  {item.is_approved ? '✅ Admin Approved' : '❌ Not Approved by Admin'}
+</p>
+
                         <p className="item-description">{item.description}</p>
                         <p className="item-price">Price: ₹{item.price}</p>
                         <p className="item-quantity">Quantity: {item.quantity}</p>
