@@ -156,4 +156,4 @@ ON DELETE CASCADE;
 
 --@block
 DELETE FROM nitc_mp_db.users
-WHERE user_id = 97;
+WHERE user_id = 206;

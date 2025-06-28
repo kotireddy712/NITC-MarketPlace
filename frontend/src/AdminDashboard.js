@@ -24,6 +24,10 @@ function AdminDashboard() {
   const [feedbackSearchQuery, setFeedbackSearchQuery] = useState('');
   const [feedbackTotalCount, setFeedbackTotalCount] = useState(0);
 
+  // New states for displaying items by category
+  const [selectedCategoryItems, setSelectedCategoryItems] = useState([]);
+  const [selectedCategoryName, setSelectedCategoryName] = useState(null);
+
   useEffect(() => {
     fetchCategoryCounts();
     fetchUsers();
@@ -140,6 +144,14 @@ function AdminDashboard() {
     try {
       await axios.post(`http://localhost:5000/admin/approve-item`, { item_id: itemId });
       fetchPendingItems();
+      // If we are currently viewing items by category, re-fetch them to update status
+      if (selectedCategoryName) {
+        // Find the category ID from categoryCounts based on selectedCategoryName
+        const category = categoryCounts.find(cat => cat.category === selectedCategoryName);
+        if (category) {
+          fetchItemsByCategory(category.category_id, selectedCategoryName);
+        }
+      }
     } catch (error) {
       alert(`Error approving item: ${error.message}`);
     }
@@ -162,6 +174,13 @@ function AdminDashboard() {
     try {
       await axios.patch('http://localhost:5000/admin/approve-all-items');
       fetchPendingItems();
+      // If we are currently viewing items by category, re-fetch them to update status
+      if (selectedCategoryName) {
+        const category = categoryCounts.find(cat => cat.category === selectedCategoryName);
+        if (category) {
+          fetchItemsByCategory(category.category_id, selectedCategoryName);
+        }
+      }
     } catch (error) {
       alert(`Error approving all items: ${error.message}`);
     }
@@ -183,6 +202,18 @@ function AdminDashboard() {
       setItemDetails(res.data);
     } catch (error) {
       alert(`Error fetching item details: ${error.message}`);
+    }
+  };
+
+  // --- NEW FUNCTION: Fetch items for a specific category ---
+  const fetchItemsByCategory = async (categoryId, categoryName) => {
+    try {
+      const res = await axios.get(`http://localhost:5000/admin/items-in-category/${categoryId}`);
+      setSelectedCategoryItems(res.data);
+      setSelectedCategoryName(categoryName); // Set the name to display in the header
+    } catch (error) {
+      console.error(`Error fetching items for category ${categoryName}:`, error);
+      alert(`Error fetching items for category ${categoryName}: ${error.message}`);
     }
   };
 
@@ -237,230 +268,294 @@ function AdminDashboard() {
       {/* Admin Actions */}
       <section className="dashboard-section admin-actions-grid">
         <button
-          className={`admin-action-button ${!showFeedbackSection ? 'active-section-button' : ''}`}
-          onClick={() => setShowFeedbackSection(false)}
+          className={`admin-action-button ${!showFeedbackSection && !selectedCategoryName ? 'active-section-button' : ''}`}
+          onClick={() => {
+            setShowFeedbackSection(false);
+            setSelectedCategoryName(null); // Ensure category view is hidden
+            setSelectedCategoryItems([]);
+          }}
         >
           Manage Users & Items
         </button>
         <button
           className={`admin-action-button ${showFeedbackSection ? 'active-section-button' : ''}`}
-          onClick={() => setShowFeedbackSection(true)}
+          onClick={() => {
+            setShowFeedbackSection(true);
+            setSelectedCategoryName(null); // Ensure category view is hidden
+            setSelectedCategoryItems([]);
+          }}
         >
           View Feedbacks
         </button>
       </section>
 
+      {/* Conditional Rendering for Sections */}
       {!showFeedbackSection ? (
-        <>
-          {/* Category Summary */}
+        selectedCategoryName ? (
+          // --- Display Items by Selected Category ---
           <section className="dashboard-section">
-            <h3>Items by Category</h3>
-            <div className="card-grid">
-              {categoryCounts.map(({ category, total_items }) => (
-                <div className="admin-card" key={category}>
-                  <h4>{category}</h4>
-                  <p>{total_items}</p>
-                </div>
-              ))}
-            </div>
-          </section>
+            <h3>Items in Category: {selectedCategoryName}</h3>
+            <button
+              className="btn-back"
+              onClick={() => {
+                setSelectedCategoryItems([]);
+                setSelectedCategoryName(null);
+                fetchCategoryCounts(); // Re-fetch category counts if needed
+              }}
+            >
+              ← Back to Categories
+            </button>
 
-          {/* Pending Items */}
-          <section className="dashboard-section">
-            <h3>Pending Items for Approval</h3>
-            {pendingItems.length > 0 && (
-              <button className="btn-approve-all" onClick={approveAllItems}>
-                Approve All
-              </button>
+            {selectedCategoryItems.length === 0 ? (
+              <p>No items found in this category.</p>
+            ) : (
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Condition</th>
+                    <th>Approved</th>
+                    <th>Listed By</th>
+                    <th>Listed On</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedCategoryItems.map(item => (
+                    <tr key={item.item_id}>
+                      <td>{item.item_id}</td>
+                      <td>
+                        <strong
+                          className="clickable-title"
+                          onClick={() => fetchItemDetails(item.item_id)}
+                        >
+                          {item.title}
+                        </strong>
+                      </td>
+                      <td>₹{item.price}</td>
+                      <td>{item.item_condition}</td>
+                      <td>{item.is_approved ? 'Yes' : 'No'}</td>
+                      <td>{item.seller_name} ({item.seller_email})</td>
+                      <td>{new Date(item.created_at).toLocaleDateString()}</td>
+                      <td>
+                        {!item.is_approved && (
+                          <button
+                            className="btn-approve"
+                            onClick={() => approveItem(item.item_id)}
+                          >
+                            Approve
+                          </button>
+                        )}
+                        {/* Add more actions like edit/delete if needed for admin */}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
-                {pendingItems.length > 0 && (
-      <button className="btn-disapprove-all" onClick={disapproveAllItems}>
-  Disapprove All
-</button>
-    )}
-
-            {pendingItems.length === 0 ? (
-            <p>No items pending approval.</p>
-          ) : (
-            <ul className="pending-list">
-              {pendingItems.map(item => (
-                <li key={item.item_id} className="pending-item">
-                  <strong
-                    className="clickable-title"
-                    onClick={() => fetchItemDetails(item.item_id)}
-                  >
-                    {item.title}
-                  </strong>{" "}
-                  - {item.category}
-                  <button className="btn-approve" onClick={() => approveItem(item.item_id)}>
-                    Approve
-                  </button>
-                  <button className="btn-disapprove" onClick={() => disapproveItem(item.item_id)}>
-                    Disapprove
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-
-
           </section>
-          {items.length > 0 && (
-  <section className="dashboard-section">
-    <h3>Items in Selected Category</h3>
-    <div className="items-grid">
-      {items.map((item) => (
-        <div key={item.item_id} className="item-card">
-          <h4>{item.title}</h4>
-          <p>Price: ₹{item.price}</p>
-          <p>Quantity: {item.quantity}</p>
-          <p>Condition: {item.item_condition}</p>
-          {item.image_url && <img src={item.image_url} alt={item.title} />}
-        </div>
-      ))}
-    </div>
-  </section>
-)}
+        ) : (
+          // --- Main Admin Dashboard View (Category Summary, Pending Items, Users) ---
+          <>
+            {/* Category Summary */}
+            <section className="dashboard-section">
+              <h3>Items by Category</h3>
+              <div className="card-grid">
+                {categoryCounts.map(({ category_id, category, total_items }) => (
+                  <div
+                    className="admin-card clickable-card"
+                    key={category_id}
+                    onClick={() => fetchItemsByCategory(category_id, category)}
+                  >
+                    <h4>{category}</h4>
+                    <p>{total_items} items</p>
+                  </div>
+                ))}
+              </div>
+            </section>
 
-
-          {/* Item Details Modal */}
-          {itemDetails && (
-            <div className="item-details-modal">
-              <h4>Item Details</h4>
-              <p><strong>Title:</strong> {itemDetails.title}</p>
-              <p><strong>Description:</strong> {itemDetails.description}</p>
-              <p><strong>Price:</strong> ₹{itemDetails.price}</p>
-              <p><strong>Quantity:</strong> {itemDetails.quantity}</p>
-              <p><strong>Condition:</strong> {itemDetails.item_condition}</p>
-              <p><strong>Uploaded by:</strong> {itemDetails.uploaded_by}</p>
-              <p><strong>Category:</strong> {itemDetails.category}</p>
-              <p><strong>Posted on:</strong> {new Date(itemDetails.created_at).toLocaleDateString()}</p>
-              {itemDetails.image_url && (
-                <img
-                  src={itemDetails.image_url}
-                  alt="Item"
-                  style={{ maxWidth: '300px', marginTop: '10px', borderRadius: '10px' }}
-                />
-              )}
-              <button className="btn-close" onClick={() => setItemDetails(null)}>
-                Close
-              </button>
-            </div>
-          )}
-
-          {/* Users Section */}
-          <section className="dashboard-section">
-            <h3>All Users</h3>
-
-            <div className="search-pagination-control">
-              <input
-                type="text"
-                placeholder="Search users by name, email or contact..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
-                  setSelectedUsers([]); // Reset selected users when search changes
-                }}
-                className="search-bar"
-              />
-              {currentUsers.length > 0 && (
-                <button
-                  className="btn-delete-selected"
-                  onClick={deleteSelectedUsers}
-                  disabled={selectedUsers.length === 0}
-                >
-                  Delete Selected ({selectedUsers.length})
+            {/* Pending Items */}
+            <section className="dashboard-section">
+              <h3>Pending Items for Approval</h3>
+              {pendingItems.length > 0 && (
+                <button className="btn-approve-all" onClick={approveAllItems}>
+                  Approve All
                 </button>
               )}
-              <div className="entries-control">
-                <label>Show </label>
-                <select
-                  value={entriesPerPage}
-                  onChange={(e) => {
-                    setEntriesPerPage(parseInt(e.target.value));
-                    setCurrentPage(1);
-                  }}
-                >
-                  <option value={5}>5</option>
-                  <option value={10}>10</option>
-                  <option value={20}>20</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-                <label> entries per page</label>
-              </div>
-            </div>
+                    {pendingItems.length > 0 && (
+        <button className="btn-disapprove-all" onClick={disapproveAllItems}>
+          Disapprove All
+        </button>
+      )}
 
-            {currentUsers.length === 0 ? (
-              <p>No users found.</p>
-            ) : (
-              <>
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>
-                        <input
-                          type="checkbox"
-                          onChange={toggleSelectAllUsers}
-                          checked={currentUsers.length > 0 && currentUsers.every(user => selectedUsers.includes(user.user_id))}
-                        />
-                      </th>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Contact</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentUsers.map(user => (
-                      <tr key={user.user_id}>
-                        <td>
+              {pendingItems.length === 0 ? (
+                <p>No items pending approval.</p>
+              ) : (
+                <ul className="pending-list">
+                  {pendingItems.map(item => (
+                    <li key={item.item_id} className="pending-item">
+                      <strong
+                        className="clickable-title"
+                        onClick={() => fetchItemDetails(item.item_id)}
+                      >
+                        {item.title}
+                      </strong>{" "}
+                      - {item.category}
+                     <button className="btn-approve" onClick={() => approveItem(item.item_id)}>
+                      Approve
+                    </button>
+
+                    <button className="btn-disapprove" onClick={() => disapproveItem(item.item_id)}>
+                      Disapprove
+                    </button>
+
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
+            {/* Item Details Modal */}
+            {itemDetails && (
+              <div className="item-details-modal">
+                <h4>Item Details</h4>
+                <p><strong>Title:</strong> {itemDetails.title}</p>
+                <p><strong>Description:</strong> {itemDetails.description}</p>
+                <p><strong>Price:</strong> ₹{itemDetails.price}</p>
+                <p><strong>Quantity:</strong> {itemDetails.quantity}</p>
+                <p><strong>Condition:</strong> {itemDetails.item_condition}</p>
+                <p><strong>Uploaded by:</strong> {itemDetails.uploaded_by}</p>
+                <p><strong>Category:</strong> {itemDetails.category}</p>
+                <p><strong>Posted on:</strong> {new Date(itemDetails.created_at).toLocaleDateString()}</p>
+                {itemDetails.image_url && (
+                  <img
+                    src={itemDetails.image_url}
+                    alt="Item"
+                    style={{ maxWidth: '300px', marginTop: '10px', borderRadius: '10px' }}
+                  />
+                )}
+                <button className="btn-close" onClick={() => setItemDetails(null)}>
+                  Close
+                </button>
+              </div>
+            )}
+
+            {/* Users Section */}
+            <section className="dashboard-section">
+              <h3>All Users</h3>
+
+              <div className="search-pagination-control">
+                <input
+                  type="text"
+                  placeholder="Search users by name, email or contact..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                    setSelectedUsers([]); // Reset selected users when search changes
+                  }}
+                  className="search-bar"
+                />
+                {currentUsers.length > 0 && (
+                  <button
+                    className="btn-delete-selected"
+                    onClick={deleteSelectedUsers}
+                    disabled={selectedUsers.length === 0}
+                  >
+                    Delete Selected ({selectedUsers.length})
+                  </button>
+                )}
+                <div className="entries-control">
+                  <label>Show </label>
+                  <select
+                    value={entriesPerPage}
+                    onChange={(e) => {
+                      setEntriesPerPage(parseInt(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                  <label> entries per page</label>
+                </div>
+              </div>
+
+              {currentUsers.length === 0 ? (
+                <p>No users found.</p>
+              ) : (
+                <>
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>
                           <input
                             type="checkbox"
-                            checked={selectedUsers.includes(user.user_id)}
-                            onChange={() => toggleUserSelection(user.user_id)}
+                            onChange={toggleSelectAllUsers}
+                            checked={currentUsers.length > 0 && currentUsers.every(user => selectedUsers.includes(user.user_id))}
                           />
-                        </td>
-                        <td>{user.name}</td>
-                        <td>{user.email}</td>
-                        <td>{user.contact_number}</td>
-                        <td>{user.is_disabled ? 'Disabled' : 'Active'}</td>
-                        <td>
-                          {user.is_disabled ? (
-                            <button className="btn-enable" onClick={() => enableUser(user.user_id)}>Enable</button>
-                          ) : (
-                            <button className="btn-danger" onClick={() => disableUser(user.user_id)}>Disable</button>
-                          )}
-                          <button className="btn-delete" onClick={() => deleteUser(user.user_id)}>Delete</button>
-                        </td>
+                        </th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Contact</th>
+                        <th>Status</th>
+                        <th>Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {currentUsers.map(user => (
+                        <tr key={user.user_id}>
+                          <td>
+                            <input
+                              type="checkbox"
+                              checked={selectedUsers.includes(user.user_id)}
+                              onChange={() => toggleUserSelection(user.user_id)}
+                            />
+                          </td>
+                          <td>{user.name}</td>
+                          <td>{user.email}</td>
+                          <td>{user.contact_number}</td>
+                          <td>{user.is_disabled ? 'Disabled' : 'Active'}</td>
+                          <td>
+                            {user.is_disabled ? (
+                              <button className="btn-enable" onClick={() => enableUser(user.user_id)}>Enable</button>
+                            ) : (
+                              <button className="btn-danger" onClick={() => disableUser(user.user_id)}>Disable</button>
+                            )}
+                            <button className="btn-delete" onClick={() => deleteUser(user.user_id)}>Delete</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
 
-                <div className="pagination">
-                  <button onClick={goToPrevUserPage} disabled={currentPage === 1} className="pagination-button">
-                    ◀ Prev
-                  </button>
-                  {[...Array(totalUserPages)].map((_, index) => (
-                    <button
-                      key={`user-page-${index + 1}`}
-                      onClick={() => goToUserPage(index + 1)}
-                      className={`pagination-button ${currentPage === index + 1 ? 'active' : ''}`}
-                    >
-                      {index + 1}
+                  <div className="pagination">
+                    <button onClick={goToPrevUserPage} disabled={currentPage === 1} className="pagination-button">
+                      ◀ Prev
                     </button>
-                  ))}
-                  <button onClick={goToNextUserPage} disabled={currentPage === totalUserPages} className="pagination-button">
-                    Next ▶
-                  </button>
-                </div>
-              </>
-            )}
-          </section>
-        </>
+                    {[...Array(totalUserPages)].map((_, index) => (
+                      <button
+                        key={`user-page-${index + 1}`}
+                        onClick={() => goToUserPage(index + 1)}
+                        className={`pagination-button ${currentPage === index + 1 ? 'active' : ''}`}
+                      >
+                        {index + 1}
+                      </button>
+                    ))}
+                    <button onClick={goToNextUserPage} disabled={currentPage === totalUserPages} className="pagination-button">
+                      Next ▶
+                    </button>
+                  </div>
+                </>
+              )}
+            </section>
+          </>
+        )
       ) : (
         // --- Feedbacks Section ---
         <section className="dashboard-section">
