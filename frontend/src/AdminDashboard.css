@@ -418,3 +418,60 @@
 .search-pagination-control .entries-control label {
     margin-bottom: 0; /* Remove default label margin */
 }
+
+/* Style for the Return to Login button */
+.admin-dashboard-footer {
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.btn-return-login {
+    background-color: #6c757d; /* Grey, similar to secondary color */
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.2);
+}
+
+.btn-return-login:hover {
+    background-color: #5a6268; /* Darker grey on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(108, 117, 125, 0.3);
+}
+
+.btn-return-login:active {
+    transform: translateY(0);
+}
+
+/* AdminDashboard.css */
+
+.return-home-button {
+  position: absolute; /* Allows positioning relative to the nearest positioned ancestor (admin-container) */
+  top: 20px; /* Adjust as needed */
+  left: 20px; /* Adjust as needed */
+  padding: 10px 15px;
+  background-color: #007bff; /* A nice blue color */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 1000; /* Ensure it stays on top of other elements */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.return-home-button:hover {
+  background-color: #0056b3;
+}
+
+/* Ensure the admin-container has relative positioning so the absolute button works correctly */
+.admin-container {
+  position: relative; /* Add this if it's not already there */
+  /* ... other styles for admin-container */
+}

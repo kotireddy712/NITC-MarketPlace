@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import './AdminDashboard.css';
 
 function AdminDashboard() {
+  const navigate = useNavigate(); // Initialize useNavigate
+
   const [categoryCounts, setCategoryCounts] = useState([]);
   const [users, setUsers] = useState([]);
   const [pendingItems, setPendingItems] = useState([]);
@@ -196,9 +199,18 @@ function AdminDashboard() {
   const goToPrevFeedbackPage = () => setFeedbackCurrentPage((prev) => Math.max(prev - 1, 1));
   const goToFeedbackPage = (pageNumber) => setFeedbackCurrentPage(pageNumber);
 
+  // Function to navigate to the LandingPage
+  const handleReturnHome = () => {
+    navigate('/');
+  };
 
   return (
     <div className="admin-container">
+      {/* Return to Home Button */}
+      <button className="return-home-button" onClick={handleReturnHome}>
+        Return to Home 🏠
+      </button>
+
       <h2 className="admin-title">Admin Dashboard</h2>
 
       {/* Admin Actions */}
@@ -401,7 +413,7 @@ function AdminDashboard() {
           </section>
         </>
       ) : (
-        // --- Feedbacks Section ---
+        // {/* --- Feedbacks Section --- */ }
         <section className="dashboard-section">
           <h3>Customer Feedbacks</h3>
           <div className="search-pagination-control">

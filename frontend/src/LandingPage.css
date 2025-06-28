@@ -1,114 +1,86 @@
 /* src/LandingPage.css */
 
-/* Google Fonts - Inter for clean look, Playfair Display for title accent (optional) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap');
-
-:root {
-  /* ⭐⭐ UPDATED: New Formal Color Palette ⭐⭐ */
-  --primary-color: #0A4C84; /* Deep Navy Blue */
-  --secondary-color: #4A90E2; /* Professional Sky Blue */
-  --text-dark: #333D47; /* Charcoal Grey */
-  --text-light: #6C7A89; /* Medium Grey */
-  --background-light: #F7F9FC; /* Very Light Blue-Grey */
-  --card-background: #FFFFFF; /* Pure White */
-  --border-color: #E6E9ED; /* Light Grey Border */
-  --shadow-subtle: rgba(0, 0, 0, 0.04);
-  --shadow-medium: rgba(0, 0, 0, 0.1);
-
-  /* Colors for the header gradient animation (kept as is) */
-  --color1: #1a73e8; /* Blue */
-  --color2: #34a853; /* Green */
-  --color3: #8e44ad; /* Purple */
-  --color4: #00bcd4; /* Cyan */
-}
-
+/* General Styles & Body */
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif; /* Using Inter for a modern look */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* ⭐ UPDATED: Subtle Linear Gradient Background ⭐ */
-  background: linear-gradient(to bottom, var(--background-light), #EBF2FA); /* Gentle transition for depth */
-  color: var(--text-dark); /* ⭐ UPDATED ⭐ */
-  line-height: 1.7;
+  background-color: #f0f2f5; /* Light grey background */
+  color: #333;
 }
 
 .landing-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  box-sizing: border-box;
+  background-color: #ffffff; /* White background for the main content area */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  margin: 20px auto; /* Center the container with some margin */
+  max-width: 1200px; /* Max width for larger screens */
+  overflow: hidden; /* Ensure rounded corners are applied correctly */
 }
 
-/* Keyframes for smooth color cycle (kept as is) */
-@keyframes colorCycle {
-  0% { background-position: 0% 0%; }
-  25% { background-position: 100% 0%; }
-  50% { background-position: 0% 100%; }
-  75% { background-position: 100% 100%; }
-  100% { background-position: 0% 0%; }
-}
-
-/* Header (kept mostly as is for animation) */
+/* Header */
 .landing-header {
-  background: linear-gradient(135deg, var(--color1), var(--color2), var(--color3), var(--color4));
-  background-size: 400% 400%;
-  animation: colorCycle 20s ease infinite;
+  background-color: #2E8B57; /* Changed to Sea Green */
   color: #ffffff;
-  padding: 25px 40px;
-  box-shadow: 0 4px 15px var(--shadow-medium);
+  padding: 1.5rem 2rem;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column; /* Stack content and nav vertically on small screens */
   align-items: center;
-  flex-wrap: wrap; 
-  gap: 20px;
+  gap: 1rem;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
 }
 
 .header-content {
-  flex-grow: 1;
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  text-align: center; 
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Center the logo and title group */
+  align-items: center;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 1rem;
 }
 
 .logo-title-group {
   display: flex;
-  align-items: center; 
-  gap: 15px; 
-  margin-bottom: 5px; 
-  flex-wrap: wrap; 
-  justify-content: center; 
-}
-
-.site-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.8em;
-  margin: 0; 
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-  white-space: nowrap; 
-}
-
-.site-title:hover {
-  transform: scale(1.02);
+  align-items: center;
+  gap: 1rem; /* Space between logo and title */
 }
 
 .nitc-logo {
-  width: 100px; 
-  height: auto; 
-  max-width: 100%; 
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
-  transition: transform 0.3s ease;
+  width: 50px; /* Smaller logo for header */
+  height: 50px;
+  border-radius: 50%; /* Make it round */
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.nitc-logo:hover {
-  transform: scale(1.05);
+.site-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.site-title:hover {
+  color: #90EE90; /* Lighter green on hover */
+}
+
+.site-tagline {
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+  opacity: 0.9;
 }
 
 .landing-nav {
-  /* No specific background, blends with header */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
 .nav-list {
@@ -116,187 +88,187 @@ body {
   padding: 0;
   margin: 0;
   display: flex;
-  gap: 30px; 
-  flex-wrap: wrap; 
-  justify-content: center; 
+  flex-wrap: wrap; /* Allow navigation items to wrap */
+  gap: 1.5rem;
 }
 
-.landing-nav li div {
-  color: #ffffff;
-  font-weight: 600;
-  font-size: 1.05em;
+.nav-list li div {
+  color: #ffffff; /* Kept white for contrast on dark green header */
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
   cursor: pointer;
-  padding: 8px 0;
-  position: relative;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
-.landing-nav li div::after {
-  content: '';
-  position: absolute;
-  left: 50%; 
-  transform: translateX(-50%); 
-  bottom: 0;
-  width: 0;
-  height: 2px;
-  background-color: #ffffff;
-  transition: width 0.3s ease;
-}
-
-.landing-nav li div:hover {
-  color: #e3f2fd; 
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5); 
-}
-
-.landing-nav li div:hover::after {
-  width: 100%;
+.nav-list li div:hover {
+  background-color: rgba(144, 238, 144, 0.3); /* Transparent lighter green on hover */
+  transform: translateY(-2px);
 }
 
 /* Main Content Area */
 .landing-main-content {
   display: flex;
-  flex: 1;
-  padding: 40px;
-  gap: 40px; 
-  max-width: 1300px;
-  margin: 0 auto;
-  flex-wrap: wrap; 
+  flex-grow: 1;
+  padding: 2rem;
+  gap: 2rem; /* Space between main sections and sidebar */
 }
 
+/* Main Sections (Left side) */
 .main-sections {
-  flex: 3; 
+  flex: 3; /* Takes up more space */
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  min-width: 60%; 
+  gap: 2.5rem;
 }
 
-/* Sections Styling */
-.hero-section, .about-section, .vision-section, .mission-section, .features-section {
-  background-color: var(--card-background); /* ⭐ UPDATED ⭐ */
-  padding: 35px;
+section {
+  background-color: #ffffff;
+  padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 6px 20px var(--shadow-subtle); /* ⭐ UPDATED ⭐ */
-  border: 1px solid var(--border-color); /* ⭐ UPDATED ⭐ */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
-.hero-section:hover, .about-section:hover, .vision-section:hover, .mission-section:hover, .features-section:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px var(--shadow-medium); /* ⭐ UPDATED ⭐ */
+section h2 {
+  color: #2E8B57; /* Changed to Sea Green */
+  font-size: 2rem;
+  margin-bottom: 1.2rem;
+  border-bottom: 3px solid #2E8B57; /* Changed to Sea Green */
+  padding-bottom: 0.5rem;
+  display: inline-block; /* To make border-bottom only as wide as text */
 }
 
-h2 {
-  color: var(--primary-color); /* ⭐ UPDATED ⭐ */
-  font-size: 2.2em;
-  margin-top: 0;
-  margin-bottom: 20px;
-  border-bottom: 2px solid var(--border-color); /* ⭐ UPDATED ⭐ */
-  padding-bottom: 10px;
-  font-weight: 700;
+section h3 {
+  color: #2E8B57; /* Changed to Sea Green */
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
 }
 
-h3 {
-  color: var(--secondary-color); /* ⭐ UPDATED ⭐ */
-  font-size: 1.6em;
-  margin-top: 0;
-  margin-bottom: 15px;
-  font-weight: 600;
+section p {
+  line-height: 1.7;
+  color: #555;
 }
 
-.hero-section p, .about-section p, .vision-section p, .mission-section p {
-  font-size: 1.1em;
-  color: var(--text-dark); /* ⭐ UPDATED ⭐ */
-}
-
-.vision-mission-container {
-  display: flex;
-  gap: 30px;
-  flex-wrap: wrap;
-}
-
-.vision-section, .mission-section {
-  flex: 1; 
-  min-width: 300px; 
-}
-
-.features-list {
-  list-style: none;
-  padding: 0;
-  display: grid; 
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 15px;
-}
-
-.features-list li {
-  background-color: #f0f7ff; /* ⭐ UPDATED: Lighter blue background for features ⭐ */
-  padding: 15px 20px;
-  border-left: 5px solid var(--secondary-color); /* ⭐ UPDATED ⭐ */
-  border-radius: 8px;
-  font-weight: 500;
-  color: var(--text-dark); /* ⭐ UPDATED ⭐ */
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 2px 8px var(--shadow-subtle); /* ⭐ UPDATED ⭐ */
-}
-
-.features-list li span {
-  font-size: 1.5em; 
-}
-
-/* Explore Button */
-.explore-button-container {
+/* Hero Section */
+.hero-section {
   text-align: center;
-  margin-top: 40px;
+  padding: 3rem;
+  background-image: linear-gradient(to right, #2E8B57, #3CB371); /* Gradient changed to greens */
+  color: #ffffff;
+  position: relative; /* For potential background elements */
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.hero-section h2 {
+  color: #ffffff;
+  border-bottom-color: #90EE90; /* Lighter green for border */
+  font-size: 2.8rem;
+  margin-bottom: 1rem;
+}
+
+.hero-section p {
+  color: #f0f0f0;
+  font-size: 1.15rem;
+  max-width: 800px;
+  margin: 0 auto 2rem auto;
+}
+
+.explore-button-container {
+  margin-top: 1.5rem;
 }
 
 .explore-button {
-  background: linear-gradient(45deg, var(--secondary-color), #2178d6); /* ⭐ UPDATED: Gradient with primary color family ⭐ */
-  color: white;
-  padding: 18px 45px;
+  background-color: #ffc107; /* Bright yellow - kept for contrast */
+  color: #2E8B57; /* Changed to Sea Green */
   border: none;
-  border-radius: 35px;
-  font-size: 1.3em;
-  font-weight: 700;
+  padding: 1rem 2.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-radius: 30px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(74, 144, 226, 0.25); /* ⭐ UPDATED ⭐ */
-  letter-spacing: 0.5px;
-  outline: none; 
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .explore-button:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(74, 144, 226, 0.4); /* ⭐ UPDATED ⭐ */
-  background: linear-gradient(45deg, #2178d6, #165691); /* ⭐ UPDATED ⭐ */
+  background-color: #e0a800; /* Darker yellow */
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .explore-button:active {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3); /* ⭐ UPDATED ⭐ */
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Sidebar */
+/* Vision/Mission Container */
+.vision-mission-container {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 2rem;
+}
+
+.vision-mission-container section {
+  flex: 1; /* Each section takes equal space */
+  min-width: 300px; /* Minimum width before wrapping */
+  background-color: #EEF8EE; /* Light green background */
+  border: 1px solid #D8EDD8; /* Matching light green border */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Features Section */
+.features-section .features-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
+  gap: 1.5rem;
+}
+
+.features-section .features-list li {
+  background-color: #f5f5f5;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.features-section .features-list li:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.features-section .features-list li span[role="img"] {
+  font-size: 1.5rem;
+}
+
+
+/* Sidebar (Right side) */
 .landing-sidebar {
-  flex: 1; 
-  background-color: var(--card-background); /* ⭐ UPDATED ⭐ */
-  padding: 30px;
+  flex: 1; /* Takes less space */
+  background-color: #F0FDF0; /* Very light green */
+  padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 6px 20px var(--shadow-subtle); /* ⭐ UPDATED ⭐ */
-  border: 1px solid var(--border-color); /* ⭐ UPDATED ⭐ */
-  align-self: flex-start; 
-  min-width: 300px; 
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .landing-sidebar h3 {
-  color: var(--primary-color); /* ⭐ UPDATED ⭐ */
-  margin-top: 0;
-  margin-bottom: 25px;
-  font-size: 1.4em;
-  border-bottom: 2px solid var(--border-color); /* ⭐ UPDATED ⭐ */
-  padding-bottom: 10px;
-  font-weight: 600;
+  color: #2E8B57; /* Changed to Sea Green */
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #90EE90; /* Lighter green border */
+  padding-bottom: 0.5rem;
 }
 
 .landing-sidebar ul {
@@ -305,212 +277,307 @@ h3 {
   margin: 0;
 }
 
-.landing-sidebar li {
-  margin-bottom: 12px;
-  color: var(--text-dark); /* ⭐ UPDATED ⭐ */
-  font-size: 1.05em;
+.landing-sidebar ul li {
+  background-color: #EEF8EE; /* Light green for list items */
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.7rem;
+  border-radius: 8px;
   cursor: pointer;
-  transition: color 0.3s ease, transform 0.2s ease;
-  padding: 5px 0;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  color: #2E8B57; /* Changed to Sea Green for contrast */
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.landing-sidebar li:hover {
-  color: var(--primary-color); /* ⭐ UPDATED ⭐ */
+.landing-sidebar ul li:hover {
+  background-color: #D8EDD8; /* Matching light green on hover */
   transform: translateX(5px);
 }
 
 .landing-sidebar p {
-  font-size: 0.95em;
-  color: var(--text-light); /* ⭐ UPDATED ⭐ */
-  margin-bottom: 15px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #666;
 }
 
 .link-text {
-  color: var(--primary-color); /* ⭐ UPDATED ⭐ */
-  cursor: pointer;
-  font-weight: 500;
+  color: #2E8B57; /* Changed to Sea Green */
   text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.3s ease;
 }
 
 .link-text:hover {
-  color: var(--secondary-color); /* ⭐ UPDATED ⭐ */
+  color: #1A532E; /* Darker green on hover */
 }
 
 /* Footer */
 .landing-footer {
-  background-color: var(--text-dark); /* ⭐ UPDATED: Dark Footer for contrast ⭐ */
+  background-color: #2E8B57; /* Changed to Sea Green */
   color: #ffffff;
+  padding: 1.5rem 2rem;
   text-align: center;
-  padding: 30px 20px;
-  font-size: 0.9em;
-  margin-top: auto; 
-  box-shadow: 0 -4px 15px var(--shadow-medium); /* ⭐ UPDATED ⭐ */
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  margin-top: auto; /* Push footer to the bottom */
 }
 
 .footer-links {
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
-  gap: 20px 30px; 
-  margin-bottom: 20px;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .footer-links div {
-  color: #e0e0e0;
-  cursor: pointer;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.95rem;
   transition: color 0.3s ease, transform 0.2s ease;
-  font-size: 1em;
-  position: relative;
-  padding-bottom: 3px;
-}
-
-.footer-links div::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 0;
-  height: 1px;
-  background-color: #e0e0e0;
-  transition: width 0.3s ease;
+  cursor: pointer;
 }
 
 .footer-links div:hover {
-  color: #ffffff;
+  color: #90EE90; /* Lighter green on hover */
   transform: translateY(-2px);
 }
 
-.footer-links div:hover::after {
-  width: 100%;
-}
-
 .copyright {
-  margin: 0;
-  font-size: 0.85em;
+  font-size: 0.85rem;
   opacity: 0.8;
+  margin: 0;
 }
 
-/* Responsive Design */
-@media (max-width: 992px) {
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
   .landing-main-content {
-    flex-direction: column;
-    padding: 30px;
-    gap: 30px;
+    flex-direction: column; /* Stack main content and sidebar vertically */
   }
 
-  .main-sections, .landing-sidebar {
-    min-width: unset; 
-    width: 100%; 
+  .landing-sidebar {
+    order: -1; /* Move sidebar above main content on smaller screens */
   }
 
-  .landing-header {
-    flex-direction: column;
-    text-align: center;
-    padding: 20px;
+  .landing-container {
+    margin: 15px;
+    border-radius: 8px;
   }
 
-  .logo-title-group {
-    flex-direction: column; 
-    gap: 5px; 
-  }
-
-  .nav-list {
-    margin-top: 15px;
-    gap: 20px;
+  .landing-header, .landing-footer {
+    padding: 1.2rem 1.5rem;
+    border-radius: 8px;
   }
 
   .site-title {
-    font-size: 2.5em;
+    font-size: 2rem;
   }
 
-  .nitc-logo {
-    width: 80px; 
+  .nav-list {
+    gap: 1rem;
+    justify-content: center;
   }
 
-  h2 {
-    font-size: 1.8em;
+  .nav-list li div {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .hero-section {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .hero-section h2 {
+    font-size: 2.4rem;
+  }
+
+  .hero-section p {
+    font-size: 1.05rem;
+  }
+
+  section h2 {
+    font-size: 1.8rem;
+  }
+
+  section h3 {
+    font-size: 1.4rem;
   }
 }
 
 @media (max-width: 768px) {
-  .landing-header {
-    padding: 15px;
+  .landing-container {
+    margin: 10px;
+    border-radius: 6px;
+  }
+
+  .landing-header, .landing-footer {
+    padding: 1rem;
+    border-radius: 6px;
   }
 
   .site-title {
-    font-size: 2.2em;
+    font-size: 1.8rem;
+  }
+
+  .nitc-logo {
+    width: 40px;
+    height: 40px;
   }
 
   .nav-list {
-    flex-direction: column; 
+    flex-direction: column; /* Stack nav items vertically */
     align-items: center;
-    gap: 10px;
+    gap: 0.8rem;
   }
 
-  .landing-nav li div {
-    font-size: 1em;
-    padding: 5px 0;
+  .nav-list li div {
+    font-size: 0.95rem;
+    width: 100%; /* Full width buttons */
+    text-align: center;
+    padding: 0.6rem;
   }
 
   .landing-main-content {
-    padding: 20px;
-    gap: 20px;
+    padding: 1.5rem;
+    gap: 1.5rem;
   }
 
-  .hero-section, .about-section, .vision-section, .mission-section, .features-section, .landing-sidebar {
-    padding: 25px;
+  .hero-section {
+    padding: 2rem 1rem;
   }
 
-  h2 {
-    font-size: 1.6em;
+  .hero-section h2 {
+    font-size: 2rem;
   }
 
-  h3 {
-    font-size: 1.3em;
-  }
-
-  .hero-section p, .about-section p, .vision-section p, .mission-section p {
-    font-size: 1em;
+  .hero-section p {
+    font-size: 1rem;
   }
 
   .explore-button {
-    padding: 15px 30px;
-    font-size: 1.1em;
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
   }
 
-  .footer-links {
+  section {
+    padding: 1.5rem;
+  }
+
+  section h2 {
+    font-size: 1.6rem;
+  }
+
+  section h3 {
+    font-size: 1.2rem;
+  }
+
+  .features-section .features-list {
+    grid-template-columns: 1fr; /* Single column on small screens */
+  }
+
+  .vision-mission-container {
     flex-direction: column;
-    gap: 10px;
   }
 }
 
 @media (max-width: 480px) {
+  .landing-container {
+    margin: 5px;
+    border-radius: 4px;
+  }
+
+  .landing-header {
+    padding: 0.8rem;
+  }
+
   .site-title {
-    font-size: 1.8em;
+    font-size: 1.5rem;
   }
 
   .nitc-logo {
-    width: 60px; 
+    width: 35px;
+    height: 35px;
+  }
+
+  .logo-title-group {
+    flex-direction: column; /* Stack logo and title */
+    gap: 0.5rem;
+  }
+
+  .landing-nav {
+    margin-top: 0.8rem;
+  }
+
+  .nav-list li div {
+    font-size: 0.85rem;
+    padding: 0.5rem;
   }
 
   .landing-main-content {
-    padding: 15px;
+    padding: 1rem;
+    gap: 1rem;
   }
 
-  h2 {
-    font-size: 1.4em;
+  .hero-section {
+    padding: 1.5rem 0.8rem;
   }
 
-  h3 {
-    font-size: 1.2em;
+  .hero-section h2 {
+    font-size: 1.8rem;
+  }
+
+  .hero-section p {
+    font-size: 0.9rem;
   }
 
   .explore-button {
-    padding: 12px 25px;
-    font-size: 1em;
+    padding: 0.7rem 1.8rem;
+    font-size: 1rem;
   }
 
-  .features-list {
-    grid-template-columns: 1fr; 
+  section {
+    padding: 1rem;
+  }
+
+  section h2 {
+    font-size: 1.4rem;
+  }
+
+  section h3 {
+    font-size: 1.1rem;
+  }
+
+  .landing-sidebar {
+    padding: 1.5rem;
+  }
+
+  .landing-sidebar h3 {
+    font-size: 1.2rem;
+  }
+
+  .landing-sidebar ul li {
+    font-size: 0.9rem;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .landing-sidebar p {
+    font-size: 0.85rem;
+  }
+
+  .landing-footer {
+    padding: 1rem;
+  }
+
+  .footer-links {
+    gap: 1rem;
+    flex-direction: column;
+  }
+
+  .footer-links div {
+    font-size: 0.85rem;
+  }
+
+  .copyright {
+    font-size: 0.75rem;
   }
 }
