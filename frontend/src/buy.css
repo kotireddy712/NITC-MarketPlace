@@ -323,3 +323,15 @@
     background-color: var(--button-primary-hover-bg);
     box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
 }
+.item-approved {
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.item-approved.approved {
+  color: green;
+}
+
+.item-approved.not-approved {
+  color: red;
+}

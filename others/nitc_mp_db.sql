@@ -125,7 +125,6 @@ WHERE email = 'chilakala_b230650cs@nitc.ac.in';
 UPDATE nitc_mp_db.users
 SET password = NULL
 WHERE user_id =44; 
--- // ** 8830
 --@block
 CREATE TABLE IF NOT EXISTS nitc_mp_db.email_otp (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -153,3 +152,6 @@ ADD CONSTRAINT fk_user_id
 FOREIGN KEY (user_id) REFERENCES users(user_id)
 ON DELETE CASCADE;
 
+--@block
+DELETE FROM nitc_mp_db.users
+WHERE user_id = 97;
