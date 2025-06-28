@@ -20,7 +20,7 @@ load_dotenv()
 
 
 app = Flask(__name__)
-
+CORS(app)
 # --- Configure Logging ---
 # You can set the logging level here. For development, DEBUG is useful.
 # For production, INFO or WARNING is more appropriate.
@@ -716,16 +716,16 @@ def delete_item(item_id):
         app.logger.error(f"Unexpected error deleting item {item_id}: {e}")
         return jsonify({"message": f"An unexpected error occurred: {e}"}), 500
 
-@app.route('/api/user/<email>', methods=['GET'])
-def get_user(email):
-    conn = get_db()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT user_id, name, email, contact_number, photo_url FROM users WHERE email = %s", (email,))
-    user = cursor.fetchone()
-    if user:
-        return jsonify(user)
-    else:
-        return jsonify({"error": "User not found"}), 404
+# @app.route('/api/user/<email>', methods=['GET'])
+# def get_user(email):
+#     conn = get_db()
+#     cursor = conn.cursor(dictionary=True)
+#     cursor.execute("SELECT user_id, name, email, contact_number, photo_url FROM users WHERE email = %s", (email,))
+#     user = cursor.fetchone()
+#     if user:
+#         return jsonify(user)
+#     else:
+#         return jsonify({"error": "User not found"}), 404
 
 @app.route('/api/user/<email>', methods=['PUT'])
 def update_user(email):
@@ -1172,6 +1172,30 @@ def approve_item_post():
     finally:
         cursor.close()
 
+@app.route('/admin/disapprove-item', methods=['POST'])
+def disapprove_item_post():
+    data = request.get_json()
+    item_id = data.get('item_id')
+
+    if not item_id:
+        return jsonify({'error': 'Item ID is required'}), 400
+
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM items WHERE item_id = %s", (item_id,))
+        db.commit()
+        return jsonify({'message': 'Item disapproved and deleted successfully'})
+    except Exception as e:
+        print("Error disapproving item:", e)
+        if db.is_connected():
+            db.rollback()
+        return jsonify({'error': 'Internal server error'}), 500
+    finally:
+        cursor.close()
+
+
+
 @app.route('/admin/approve-all-items', methods=['PATCH'])
 def approve_all_items():
     db = get_db()
@@ -1184,6 +1208,42 @@ def approve_all_items():
         print("Error approving all items:", e)
         if db.is_connected():
             db.rollback()
+        return jsonify({'error': 'Internal server error'}), 500
+    finally:
+        cursor.close()
+
+@app.route('/admin/disapprove-all-items', methods=['DELETE'])
+def disapprove_all_items():
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM items WHERE is_approved = FALSE")
+        db.commit()
+        return jsonify({'message': 'All unapproved items disapproved and deleted successfully'})
+    except Exception as e:
+        print("Error disapproving all items:", e)
+        if db.is_connected():
+            db.rollback()
+        return jsonify({'error': 'Internal server error'}), 500
+    finally:
+        cursor.close()
+        
+@app.route('/admin/items-by-category/<int:category_id>', methods=['GET'])
+def get_items_by_category(category_id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT items.*, categories.name as category_name, users.name as seller_name 
+            FROM items 
+            JOIN categories ON items.category_id = categories.category_id
+            JOIN users ON items.seller_id = users.user_id
+            WHERE items.category_id = %s
+        """, (category_id,))
+        items = cursor.fetchall()
+        return jsonify(items)
+    except Exception as e:
+        print("Error fetching items by category:", e)
         return jsonify({'error': 'Internal server error'}), 500
     finally:
         cursor.close()
@@ -1262,7 +1322,181 @@ def delete_users():
     finally:
         cursor.close()
 
+# --- ADD this new route to your app.py ---
+@app.route('/admin/feedbacks', methods=['GET'])
+def get_feedbacks():
+    """
+    Fetches all feedback entries with pagination and search functionality for admin dashboard.
+    """
+    app.logger.debug("Received request to /admin/feedbacks")
+    db = None
+    cursor = None
+    try:
+        db = get_db()
+        cursor = g.cursor
 
+        # Pagination parameters
+        page = request.args.get('page', 1, type=int)
+        limit = request.args.get('limit', 10, type=int) # Default limit for feedbacks
+        search_query = request.args.get('search', '').strip()
+        offset = (page - 1) * limit
+
+        # Base SQL query for feedback data
+        sql_base = """
+            FROM feedback
+            WHERE 1=1
+        """
+        params = []
+
+        # Add search condition if query is provided
+        if search_query:
+            # Search across feedback_text, user_name, user_email, user_contact_number
+            sql_base += """
+                AND (
+                    feedback_text LIKE %s OR
+                    user_name LIKE %s OR
+                    user_email LIKE %s OR
+                    user_contact_number LIKE %s
+                )
+            """
+            search_pattern = f"%{search_query}%"
+            params.extend([search_pattern, search_pattern, search_pattern, search_pattern])
+
+        # Count total feedbacks matching the search criteria
+        sql_count = f"SELECT COUNT(*) AS total_count {sql_base}"
+        cursor.execute(sql_count, params)
+        total_feedbacks = cursor.fetchone()['total_count']
+
+        # Fetch feedbacks with pagination and ordering
+        sql_feedbacks = f"""
+            SELECT feedback_id, user_id, user_name, user_email, user_contact_number, feedback_text, submission_timestamp
+            {sql_base}
+            ORDER BY submission_timestamp DESC
+            LIMIT %s OFFSET %s
+        """
+        # Append limit and offset parameters
+        params.extend([limit, offset])
+        cursor.execute(sql_feedbacks, params)
+        feedbacks = cursor.fetchall()
+
+        # Format timestamps for better readability if desired (optional)
+        for feedback in feedbacks:
+            if feedback['submission_timestamp']:
+                feedback['submission_timestamp'] = feedback['submission_timestamp'].strftime('%Y-%m-%d %H:%M:%S')
+
+        app.logger.info(f"Fetched {len(feedbacks)} feedbacks (Total: {total_feedbacks}) for page {page}, limit {limit}.")
+        return jsonify({
+            "feedbacks": feedbacks,
+            "total_feedbacks": total_feedbacks,
+            "page": page,
+            "limit": limit
+        }), 200
+
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error fetching feedbacks: {err}")
+        return jsonify({"msg": f"Database error: {err}"}), 500
+    except Exception as e:
+        app.logger.error(f"An unexpected error occurred fetching feedbacks: {e}")
+        return jsonify({"msg": f"An unexpected error occurred: {e}"}), 500
+
+# --- VERIFY/UPDATE this existing route in your app.py ---
+@app.route('/api/feedback', methods=['POST'])
+def submit_feedback():
+    """
+    Receives feedback from the frontend and stores it in the MySQL database,
+    associating it with the user's name, email, and contact number from the users table.
+    """
+    app.logger.debug("Received request to /api/feedback")
+    if not request.is_json:
+        app.logger.warning("Feedback submission failed: Missing JSON in request")
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    data = request.get_json()
+    feedback_text = data.get('feedback', '').strip()
+    user_email_from_frontend = data.get('user_email') # This is sent from frontend localStorage
+
+    if not feedback_text:
+        app.logger.warning("Feedback submission failed: Feedback text is empty")
+        return jsonify({"msg": "Feedback cannot be empty"}), 400
+
+    if not user_email_from_frontend:
+        app.logger.warning("Feedback submission failed: User email is missing from frontend data")
+        return jsonify({"msg": "User email is required to submit feedback"}), 400
+
+    db = None
+    cursor = None
+    user_id = None # Initialize user_id
+    user_name = "Anonymous User" # Default name if not found
+    user_contact_number = None # Default contact number if not found
+
+    try:
+        db = get_db()
+        cursor = g.cursor
+
+        # 1. Fetch user's ID, name, and contact number from the 'users' table
+        sql_fetch_user_details = "SELECT user_id, name, contact_number FROM users WHERE email = %s"
+        cursor.execute(sql_fetch_user_details, (user_email_from_frontend,))
+        user_record = cursor.fetchone()
+
+        if user_record:
+            user_id = user_record.get('user_id')
+            user_name = user_record.get('name') or "Anonymous User" # Use default if name is empty
+            user_contact_number = user_record.get('contact_number')
+            app.logger.debug(f"Found user details: ID={user_id}, Name='{user_name}', Contact='{user_contact_number}' for email '{user_email_from_frontend}'")
+        else:
+            app.logger.warning(f"User details not found for email: {user_email_from_frontend}. Using default 'Anonymous User', no ID/contact.")
+
+        # 2. Insert feedback into the 'feedback' table
+        # Include user_id in the INSERT statement
+        sql_insert_feedback = """
+            INSERT INTO feedback (user_id, user_name, user_email, user_contact_number, feedback_text)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(sql_insert_feedback, (user_id, user_name, user_email_from_frontend, user_contact_number, feedback_text))
+        db.commit() # Commit the transaction
+
+        feedback_id = cursor.lastrowid
+        app.logger.info(f"Feedback received and stored successfully. ID: {feedback_id}, User: {user_name} ({user_email_from_frontend}), Contact: {user_contact_number}")
+        return jsonify({"msg": "Feedback received successfully!", "feedback_id": feedback_id}), 200
+
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error during feedback submission: {err}")
+        if db:
+            db.rollback() # Rollback on error
+        return jsonify({"msg": f"Database error: {err}"}), 500
+    except Exception as e:
+        app.logger.error(f"An unexpected error occurred during feedback submission: {e}")
+        if db:
+            db.rollback() # Rollback on any other error
+        return jsonify({"msg": f"An unexpected error occurred: {e}"}), 500
+
+# --- VERIFY/UPDATE this existing route in your app.py ---
+@app.route('/api/user/<email>', methods=['GET'])
+def get_user_data(email):
+    """
+    Fetches user data (name, photo_url) from the database based on email.
+    """
+    db = None
+    cursor = None
+    try:
+        db = get_db()
+        cursor = g.cursor
+        sql = "SELECT name, photo_url, contact_number FROM users WHERE email = %s" # Added contact_number for completeness
+        cursor.execute(sql, (email,))
+        user_data = cursor.fetchone()
+
+        if user_data:
+            return jsonify(user_data), 200
+        else:
+            app.logger.info(f"User data not found for email: {email}. Returning default.")
+            return jsonify({"name": "Guest", "photo_url": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png", "contact_number": None}), 200 # Include contact_number fallback
+
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error fetching user data: {err}")
+        return jsonify({"msg": f"Database error: {err}"}), 500
+    except Exception as e:
+        app.logger.error(f"An unexpected error occurred fetching user data: {e}")
+        return jsonify({"msg": f"An unexpected error occurred: {e}"}), 500
         
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

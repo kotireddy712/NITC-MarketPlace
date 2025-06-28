@@ -105,9 +105,10 @@
     --text-color-secondary: #bdc3c7;
     --heading-color: var(--extra-dark-grey);
     --placeholder-color: #aaa;
+    --otp-instruction-text: #b3d4f5;
     --message-success-text: #d4edda;
     --message-error-text: #f8d7da;
-    --otp-instruction-text: #b3d4f5;
+
 
     /* Borders & Shadows */
     --border-color: #4a6375;
