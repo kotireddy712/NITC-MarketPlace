@@ -18,7 +18,6 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
-
 # --- Configure Logging ---
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 app.logger.setLevel(logging.DEBUG)

@@ -478,3 +478,52 @@
     cursor: pointer;
     text-decoration: underline;
 }
+.btn-disapprove {
+  background-color: #f44336; /* Red */
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  margin: 4px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-disapprove:hover {
+  background-color: #d32f2f;
+}
+.btn-approve-all {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  margin: 6px;
+  font-size: 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-approve-all:hover {
+  background-color: #45a049;
+}
+
+.btn-disapprove-all {
+  background-color: #f44336;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  margin: 6px;
+  font-size: 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-disapprove-all:hover {
+  background-color: #d32f2f;
+}

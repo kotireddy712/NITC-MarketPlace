@@ -8,6 +8,8 @@ function AdminDashboard() {
   const [pendingItems, setPendingItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [itemDetails, setItemDetails] = useState(null);
+  const [items, setItems] = useState([]);
+
 
   // Pagination and selection states for Users
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,6 +50,15 @@ function AdminDashboard() {
       console.error('Error fetching category counts:', error);
     }
   };
+ const handleCategoryClick = async (categoryId) => {
+    console.log("Category clicked:", categoryId); // 🔥 Debug line
+    try {
+        const res = await axios.get(`http://localhost:5000/admin/items-by-category/${categoryId}`);
+        setItems(res.data);
+    } catch (error) {
+        console.error('Error fetching items for this category:', error);
+    }
+};
 
   const fetchUsers = async () => {
     try {
@@ -146,6 +157,18 @@ function AdminDashboard() {
     }
   };
 
+  const disapproveItem = async (itemId) => {
+  try {
+    await axios.post('http://localhost:5000/admin/disapprove-item', { item_id: itemId });
+    alert('Item disapproved and deleted successfully');
+    fetchPendingItems(); // Refresh the pending items list
+  } catch (error) {
+    alert(`Error disapproving item: ${error.message}`);
+  }
+};
+
+
+
   const approveAllItems = async () => {
     if (!window.confirm("Approve all pending items?")) return;
     try {
@@ -162,6 +185,16 @@ function AdminDashboard() {
       alert(`Error approving all items: ${error.message}`);
     }
   };
+
+  const disapproveAllItems = async () => {
+  if (!window.confirm("Disapprove (Delete) all pending items? This cannot be undone.")) return;
+  try {
+    await axios.delete('http://localhost:5000/admin/disapprove-all-items');
+    fetchPendingItems();
+  } catch (error) {
+    alert(`Error disapproving all items: ${error.message}`);
+  }
+};
 
   const fetchItemDetails = async (itemId) => {
     try {
@@ -351,6 +384,12 @@ function AdminDashboard() {
                   Approve All
                 </button>
               )}
+                    {pendingItems.length > 0 && (
+        <button className="btn-disapprove-all" onClick={disapproveAllItems}>
+          Disapprove All
+        </button>
+      )}
+
               {pendingItems.length === 0 ? (
                 <p>No items pending approval.</p>
               ) : (
@@ -364,9 +403,14 @@ function AdminDashboard() {
                         {item.title}
                       </strong>{" "}
                       - {item.category}
-                      <button className="btn-approve" onClick={() => approveItem(item.item_id)}>
-                        Approve
-                      </button>
+                     <button className="btn-approve" onClick={() => approveItem(item.item_id)}>
+                      Approve
+                    </button>
+
+                    <button className="btn-disapprove" onClick={() => disapproveItem(item.item_id)}>
+                      Disapprove
+                    </button>
+
                     </li>
                   ))}
                 </ul>
