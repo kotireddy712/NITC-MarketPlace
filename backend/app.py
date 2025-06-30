@@ -35,7 +35,6 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = False # Set to True in production with HTTPS (e.g., if using Render, Vercel, Netlify)
 
 # Configure CORS origins - **IMPORTANT: Update this with your frontend URL(s) in production**
-CORS(app, supports_credentials=True, origins=["http://localhost:3000", "http://127.0.0.1:5000"])
 
 # --- Email Configuration ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
