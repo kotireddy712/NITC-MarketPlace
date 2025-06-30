@@ -175,17 +175,12 @@ function AuthForm() {
         } else {
             // Signup Flow
             if (!isOtpVerified) {
-                // OTP not yet verified
-                if (!otpSent) {
-                    await sendOtp();
-                } else {
-                    await verifyOtp();
-                }
+                setMessage('Please verify your email with OTP before signing up.');
+                setIsSuccess(false);
                 setIsLoading(false);
                 return;
             }
 
-            // Proceed with signup after OTP verified
             if (!form.name || !form.password || !form.contact_number) {
                 setMessage('Please fill in all signup details (Full Name, Password, Contact Number).');
                 setIsSuccess(false);
@@ -269,7 +264,7 @@ function AuthForm() {
                     />
 
                     {/* OTP Section */}
-                    {!isLogin && showOtpVerification && !isOtpVerified && (
+                    {!isLogin && otpSent && !isOtpVerified && (
                         <div className="otp-section">
                             <div className="otp-input-container">
                                 <input
@@ -301,6 +296,18 @@ function AuthForm() {
                                 {otpCountdown > 0 ? `Resend OTP (${otpCountdown}s)` : 'Resend OTP'}
                             </button>
                         </div>
+                    )}
+
+                    {/* Send OTP Button */}
+                    {!isLogin && !otpSent && !isOtpVerified && (
+                        <button
+                            type="button"
+                            onClick={sendOtp}
+                            disabled={isLoading}
+                            className="send-otp-btn"
+                        >
+                            Send OTP
+                        </button>
                     )}
 
                     {/* Signup Fields */}
