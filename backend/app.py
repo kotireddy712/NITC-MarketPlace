@@ -47,25 +47,13 @@ mail = Mail(app)
 
 # --- Database Connection Pool Configuration ---
 db_config = {
-    "host": "localhost",
-    "user": "root",
-    "password": "1234", # IMPORTANT: Use environment variable or stronger password in production
-    "database": "nitc_mp_db",
-    "autocommit": False # Keep autocommit False to manage transactions manually
+    "host": os.environ.get("DB_HOST", "maglev.proxy.rlwy.net"),
+    "port": int(os.environ.get("DB_PORT", 24352)),
+    "user": os.environ.get("DB_USER", "root"),
+    "password": os.environ.get("DB_PASSWORD", "ASymRKPoivjXkgAEzxxCLsWrtdKfCIuU"),
+    "database": os.environ.get("DB_NAME", "railway"),
+    "autocommit": False
 }
-
-mysql_host = os.environ.get('MYSQL_HOST')
-mysql_user = os.environ.get('MYSQL_USER')
-mysql_pass = os.environ.get('MYSQL_PASSWORD')
-mysql_db   = os.environ.get('MYSQL_DATABASE')
-
-conn = mysql.connector.connect(
-    host=mysql_host,
-    port=int(os.environ.get("MYSQL_PORT", 3306)),  # Add port!
-    user=mysql_user,
-    password=mysql_pass,
-    database=mysql_db
-)
 
 
 try:
