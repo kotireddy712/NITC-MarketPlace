@@ -398,7 +398,7 @@ def verify_otp_route():
 
 @app.route("/signup", methods=["POST"])
 def signup():
-    """Endpoint for a user to complete their signup after OTP verification."""
+    """Endpoint for user signup after OTP verification."""
     db_conn = get_db()
     cursor = db_conn.cursor(dictionary=True)
     data = request.json
@@ -409,70 +409,61 @@ def signup():
     contact_number = data.get("phone")  # Assuming frontend sends 'phone'
 
     app.logger.debug(f"Received /signup request for email: {email}")
-    app.logger.debug(f"Session state for signup: OTP Verified: {session.get('otp_verified')}, Verified Email: {session.get('verified_email')}")
+    app.logger.debug(f"Session state: otp_verified={session.get('otp_verified')}, verified_email={session.get('verified_email')}")
 
     if not all([email, password, name, contact_number]):
-        app.logger.warning("Missing fields for signup.")
-        return jsonify({"message": "All fields are required."}), 400
+        app.logger.warning("Signup failed: Missing required fields.")
+        return jsonify({"message": "All fields (email, password, name, phone) are required."}), 400
 
-    # Step 1: Crucial check to ensure OTP was verified for this email in the current session.
-    # This prevents users from skipping OTP verification.
-    if 'otp_verified' not in session or not session.get('otp_verified') or session.get('verified_email') != email:
-        app.logger.warning(f"Signup attempt for {email} without proper OTP verification. "
-                           f"Session state: otp_verified={session.get('otp_verified')}, verified_email={session.get('verified_email')}")
+    # ✅ Check 1: OTP verification check
+    if session.get('otp_verified') != True or session.get('verified_email') != email:
+        app.logger.warning(f"Signup attempt without OTP verification for {email}")
         return jsonify({"message": "OTP verification required before signup."}), 401
 
     try:
-        # Before updating, ensure the user exists and is not already fully signed up or disabled
+        # ✅ Fetch user record to validate state
         cursor.execute("SELECT password, is_disabled FROM users WHERE email = %s", (email,))
         user_record = cursor.fetchone()
 
         if not user_record:
-            app.logger.warning(f"Signup failed: Email {email} not found in users table for update, despite OTP verification. This is unexpected.")
-            return jsonify({"message": "User email not found or not authorized for signup completion. Please request OTP again."}), 404
-        
+            app.logger.error(f"Signup failed: No user record found for {email}. This should not happen after OTP verification.")
+            return jsonify({"message": "User not found. Please restart the signup process."}), 404
+
         if user_record.get("is_disabled") == 1:
-            app.logger.warning(f"Signup attempt for disabled account: {email}.")
-            return jsonify({"message": "Account is disabled. Please contact support."}), 403
+            app.logger.warning(f"Signup attempt for disabled account {email}")
+            return jsonify({"message": "Your account is disabled. Contact support."}), 403
 
-        if user_record.get("password") is not None and user_record.get("password") != '':
-            app.logger.warning(f"Signup attempt for {email} which already has a password set.")
-            return jsonify({"message": "Account already has a password. Please log in."}), 409
+        if user_record.get("password") not in (None, ''):
+            app.logger.info(f"Signup blocked: User {email} already registered.")
+            return jsonify({"message": "User already registered. Please login."}), 409
 
-        # Step 2: Hash the password using bcrypt.
-        hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        # ✅ Encrypt password securely
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-        # Step 3: Update the `users` table with the new password, name, and contact number.
-        # This will update the preliminary row created during /send-otp.
+        # ✅ Update user record with signup details
         cursor.execute("""
             UPDATE users
             SET password = %s, name = %s, contact_number = %s
             WHERE email = %s
-        """, (hashed_pw, name, contact_number, email))
-        
-        # Check if any row was updated. If not, it means the email wasn't found (highly unlikely here)
-        if cursor.rowcount == 0:
-            app.logger.error(f"Signup update failed: No rows updated for email {email}. This shouldn't happen after preliminary insert.")
-            db_conn.rollback()
-            return jsonify({"message": "Failed to complete signup due to an internal error."}), 500
+        """, (hashed_password, name, contact_number, email))
+        db_conn.commit()
 
-        db_conn.commit() # Commit the changes to the database
+        app.logger.info(f"Signup successful for {email}")
 
-        # Step 4: Clear session variables after successful signup to prevent reuse
+        # ✅ Clear OTP session info after successful signup
         session.pop('otp_verified', None)
         session.pop('verified_email', None)
-        app.logger.info(f"Signup successful for {email}. Session cleared.")
 
         return jsonify({"message": "Signup successful. You can now log in."}), 200
 
     except mysql.connector.Error as err:
-        db_conn.rollback() # Rollback on database error
+        db_conn.rollback()
         app.logger.error(f"Database error during signup for {email}: {err}", exc_info=True)
-        return jsonify({"message": f"Database error during signup: {err}"}), 500
+        return jsonify({"message": "Database error during signup."}), 500
 
     except Exception as e:
         app.logger.error(f"Unexpected error during signup for {email}: {e}", exc_info=True)
-        return jsonify({"message": f"An unexpected error occurred during signup: {e}"}), 500
+        return jsonify({"message": "Unexpected error during signup."}), 500
 
 # --- Basic Login Route ---
 @app.route("/login", methods=["POST"])
