@@ -19,7 +19,7 @@ function LostFoundListings() {
       try {
         // Backend already handles fetching all active items, which is good.
         // If you later need to send filter parameters to backend, you'd modify this axios call.
-        const response = await axios.get('${process.env.REACT_APP_BACKEND_URL}/lost_found/all');
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/lost_found/all`);
         setAllListings(response.data);
         setFilteredListings(response.data); // Initially, all listings are displayed
       } catch (err) {
