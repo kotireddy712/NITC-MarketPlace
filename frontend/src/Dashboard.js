@@ -152,7 +152,7 @@ function Dashboard() {
     }
 
     // Fetch user data including name and photo_url
-    axios.get(`http://localhost:5000/api/user/${email}`)
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/user/${email}`)
       .then((res) => {
         setUserData({
           name: res.data.name,
@@ -186,7 +186,7 @@ function Dashboard() {
     try {
       // Send feedback along with the user's email to the backend
       // The backend will then retrieve name and contact_number from the users table
-      const response = await axios.post('http://localhost:5000/api/feedback', {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/feedback`, {
         user_email: userEmail,
         feedback: feedbackText,
       });
