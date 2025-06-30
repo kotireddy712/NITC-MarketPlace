@@ -16,7 +16,7 @@ export default function Buy() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/categories');
+                const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/categories`);
                 setCategories(res.data);
                 fetchItems();
             } catch (err) {
@@ -36,7 +36,7 @@ export default function Buy() {
         setLoading(true);
         setError('');
         try {
-            let url = 'http://localhost:5000/items';
+            let url = '${process.env.REACT_APP_BACKEND_URL}/items`;
             if (selectedCategory) {
                 url += `?category_id=${selectedCategory}`;
             }
