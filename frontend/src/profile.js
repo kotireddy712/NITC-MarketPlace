@@ -28,7 +28,7 @@ function Profile() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/user/${email}`)
+      .get(`${process.env.REACT_APP_BACKEND_URL}/api/user/${email}`)
       .then((res) => setUserData(res.data))
       .catch((err) => {
         console.error('Error loading user data:', err);
@@ -66,7 +66,7 @@ function Profile() {
         formData.append('image', imageFile);
       }
 
-      const profileRes = await axios.put(`http://localhost:5000/api/user/${email}`, formData, {
+      const profileRes = await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/user/${email}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -80,7 +80,7 @@ function Profile() {
           return;
         }
 
-        await axios.put('http://localhost:5000/api/user/change-password', {
+        await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/user/change-password`, {
           email,
           oldPassword,
           newPassword,
