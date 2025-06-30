@@ -17,7 +17,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True, origins=[
+    "http://localhost:3000",                 # local React dev server
+    "https://nitc-marketplace.netlify.app"     # ✅ replace with your real Netlify frontend URL
+])
 # --- Configure Logging ---
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 app.logger.setLevel(logging.DEBUG)
