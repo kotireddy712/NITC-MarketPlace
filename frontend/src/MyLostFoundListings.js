@@ -23,7 +23,7 @@ function MyLostFoundListings() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`http://localhost:5000/lost_found/user/${userId}`);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/lost_found/user/${userId}`);
       setMyListings(response.data);
     } catch (err) {
       console.error('Error fetching my lost and found listings:', err);
@@ -55,7 +55,7 @@ function MyLostFoundListings() {
     setIsError(false);
 
     try {
-      const response = await axios.patch(`http://localhost:5000/lost_found/items/${itemId}/status`, {
+      const response = await axios.patch(`${process.env.REACT_APP_BACKEND_URL}/lost_found/items/${itemId}/status`, {
         user_id: userId, // Send user ID for authorization check on backend
         new_status: newStatus,
       });
@@ -87,7 +87,7 @@ function MyLostFoundListings() {
 
     try {
       // For DELETE requests, send data in the 'data' property
-      const response = await axios.delete(`http://localhost:5000/lost_found/items/${itemId}`, {
+      const response = await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/lost_found/items/${itemId}`, {
         data: { user_id: userId }, // Send user_id in the request body for verification
       });
       setMessage(response.data.message);
