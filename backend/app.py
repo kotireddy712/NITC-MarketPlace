@@ -54,12 +54,17 @@ db_config = {
     "autocommit": False # Keep autocommit False to manage transactions manually
 }
 
+mysql_host = os.environ.get('MYSQL_HOST')
+mysql_user = os.environ.get('MYSQL_USER')
+mysql_pass = os.environ.get('MYSQL_PASSWORD')
+mysql_db   = os.environ.get('MYSQL_DATABASE')
+
 conn = mysql.connector.connect(
-    host="maglev.proxy.rlwy.net",
-    port=24352,
-    user="root",
-    password="ASymRKPoivjXkgAEzxxCLsWrtdKfCIuU",
-    database="railway"
+    host=mysql_host,
+    port=int(os.environ.get("MYSQL_PORT", 3306)),  # Add port!
+    user=mysql_user,
+    password=mysql_pass,
+    database=mysql_db
 )
 
 
