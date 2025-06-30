@@ -81,7 +81,7 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-
   // --- New Feedback Fetching Function ---
   const fetchFeedbacks = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/admin/feedbacks', {
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/feedbacks`, {
         params: {
           page: feedbackCurrentPage,
           limit: feedbackEntriesPerPage,
@@ -98,7 +98,7 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-
   const disableUser = async (userId) => {
     if (!window.confirm('Are you sure you want to disable this user?')) return;
     try {
-      await axios.post('http://localhost:5000/admin/disable-user', { user_id: userId });
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/admin/disable-user`, { user_id: userId });
       fetchUsers();
     } catch (error) {
       alert(`Error disabling user: ${error.message}`);
@@ -108,7 +108,7 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-
   const enableUser = async (userId) => {
     if (!window.confirm('Are you sure you want to enable this user?')) return;
     try {
-      await axios.post('http://localhost:5000/admin/enable-user', { user_id: userId });
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/admin/enable-user`, { user_id: userId });
       fetchUsers();
     } catch (error) {
       alert(`Error enabling user: ${error.message}`);
@@ -118,7 +118,7 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-
   const deleteUser = async (userId) => {
     if (!window.confirm('Are you sure you want to permanently delete this user?')) return;
     try {
-      await axios.delete(`http://localhost:5000/admin/delete-user/${userId}`);
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/admin/delete-user/${userId}`);
       fetchUsers();
     } catch (error) {
       alert(`Error deleting user: ${error.message}`);
@@ -132,7 +132,7 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-
     }
     if (!window.confirm(`Delete ${selectedUsers.length} user(s)?`)) return;
     try {
-      await axios.post('http://localhost:5000/admin/delete-users', { user_ids: selectedUsers });
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/admin/delete-users`, { user_ids: selectedUsers });
       setSelectedUsers([]);
       fetchUsers();
     } catch (error) {
@@ -142,7 +142,7 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-
 
   const approveItem = async (itemId) => {
     try {
-      await axios.post(`http://localhost:5000/admin/approve-item`, { item_id: itemId });
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/admin/approve-item`, { item_id: itemId });
       fetchPendingItems();
       // If we are currently viewing items by category, re-fetch them to update status
       if (selectedCategoryName) {
@@ -159,7 +159,7 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-
 
   const disapproveItem = async (itemId) => {
   try {
-    await axios.post('http://localhost:5000/admin/disapprove-item', { item_id: itemId });
+    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/admin/disapprove-item`, { item_id: itemId });
     alert('Item disapproved and deleted successfully');
     fetchPendingItems(); // Refresh the pending items list
   } catch (error) {
@@ -172,7 +172,7 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-
   const approveAllItems = async () => {
     if (!window.confirm("Approve all pending items?")) return;
     try {
-      await axios.patch('http://localhost:5000/admin/approve-all-items');
+      await axios.patch(`${process.env.REACT_APP_BACKEND_URL}/admin/approve-all-items`);
       fetchPendingItems();
       // If we are currently viewing items by category, re-fetch them to update status
       if (selectedCategoryName) {
@@ -189,7 +189,7 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-
   const disapproveAllItems = async () => {
   if (!window.confirm("Disapprove (Delete) all pending items? This cannot be undone.")) return;
   try {
-    await axios.delete('http://localhost:5000/admin/disapprove-all-items');
+    await axios.delete(`${process.env.REACT_APP_BACKEND_URL}`/admin/disapprove-all-items`);
     fetchPendingItems();
   } catch (error) {
     alert(`Error disapproving all items: ${error.message}`);
@@ -198,7 +198,7 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-
 
   const fetchItemDetails = async (itemId) => {
     try {
-      const res = await axios.get(`http://localhost:5000/admin/item-details/${itemId}`);
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/item-details/${itemId}`);
       setItemDetails(res.data);
     } catch (error) {
       alert(`Error fetching item details: ${error.message}`);
@@ -208,7 +208,7 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-
   // --- NEW FUNCTION: Fetch items for a specific category ---
   const fetchItemsByCategory = async (categoryId, categoryName) => {
     try {
-      const res = await axios.get(`http://localhost:5000/admin/items-in-category/${categoryId}`);
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/items-in-category/${categoryId}`);
       setSelectedCategoryItems(res.data);
       setSelectedCategoryName(categoryName); // Set the name to display in the header
     } catch (error) {
