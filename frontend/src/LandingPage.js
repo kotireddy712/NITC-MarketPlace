@@ -39,6 +39,7 @@ const LandingPage = () => {
             <li><div onClick={() => navigate('/news')}>News</div></li>
             <li><div onClick={() => navigate('/announcements')}>Announcements</div></li>
             <li><div onClick={() => navigate('/contact')}>Contact Us</div></li>
+          <li><div onClick={() => navigate('/credits')}>Credits</div></li>
           </ul>
         </nav>
       </header>
@@ -110,7 +111,6 @@ const LandingPage = () => {
           <div onClick={() => navigate('/accessibility')}>Accessibility Statement</div>
           <div onClick={() => navigate('/about-site')}>About the Site</div>
           {/* <div onClick={() => navigate('/feedback-info')}>Feedback</div> */}
-          <div onClick={() => navigate('/credits')}>Credits</div>
         </div>
         <p className="copyright">&copy; 2025 NITC Marketplace. All rights reserved.</p>
       </footer>
