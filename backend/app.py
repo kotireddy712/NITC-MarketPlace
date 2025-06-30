@@ -54,6 +54,15 @@ db_config = {
     "autocommit": False # Keep autocommit False to manage transactions manually
 }
 
+conn = mysql.connector.connect(
+    host="maglev.proxy.rlwy.net",
+    port=24352,
+    user="root",
+    password="ASymRKPoivjXkgAEzxxCLsWrtdKfCIuU",
+    database="railway"
+)
+
+
 try:
     db_pool = pooling.MySQLConnectionPool(
         pool_name="mypool",
