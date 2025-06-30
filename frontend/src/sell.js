@@ -21,7 +21,7 @@ export default function Sell() {
         // Fetch categories when the component mounts
         const fetchCategories = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/categories');
+                const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/categories`);
                 setCategories(res.data);
                 if (res.data.length > 0) {
                     setSelectedCategory(res.data[0].category_id); // Set default selected category
@@ -60,7 +60,7 @@ export default function Sell() {
         }
 
         try {
-            const res = await axios.post('http://localhost:5000/sell_item', formData, {
+            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/sell_item`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
