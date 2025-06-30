@@ -17,77 +17,86 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+# Configure CORS to allow credentials and specify allowed origins
 CORS(app, supports_credentials=True, origins=[
-    "http://localhost:3000",                 # local React dev server
-    "https://nitc-marketplace.netlify.app"     # ✅ replace with your real Netlify frontend URL
+    "http://localhost:3000",             # Local React development server
+    "https://nitc-marketplace.netlify.app"  # Your deployed Netlify frontend URL
 ])
+
 # --- Configure Logging ---
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-app.logger.setLevel(logging.DEBUG)
+app.logger.setLevel(logging.DEBUG) # Set app logger to DEBUG level
 
 # Add secret key for sessions
 # IMPORTANT: Change this to a strong, random string in production!
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-super-secret-key-please-change-this-in-production')
+# This key is vital for securely signing session cookies.
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-super-secret-key-please-change-this-in-production-!!!!!!')
 
-# Session cookie configuration (adjust for production)
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-# Set to True if your application is served over HTTPS. Essential for 'SAMESITE=None'.
-app.config['SESSION_COOKIE_SECURE'] = False # Set to True in production with HTTPS (e.g., if using Render, Vercel, Netlify)
+# Session cookie configuration
+# CRITICAL: For cross-origin frontend (Netlify HTTPS) and backend,
+# set SAMESITE to 'None' and SECURE to True.
+# Browsers will only send 'SameSite=None' cookies if 'Secure=True'.
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True # MUST BE TRUE FOR HTTPS DEPLOYMENT
 
-# Configure CORS origins - **IMPORTANT: Update this with your frontend URL(s) in production**
-
-# --- Email Configuration ---
+# --- Email Configuration (using environment variables) ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USE_SSL'] = False # TLS is used, so SSL should be False
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
 
 mail = Mail(app)
 
-# --- Database Connection Pool Configuration ---
+# --- Database Connection Pool Configuration (using environment variables) ---
 db_config = {
     "host": os.environ.get("DB_HOST", "maglev.proxy.rlwy.net"),
     "port": int(os.environ.get("DB_PORT", 24352)),
     "user": os.environ.get("DB_USER", "root"),
-    "password": os.environ.get("DB_PASSWORD", "ASymRKPoivjXkgAEzxxCLsWrtdKfCIuU"),
-    "database": os.environ.get("DB_NAME", "railway"),
-    "autocommit": False
+    "password": os.environ.get("DB_PASSWORD", "ASymRKPoivjXkgAEzxxCLsWrtdKfCIuU"), # Replace with your actual DB password from environment variables
+    "database": os.environ.get("DB_NAME", "railway"), # Replace with your actual DB name
+    "autocommit": False # Manual commit control for transactions
 }
-
 
 try:
     db_pool = pooling.MySQLConnectionPool(
         pool_name="mypool",
-        pool_size=5,
+        pool_size=5, # Number of connections in the pool
         **db_config
     )
     app.logger.info("Database connection pool created successfully.")
 except mysql.connector.Error as err:
     app.logger.critical(f"Error creating database connection pool: {err}")
-    # It's usually good to exit or raise if database connection cannot be established at startup
+    # Exit if database connection cannot be established at startup, as the app won't function
     exit(1)
 
 # --- Helper Functions for Database Connection Management ---
 def get_db():
-    """Provides a database connection from the pool."""
+    """
+    Provides a database connection from the pool.
+    Stores the connection and cursor in Flask's `g` object for request-scoped access.
+    """
     if 'db' not in g:
         g.db = db_pool.get_connection()
-        g.cursor = g.db.cursor(dictionary=True) # Cursor returns rows as dictionaries
+        # Cursor returns rows as dictionaries for easier access by column name
+        g.cursor = g.db.cursor(dictionary=True)
     return g.db
 
 @app.teardown_appcontext
 def close_db_connection(exception):
-    """Closes the database connection at the end of the request."""
+    """
+    Closes the database connection at the end of each request.
+    Ensures resources are properly released.
+    """
     db = g.pop('db', None)
     if db is not None and db.is_connected():
         app.logger.debug("Closing database connection.")
         g.cursor.close()
         db.close()
 
-# --- Cloudinary Configuration (Optional, if you plan to handle image uploads) ---
+# --- Cloudinary Configuration (Optional: for image uploads) ---
 cloudinary.config(
     cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
     api_key=os.getenv('CLOUDINARY_API_KEY'),
@@ -96,15 +105,18 @@ cloudinary.config(
 
 # --- OTP Helper Functions ---
 def generate_otp(length=6):
-    """Generate a secure random OTP (6 digits by default)"""
+    """Generates a secure random 6-digit OTP."""
     return ''.join(secrets.choice(string.digits) for _ in range(length))
 
 def send_otp_email(email, otp, name=None):
-    """Send OTP via email using Flask-Mail"""
+    """
+    Sends an OTP to the specified email address using Flask-Mail.
+    Includes both HTML and plain text versions of the email.
+    """
     try:
         subject = "NITC Marketplace - Email Verification OTP"
         
-        # HTML email template for better presentation
+        # HTML email template for a better user experience
         html_body = f"""
         <!DOCTYPE html>
         <html>
@@ -152,7 +164,7 @@ def send_otp_email(email, otp, name=None):
         </html>
         """
         
-        # Plain text version for email clients that don't render HTML
+        # Plain text version for email clients that prefer it or don't render HTML
         text_body = f"""
         NITC Marketplace - Email Verification OTP
         
@@ -189,32 +201,38 @@ def send_otp_email(email, otp, name=None):
         return False
 
 def store_otp(email, otp):
-    """Store OTP in database with an expiration time of 10 minutes."""
+    """
+    Stores the OTP in the database for the given email with a 10-minute expiration.
+    Deletes any existing OTP for the same email to ensure only one is active.
+    """
     db_conn = get_db()
     cursor = db_conn.cursor(dictionary=True)
     
     try:
-        # Delete any existing, pending OTP for this email to ensure only one is active
+        # Delete any existing, pending OTP for this email
         cursor.execute("DELETE FROM email_otp WHERE email = %s", (email,))
         app.logger.debug(f"Deleted existing OTP for {email}")
         
-        # Store new OTP with 10-minute expiration
+        # Store the new OTP with a 10-minute expiration timestamp
         expires_at = datetime.now() + timedelta(minutes=10)
         cursor.execute(
             "INSERT INTO email_otp (email, otp, expires_at) VALUES (%s, %s, %s)",
             (email, otp, expires_at)
         )
-        db_conn.commit() # Commit the transaction to save changes
+        db_conn.commit() # Commit the transaction to save changes to the database
         app.logger.info(f"OTP stored successfully for {email}")
         return True
         
     except mysql.connector.Error as err:
-        db_conn.rollback() # Rollback on error
+        db_conn.rollback() # Rollback the transaction on error
         app.logger.error(f"Database error storing OTP for {email}: {err}", exc_info=True)
         return False
 
 def verify_otp(email, otp):
-    """Verify OTP from database, checking for expiration and correctness."""
+    """
+    Verifies the provided OTP against the one stored in the database for the given email.
+    Checks for expiration and correctness. Deletes the OTP after successful verification.
+    """
     db_conn = get_db()
     cursor = db_conn.cursor(dictionary=True)
     
@@ -227,15 +245,15 @@ def verify_otp(email, otp):
         
         if not result:
             app.logger.warning(f"No OTP found for {email} or already used/expired.")
-            return False # No OTP found for this email
+            return False # No OTP found for this email (perhaps already used or expired and cleaned up)
             
         stored_otp = result['otp']
         expires_at = result['expires_at']
         
-        # Check if OTP has expired
+        # Check if the OTP has expired
         if datetime.now() > expires_at:
             app.logger.warning(f"OTP for {email} has expired. Expiration time: {expires_at}")
-            # Clean up expired OTP
+            # Clean up expired OTP from the database
             cursor.execute("DELETE FROM email_otp WHERE email = %s", (email,))
             db_conn.commit()
             return False
@@ -243,29 +261,25 @@ def verify_otp(email, otp):
         # Verify if the provided OTP matches the stored one
         if stored_otp == otp:
             app.logger.info(f"OTP verified successfully for {email}.")
-            # Clean up used OTP immediately after successful verification
+            # Clean up the used OTP immediately after successful verification
             cursor.execute("DELETE FROM email_otp WHERE email = %s", (email,))
             db_conn.commit()
             return True
             
         app.logger.warning(f"Invalid OTP provided for {email}. Stored: {stored_otp}, Provided: {otp}")
-        return False # OTP does not match
+        return False # Provided OTP does not match
         
     except mysql.connector.Error as err:
         app.logger.error(f"Database error verifying OTP for {email}: {err}", exc_info=True)
         return False
 
-# ---
-# ### OTP and Signup Flow Endpoints
-# ---
+# --- OTP and Signup Flow Endpoints ---
 
 @app.route("/send-otp", methods=["POST"])
 def send_otp_route():
     """
-    Endpoint to send an OTP to a user's email for registration.
-    If the email does not exist, a preliminary user entry is created.
-    If the email exists but the password is NULL, it proceeds to send OTP.
-    If the email exists and has a password, it indicates the user is already registered.
+    Endpoint to send an OTP to a user's email for registration or password reset (if applicable).
+    Handles logic for existing users vs. new preliminary users.
     """
     db_conn = get_db()
     cursor = db_conn.cursor(dictionary=True)
@@ -277,7 +291,7 @@ def send_otp_route():
     if not email:
         return jsonify({"message": "Email is required."}), 400
 
-    # --- Enforce @nitc.ac.in domain ---
+    # Enforce @nitc.ac.in domain for institutional accounts
     if not email.endswith("@nitc.ac.in"):
         app.logger.warning(f"Invalid email domain for OTP request: {email}")
         return jsonify({"message": "Only @nitc.ac.in emails are allowed for signup."}), 400
@@ -294,27 +308,26 @@ def send_otp_route():
                 return jsonify({"message": "Your account is disabled. Please contact support."}), 403
 
             if user.get("password") is not None and user.get("password") != '':
-                # User exists and has a non-null password - DO NOT SEND OTP
+                # User exists and has a non-null password - DO NOT SEND OTP for signup, suggest login
                 app.logger.info(f"OTP not sent: User {email} already signed up.")
                 return jsonify({"message": "User already signed up. Please use login instead."}), 409
             else:
-                # User exists but password is NULL - PROCEED to send OTP
+                # User exists but password is NULL - PROCEED to send OTP (implies incomplete signup)
                 app.logger.info(f"User {email} found with NULL password. Proceeding to send OTP.")
-                # No need to update user table here, just proceed with OTP logic
         else:
             # User does NOT exist - CREATE a new preliminary user row and PROCEED to send OTP
             app.logger.info(f"Email {email} not found. Creating preliminary user entry.")
             try:
                 # Insert a new row with default values for name, contact_number, photo_url, role, is_disabled
-                # and NULL password, which will be updated during signup.
+                # and NULL password, which will be updated during signup completion.
                 cursor.execute("""
                     INSERT INTO users (email, password, name, contact_number, photo_url, role, is_disabled)
                     VALUES (%s, NULL, NULL, NULL, %s, %s, %s)
                 """, (email, 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png', 'user', False))
-                db_conn.commit()
+                db_conn.commit() # Commit the new user entry
                 app.logger.info(f"Preliminary user row created for {email}.")
             except mysql.connector.Error as err:
-                db_conn.rollback()
+                db_conn.rollback() # Rollback if preliminary user creation fails
                 # Handle cases where duplicate entry might occur (e.g., race condition)
                 if err.errno == 1062: # MySQL error code for duplicate entry for unique key
                     app.logger.warning(f"Attempted to create duplicate user for {email}. Re-fetching user to verify state.")
@@ -331,7 +344,7 @@ def send_otp_route():
                     return jsonify({"message": f"Database error: {err}"}), 500
 
         # At this point, the email has passed the domain check, and either:
-        # 1. An existing user with NULL password was found.
+        # 1. An existing user with NULL password was found (ready for signup completion).
         # 2. A new preliminary user (with NULL password and defaults) was created.
         # Now, proceed to generate and send OTP.
         otp = generate_otp()
@@ -362,12 +375,16 @@ def send_otp_route():
 
 @app.route("/verify-otp", methods=["POST"])
 def verify_otp_route():
-    """Endpoint to verify the OTP entered by the user."""
+    """
+    Endpoint to verify the OTP entered by the user.
+    If successful, sets session variables to indicate OTP verification.
+    """
     data = request.json
     email = data.get("email")
     otp = data.get("otp")
 
     app.logger.debug(f"Received /verify-otp request for email: {email}, OTP: {otp}")
+    # Log session state before attempting verification
     app.logger.debug(f"Session before verification: otp_verified={session.get('otp_verified')}, verified_email={session.get('verified_email')}")
 
     if not all([email, otp]):
@@ -379,6 +396,7 @@ def verify_otp_route():
             session['verified_email'] = email
             session['otp_verified'] = True
             app.logger.info(f"OTP verified successfully for {email}. Session updated.")
+            # Log session state after successful verification
             app.logger.debug(f"Session after verification: otp_verified={session.get('otp_verified')}, verified_email={session.get('verified_email')}")
             return jsonify({
                 "message": "OTP verified successfully! Please proceed to complete your signup details.",
@@ -398,7 +416,10 @@ def verify_otp_route():
 
 @app.route("/signup", methods=["POST"])
 def signup():
-    """Endpoint for user signup after OTP verification."""
+    """
+    Endpoint for a user to complete their signup after successful OTP verification.
+    Updates the preliminary user record with full details and a hashed password.
+    """
     db_conn = get_db()
     cursor = db_conn.cursor(dictionary=True)
     data = request.json
@@ -406,65 +427,77 @@ def signup():
     email = data.get("email")
     password = data.get("password")
     name = data.get("name")
-    contact_number = data.get("phone")  # Assuming frontend sends 'phone'
+    contact_number = data.get("phone")  # Frontend sends 'phone' for contact number
 
     app.logger.debug(f"Received /signup request for email: {email}")
-    app.logger.debug(f"Session state: otp_verified={session.get('otp_verified')}, verified_email={session.get('verified_email')}")
+    # Log current session state for debugging
+    app.logger.debug(f"Session state for signup: OTP Verified: {session.get('otp_verified')}, Verified Email: {session.get('verified_email')}")
 
     if not all([email, password, name, contact_number]):
-        app.logger.warning("Signup failed: Missing required fields.")
-        return jsonify({"message": "All fields (email, password, name, phone) are required."}), 400
+        app.logger.warning("Missing fields for signup.")
+        return jsonify({"message": "All fields are required."}), 400
 
-    # ✅ Check 1: OTP verification check
-    if session.get('otp_verified') != True or session.get('verified_email') != email:
-        app.logger.warning(f"Signup attempt without OTP verification for {email}")
+    # Step 1: Crucial check to ensure OTP was verified for this email in the current session.
+    # This prevents users from skipping OTP verification and ensures the flow.
+    if 'otp_verified' not in session or not session.get('otp_verified') or session.get('verified_email') != email:
+        app.logger.warning(f"Signup attempt for {email} without proper OTP verification. "
+                            f"Session state: otp_verified={session.get('otp_verified')}, verified_email={session.get('verified_email')}")
         return jsonify({"message": "OTP verification required before signup."}), 401
 
     try:
-        # ✅ Fetch user record to validate state
+        # Before updating, ensure the user exists and is not already fully signed up or disabled
         cursor.execute("SELECT password, is_disabled FROM users WHERE email = %s", (email,))
         user_record = cursor.fetchone()
 
         if not user_record:
-            app.logger.error(f"Signup failed: No user record found for {email}. This should not happen after OTP verification.")
-            return jsonify({"message": "User not found. Please restart the signup process."}), 404
-
+            app.logger.warning(f"Signup failed: Email {email} not found in users table for update, despite OTP verification. This is unexpected.")
+            return jsonify({"message": "User email not found or not authorized for signup completion. Please request OTP again."}), 404
+        
         if user_record.get("is_disabled") == 1:
-            app.logger.warning(f"Signup attempt for disabled account {email}")
-            return jsonify({"message": "Your account is disabled. Contact support."}), 403
+            app.logger.warning(f"Signup attempt for disabled account: {email}.")
+            return jsonify({"message": "Account is disabled. Please contact support."}), 403
 
-        if user_record.get("password") not in (None, ''):
-            app.logger.info(f"Signup blocked: User {email} already registered.")
-            return jsonify({"message": "User already registered. Please login."}), 409
+        if user_record.get("password") is not None and user_record.get("password") != '':
+            app.logger.warning(f"Signup attempt for {email} which already has a password set.")
+            return jsonify({"message": "Account already has a password. Please log in."}), 409
 
-        # ✅ Encrypt password securely
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        # Step 2: Hash the password using bcrypt for security.
+        hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-        # ✅ Update user record with signup details
+        # Step 3: Update the `users` table with the new password, name, and contact number.
+        # This completes the user registration from the preliminary row created during /send-otp.
         cursor.execute("""
             UPDATE users
             SET password = %s, name = %s, contact_number = %s
             WHERE email = %s
-        """, (hashed_password, name, contact_number, email))
-        db_conn.commit()
+        """, (hashed_pw, name, contact_number, email))
+        
+        # Check if any row was updated. If not, it indicates a logic error or race condition.
+        if cursor.rowcount == 0:
+            app.logger.error(f"Signup update failed: No rows updated for email {email}. This shouldn't happen after preliminary insert and session verification.")
+            db_conn.rollback() # Rollback on update failure
+            return jsonify({"message": "Failed to complete signup due to an internal error."}), 500
 
-        app.logger.info(f"Signup successful for {email}")
+        db_conn.commit() # Commit the changes to the database
 
-        # ✅ Clear OTP session info after successful signup
+        # Step 4: Clear session variables after successful signup to prevent reuse
+        # and ensure the user must log in explicitly.
         session.pop('otp_verified', None)
         session.pop('verified_email', None)
+        app.logger.info(f"Signup successful for {email}. Session cleared.")
 
         return jsonify({"message": "Signup successful. You can now log in."}), 200
 
     except mysql.connector.Error as err:
-        db_conn.rollback()
+        db_conn.rollback() # Rollback on database error
         app.logger.error(f"Database error during signup for {email}: {err}", exc_info=True)
-        return jsonify({"message": "Database error during signup."}), 500
+        return jsonify({"message": f"Database error during signup: {err}"}), 500
 
     except Exception as e:
         app.logger.error(f"Unexpected error during signup for {email}: {e}", exc_info=True)
-        return jsonify({"message": "Unexpected error during signup."}), 500
+        return jsonify({"message": f"An unexpected error occurred during signup: {e}"}), 500
 
+# --- Basic Login Route (from your previous code) ---
 # --- Basic Login Route ---
 @app.route("/login", methods=["POST"])
 def login():
