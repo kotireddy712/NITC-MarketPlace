@@ -11,7 +11,7 @@ export default function Login() {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/login', { email, password, role });
+      const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/login`, { email, password, role });
       alert(res.data.message);
       setIsLoggedIn(true);
     } catch (err) {
