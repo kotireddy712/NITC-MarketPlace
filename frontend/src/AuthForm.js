@@ -90,10 +90,10 @@ function AuthForm() {
         setMessage(''); // Clear previous messages
         setIsSuccess(null);
 
-        try {
-            const res = await axios.post('http://localhost:5000/send-otp', {
-                email: form.email
-            });
+       const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/send-otp`, {
+    email: form.email
+});
+
 
             setMessage(res.data.message);
             setIsSuccess(true);
@@ -121,11 +121,11 @@ function AuthForm() {
         setMessage('');
         setIsSuccess(null);
 
-        try {
-            const res = await axios.post('http://localhost:5000/verify-otp', {
-                email: form.email,
-                otp: form.otp
-            });
+      const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/verify-otp`, {
+  email: form.email,
+  otp: form.otp
+});
+
 
             if (res.data.verified) {
                 setMessage(res.data.message);
@@ -154,13 +154,10 @@ function AuthForm() {
         setMessage(''); // Clear previous messages
         setIsSuccess(null);
 
-        if (isLogin) {
-            // --- Login Logic ---
-            try {
-                const res = await axios.post('http://localhost:5000/login', {
-                    email: form.email,
-                    password: form.password
-                });
+       const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/login`, {
+  email: form.email,
+  password: form.password
+});
 
                 const data = res.data;
 
@@ -208,7 +205,7 @@ function AuthForm() {
                 }
 
                 try {
-                    const res = await axios.post('http://localhost:5000/signup', {
+                  const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/signup`, {
                         email: form.email,
                         password: form.password,
                         name: form.name,
