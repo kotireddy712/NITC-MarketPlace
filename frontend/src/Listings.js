@@ -281,7 +281,7 @@ function MyListings() {
             setError('');
             setMessage('');
             try {
-                const response = await fetch(`http://localhost:5000/user/${userId}/items`);
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user/${userId}/items`);
                 if (!response.ok) {
                     const errData = await response.json();
                     throw new Error(errData.message || `Error: ${response.status}`);
@@ -304,7 +304,7 @@ function MyListings() {
         setMessage('');
         setMessageType('');
         try {
-            const response = await fetch(`http://localhost:5000/items/${itemId}/status`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/items/${itemId}/status`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -338,7 +338,7 @@ function MyListings() {
             return;
         }
         try {
-            const response = await fetch(`http://localhost:5000/items/${itemId}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/items/${itemId}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: parseInt(userId) }),
