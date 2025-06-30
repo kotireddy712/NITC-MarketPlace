@@ -581,3 +581,24 @@ section p {
     font-size: 0.75rem;
   }
 }
+
+.github-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-weight: 500;
+  color: #ffffff; /* Change if needed to match your theme */
+  text-decoration: none;
+}
+
+.github-link:hover {
+  opacity: 0.85;
+}
+
+.github-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}

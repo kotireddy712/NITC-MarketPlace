@@ -44,7 +44,7 @@ const Credits = () => {
             style={styles.profileImage}
           />
           <h3 style={styles.name}>Kasireddy KotiReddy</h3>
-          <p style={styles.role}>Database & Systems Developer</p>
+          <p style={styles.role}>Database & Backend Developer</p>
           <p style={styles.description}>
             Managed the database architecture, system design, data integrity, and worked tirelessly on backend optimization to ensure smooth performance.
           </p>

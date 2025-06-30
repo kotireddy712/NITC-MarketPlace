@@ -1,4 +1,3 @@
-// src/LandingPage.js
 import React from 'react';
 import './LandingPage.css';
 import { useNavigate } from 'react-router-dom';
@@ -14,32 +13,29 @@ const LandingPage = () => {
     <div className="landing-container">
       <header className="landing-header">
         <div className="header-content">
-          {/* ⭐⭐⭐ NEW: Logo and Title Group for Horizontal Alignment ⭐⭐⭐ */}
           <div className="logo-title-group">
             <img 
-              src="/logo.png" // Assuming logo.png is in your public folder
-              alt="NITC Logo" 
-              className="nitc-logo" 
-              width="600" // Intrinsic width, will be styled by CSS
-              height="600" // Intrinsic height, will be styled by CSS
+              src="/logo.png"
+              alt="NITC Logo"
+              className="nitc-logo"
+              width="600"
+              height="600"
               onError={(e) => { 
                 e.target.onerror = null; 
-                e.target.src = "https://placehold.co/600x600/0c4383/ffffff?text=NITC+Logo"; // Fallback placeholder
+                e.target.src = "https://placehold.co/600x600/0c4383/ffffff?text=NITC+Logo";
               }}
             />
             <h1 className="site-title" onClick={() => navigate('/')}>NITC Marketplace</h1>
           </div>
-          {/* ⭐⭐⭐ END NEW ⭐⭐⭐ */}
-          
-          {/* REMOVED: <p className="site-tagline">Your Peer-to-Peer Platform for NIT Calicut Students</p> */}
         </div>
+
         <nav className="landing-nav">
           <ul className="nav-list">
             <li><div onClick={() => navigate('/')}>Home</div></li>
             <li><div onClick={() => navigate('/news')}>News</div></li>
             <li><div onClick={() => navigate('/announcements')}>Announcements</div></li>
             <li><div onClick={() => navigate('/contact')}>Contact Us</div></li>
-          <li><div onClick={() => navigate('/credits')}>Credits</div></li>
+            <li><div onClick={() => navigate('/credits')}>Credits</div></li>
           </ul>
         </nav>
       </header>
@@ -102,16 +98,29 @@ const LandingPage = () => {
 
       <footer className="landing-footer">
         <div className="footer-links">
-<div 
-    onClick={() => window.open('https://nitc.ac.in/', '_blank')} 
-    className="nitc-link">
-    National Institute of Technology Calicut
-</div>
+          <div 
+            onClick={() => window.open('https://nitc.ac.in/', '_blank')} 
+            className="nitc-link">
+            National Institute of Technology Calicut
+          </div>
           <div onClick={() => navigate('/terms')}>Terms of Use</div>
           <div onClick={() => navigate('/accessibility')}>Accessibility Statement</div>
           <div onClick={() => navigate('/about-site')}>About the Site</div>
-          {/* <div onClick={() => navigate('/feedback-info')}>Feedback</div> */}
+
+          {/* GitHub Link */}
+          <div 
+            className="github-link" 
+            onClick={() => window.open('https://github.com/kotireddy712/NITC-MarketPlace/tree/main', '_blank')}
+          >
+            <img 
+              src="/github.png" 
+              alt="GitHub Repository" 
+              className="github-logo"
+            />
+            GitHub
+          </div>
         </div>
+
         <p className="copyright">&copy; 2025 NITC Marketplace. All rights reserved.</p>
       </footer>
     </div>

@@ -52,12 +52,12 @@ mail = Mail(app)
 
 # --- Database Connection Pool Configuration (using environment variables) ---
 db_config = {
-    "host": os.environ.get("DB_HOST", "maglev.proxy.rlwy.net"),
-    "port": int(os.environ.get("DB_PORT", 24352)),
-    "user": os.environ.get("DB_USER", "root"),
-    "password": os.environ.get("DB_PASSWORD", "ASymRKPoivjXkgAEzxxCLsWrtdKfCIuU"), # Replace with your actual DB password from environment variables
-    "database": os.environ.get("DB_NAME", "railway"), # Replace with your actual DB name
-    "autocommit": False # Manual commit control for transactions
+    "host": os.environ["DB_HOST"],
+    "port": int(os.environ["DB_PORT"]),
+    "user": os.environ["DB_USER"],
+    "password": os.environ["DB_PASSWORD"],
+    "database": os.environ["DB_NAME"],
+    "autocommit": False
 }
 
 try:
