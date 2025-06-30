@@ -527,3 +527,20 @@
 .btn-disapprove-all:hover {
   background-color: #d32f2f;
 }
+.home-button {
+    background-color: #0077b6;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 119, 182, 0.2);
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+.home-button:hover {
+    background-color: #023e8a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 119, 182, 0.3);
+}
