@@ -44,7 +44,7 @@ function AdminDashboard() {
 
   const fetchCategoryCounts = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/admin/category-counts');
+    const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/category-counts`);
       setCategoryCounts(res.data);
     } catch (error) {
       console.error('Error fetching category counts:', error);
@@ -53,7 +53,7 @@ function AdminDashboard() {
  const handleCategoryClick = async (categoryId) => {
     console.log("Category clicked:", categoryId); // 🔥 Debug line
     try {
-        const res = await axios.get(`http://localhost:5000/admin/items-by-category/${categoryId}`);
+const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/items-by-category/${categoryId}`);
         setItems(res.data);
     } catch (error) {
         console.error('Error fetching items for this category:', error);
@@ -62,7 +62,7 @@ function AdminDashboard() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/admin/users');
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/users');
       setUsers(res.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -71,7 +71,7 @@ function AdminDashboard() {
 
   const fetchPendingItems = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/admin/pending-items');
+const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-items`);
       setPendingItems(res.data);
     } catch (error) {
       console.error('Error fetching pending items:', error);
