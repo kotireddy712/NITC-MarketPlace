@@ -68,15 +68,15 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/items-by
       console.error('Error fetching users:', error);
     }
   };
+const fetchPendingItems = async () => {
+  try {
+    const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-items`);
+    setPendingItems(res.data);
+  } catch (error) {
+    console.error('Error fetching pending items:', error);
+  }
+};
 
-  const fetchPendingItems = async () => {
-    try {
-const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-items`);
-      setPendingItems(res.data);
-    } catch (error) {
-      console.error('Error fetching pending items:', error);
-    }
-  };
 
   // --- New Feedback Fetching Function ---
   const fetchFeedbacks = async () => {
