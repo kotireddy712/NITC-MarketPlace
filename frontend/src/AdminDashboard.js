@@ -68,15 +68,14 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/items-by
       console.error('Error fetching users:', error);
     }
   };
-const fetchPendingItems = async () => {
-  try {
+  const fetchPendingItems = async () => {
+   try {
     const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-items`);
     setPendingItems(res.data);
   } catch (error) {
     console.error('Error fetching pending items:', error);
   }
 };
-
 
   // --- New Feedback Fetching Function ---
   const fetchFeedbacks = async () => {
@@ -189,7 +188,7 @@ const fetchPendingItems = async () => {
   const disapproveAllItems = async () => {
   if (!window.confirm("Disapprove (Delete) all pending items? This cannot be undone.")) return;
   try {
-    await axios.delete(`${process.env.REACT_APP_BACKEND_URL}`/admin/disapprove-all-items`);
+    await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/admin/disapprove-all-items`);
     fetchPendingItems();
   } catch (error) {
     alert(`Error disapproving all items: ${error.message}`);
