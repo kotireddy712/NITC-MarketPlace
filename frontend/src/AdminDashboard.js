@@ -265,9 +265,12 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/items-by
   return (
     <div className="admin-container">
       <h2 className="admin-title">Admin Dashboard</h2>
-    <button class="home-button" onclick="window.location.href='https://nitc-marketplace.netlify.app/'">
+    <button
+    className="home-button"
+    onClick={() => window.location.href = "https://nitc-marketplace.netlify.app/"}>
     🏠 Back to Home
 </button>
+
 
       {/* Admin Actions */}
       <section className="dashboard-section admin-actions-grid">
