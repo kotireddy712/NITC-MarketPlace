@@ -119,6 +119,7 @@ function AuthForm() {
                 setIsOtpVerified(true);
                 setShowOtpVerification(false);
                 setOtpSent(false);
+                setOtpCountdown(0);
                 setForm({ ...form, otp: '' });
             } else {
                 setMessage(res.data.message || 'OTP verification failed.');
@@ -140,6 +141,7 @@ function AuthForm() {
         setIsSuccess(null);
 
         if (isLogin) {
+            // Login Flow
             try {
                 const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/login`, {
                     email: form.email,
@@ -160,7 +162,7 @@ function AuthForm() {
                     if (data.is_admin) {
                         setShowAdminChoice(true);
                     } else {
-                        setTimeout(() => navigate('/dashboard'), 1500);
+                        setTimeout(() => navigate('/dashboard'), 1000);
                     }
                 }
             } catch (err) {
@@ -171,45 +173,52 @@ function AuthForm() {
                 setIsLoading(false);
             }
         } else {
-            if (!otpSent && !isOtpVerified) {
-                await sendOtp();
-            } else if (otpSent && !isOtpVerified) {
-                await verifyOtp();
-            } else {
-                if (!form.name || !form.password || !form.contact_number) {
-                    setMessage('Please fill in all signup details (Full Name, Password, Contact Number).');
-                    setIsSuccess(false);
-                    setIsLoading(false);
-                    return;
+            // Signup Flow
+            if (!isOtpVerified) {
+                // OTP not yet verified
+                if (!otpSent) {
+                    await sendOtp();
+                } else {
+                    await verifyOtp();
                 }
+                setIsLoading(false);
+                return;
+            }
 
-                try {
-                    const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/signup`, {
-                        email: form.email,
-                        password: form.password,
-                        name: form.name,
-                        phone: form.contact_number
-                    });
+            // Proceed with signup after OTP verified
+            if (!form.name || !form.password || !form.contact_number) {
+                setMessage('Please fill in all signup details (Full Name, Password, Contact Number).');
+                setIsSuccess(false);
+                setIsLoading(false);
+                return;
+            }
 
-                    setMessage(res.data.message);
+            try {
+                const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/signup`, {
+                    email: form.email,
+                    password: form.password,
+                    name: form.name,
+                    phone: form.contact_number
+                });
+
+                setMessage(res.data.message);
+                setIsSuccess(true);
+
+                setTimeout(() => {
+                    setIsLogin(true);
+                    setForm({ email: form.email, password: '', name: '', contact_number: '', otp: '' });
+                    setMessage('Signup successful! Please log in with your new password.');
                     setIsSuccess(true);
-
-                    setTimeout(() => {
-                        setIsLogin(true);
-                        setForm({ email: form.email, password: '', name: '', contact_number: '', otp: '' });
-                        setMessage('Signup successful! Please log in with your new password.');
-                        setIsSuccess(true);
-                        setShowOtpVerification(false);
-                        setIsOtpVerified(false);
-                        setOtpSent(false);
-                    }, 1500);
-                } catch (err) {
-                    console.error("Error during signup:", err);
-                    setMessage(err.response?.data?.message || err.message || 'Signup failed.');
-                    setIsSuccess(false);
-                } finally {
-                    setIsLoading(false);
-                }
+                    setShowOtpVerification(false);
+                    setIsOtpVerified(false);
+                    setOtpSent(false);
+                }, 1000);
+            } catch (err) {
+                console.error("Error during signup:", err);
+                setMessage(err.response?.data?.message || err.message || 'Signup failed.');
+                setIsSuccess(false);
+            } finally {
+                setIsLoading(false);
             }
         }
     };
@@ -259,6 +268,7 @@ function AuthForm() {
                         disabled={!isLogin && (otpSent || isOtpVerified || isLoading)}
                     />
 
+                    {/* OTP Section */}
                     {!isLogin && showOtpVerification && !isOtpVerified && (
                         <div className="otp-section">
                             <div className="otp-input-container">
@@ -293,6 +303,7 @@ function AuthForm() {
                         </div>
                     )}
 
+                    {/* Signup Fields */}
                     {!isLogin && isOtpVerified && (
                         <>
                             <input
@@ -325,6 +336,7 @@ function AuthForm() {
                         </>
                     )}
 
+                    {/* Login Password */}
                     {isLogin && (
                         <input
                             type="password"
@@ -338,7 +350,15 @@ function AuthForm() {
                     )}
 
                     <button type="submit" disabled={isLoading}>
-                        {isLoading ? 'Processing...' : isLogin ? 'Login' : isOtpVerified ? 'Complete Signup' : otpSent ? 'Verify OTP' : 'Send OTP'}
+                        {isLoading
+                            ? 'Processing...'
+                            : isLogin
+                                ? 'Login'
+                                : isOtpVerified
+                                    ? 'Complete Signup'
+                                    : otpSent
+                                        ? 'Verify OTP'
+                                        : 'Send OTP'}
                     </button>
 
                     {message && (
