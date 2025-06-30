@@ -31,6 +31,7 @@ function AuthForm() {
     const [isVerifying, setIsVerifying] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
+    // Theme handling
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
@@ -39,6 +40,15 @@ function AuthForm() {
         }
     }, []);
 
+    // Persist OTP verification on reload
+    useEffect(() => {
+        const otpStatus = localStorage.getItem('otp_verified');
+        if (otpStatus === 'true') {
+            setIsOtpVerified(true);
+        }
+    }, []);
+
+    // OTP resend timer
     useEffect(() => {
         let timer;
         if (otpCountdown > 0) {
@@ -60,6 +70,7 @@ function AuthForm() {
         setOtpCountdown(0);
         setIsLoading(false);
         setIsVerifying(false);
+        localStorage.removeItem('otp_verified');
     };
 
     const handleChange = (e) => {
@@ -117,6 +128,7 @@ function AuthForm() {
                 setMessage(res.data.message);
                 setIsSuccess(true);
                 setIsOtpVerified(true);
+                localStorage.setItem('otp_verified', 'true');
                 setShowOtpVerification(false);
                 setOtpSent(false);
                 setOtpCountdown(0);
@@ -139,6 +151,8 @@ function AuthForm() {
         setIsLoading(true);
         setMessage('');
         setIsSuccess(null);
+
+        console.log("OTP Verified:", isOtpVerified);
 
         if (isLogin) {
             // Login Flow
@@ -174,9 +188,13 @@ function AuthForm() {
             }
         } else {
             // Signup Flow
+
             if (!isOtpVerified) {
-                setMessage('Please verify your email with OTP before signing up.');
-                setIsSuccess(false);
+                if (!otpSent) {
+                    await sendOtp();
+                } else {
+                    await verifyOtp();
+                }
                 setIsLoading(false);
                 return;
             }
@@ -207,6 +225,7 @@ function AuthForm() {
                     setShowOtpVerification(false);
                     setIsOtpVerified(false);
                     setOtpSent(false);
+                    localStorage.removeItem('otp_verified');
                 }, 1000);
             } catch (err) {
                 console.error("Error during signup:", err);
@@ -263,8 +282,7 @@ function AuthForm() {
                         disabled={!isLogin && (otpSent || isOtpVerified || isLoading)}
                     />
 
-                    {/* OTP Section */}
-                    {!isLogin && otpSent && !isOtpVerified && (
+                    {!isLogin && showOtpVerification && !isOtpVerified && (
                         <div className="otp-section">
                             <div className="otp-input-container">
                                 <input
@@ -298,19 +316,6 @@ function AuthForm() {
                         </div>
                     )}
 
-                    {/* Send OTP Button */}
-                    {!isLogin && !otpSent && !isOtpVerified && (
-                        <button
-                            type="button"
-                            onClick={sendOtp}
-                            disabled={isLoading}
-                            className="send-otp-btn"
-                        >
-                            Send OTP
-                        </button>
-                    )}
-
-                    {/* Signup Fields */}
                     {!isLogin && isOtpVerified && (
                         <>
                             <input
@@ -343,7 +348,6 @@ function AuthForm() {
                         </>
                     )}
 
-                    {/* Login Password */}
                     {isLogin && (
                         <input
                             type="password"
@@ -356,7 +360,10 @@ function AuthForm() {
                         />
                     )}
 
-                    <button type="submit" disabled={isLoading}>
+                    <button 
+                        type="submit" 
+                        disabled={isLoading || (!isLogin && !isOtpVerified)}
+                    >
                         {isLoading
                             ? 'Processing...'
                             : isLogin
