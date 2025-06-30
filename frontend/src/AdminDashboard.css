@@ -20,7 +20,7 @@
 
 /* Section Styling */
 .dashboard-section {
-    background-color: #ffffff;
+    background-color: #fff;
     padding: 25px;
     border-radius: 10px;
     margin-bottom: 25px;
@@ -36,7 +36,7 @@
     padding-bottom: 10px;
 }
 
-/* Admin Actions (Buttons to switch sections) */
+/* Admin Actions */
 .admin-actions-grid {
     display: flex;
     gap: 15px;
@@ -46,6 +46,7 @@
     background-color: #e6f0ff;
     border-radius: 10px;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
 }
 
 .admin-action-button {
@@ -71,12 +72,12 @@
 }
 
 .admin-action-button.active-section-button {
-    background-color: #004085; /* Darker blue for active state */
+    background-color: #004085;
     box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
     transform: translateY(0);
 }
 
-/* Card Grid for Categories */
+/* Card Grid */
 .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -105,7 +106,6 @@
 }
 
 .admin-card h4 {
-    margin-top: 0;
     color: #007bff;
     font-size: 1.2em;
     margin-bottom: 10px;
@@ -117,7 +117,7 @@
     color: #333;
 }
 
-/* Tables */
+/* Table Styling */
 .admin-table {
     width: 100%;
     border-collapse: collapse;
@@ -147,16 +147,6 @@
 }
 
 /* Buttons */
-.btn-approve, .btn-danger, .btn-enable, .btn-delete, .btn-close, .btn-delete-selected, .btn-approve-all, .btn-back {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-right: 5px; /* Spacing between buttons */
-}
-
 .btn-approve, .btn-enable, .btn-approve-all {
     background-color: #28a745;
     color: white;
@@ -164,37 +154,38 @@
 
 .btn-approve:hover, .btn-enable:hover, .btn-approve-all:hover {
     background-color: #218838;
-    transform: translateY(-1px);
 }
 
-.btn-danger, .btn-delete, .btn-delete-selected {
+.btn-danger, .btn-delete, .btn-delete-selected, .btn-disapprove, .btn-disapprove-all {
     background-color: #dc3545;
     color: white;
 }
 
-.btn-danger:hover, .btn-delete:hover, .btn-delete-selected:hover {
+.btn-danger:hover, .btn-delete:hover, .btn-delete-selected:hover, .btn-disapprove:hover, .btn-disapprove-all:hover {
     background-color: #c82333;
-    transform: translateY(-1px);
 }
 
 .btn-close, .btn-back {
     background-color: #6c757d;
     color: white;
-    margin-top: 15px;
 }
 
 .btn-close:hover, .btn-back:hover {
     background-color: #5a6268;
-    transform: translateY(-1px);
 }
 
-.btn-approve-all {
-    margin-bottom: 15px;
+.btn-approve-all, .btn-disapprove-all {
     padding: 10px 20px;
-    font-size: 1em;
-    display: block; /* Make it a block element to take full width or align left */
-    margin-left: auto;
-    margin-right: auto;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95em;
+    margin: 6px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-approve-all:hover, .btn-disapprove-all:hover {
+    transform: translateY(-1px);
 }
 
 .btn-delete-selected:disabled {
@@ -202,37 +193,32 @@
     cursor: not-allowed;
 }
 
-/* Pending Items List */
-.pending-list {
-    list-style: none;
-    padding: 0;
-}
-
+/* Pending Items */
 .pending-item {
-    background-color: #fff3cd; /* Light warning color */
+    background-color: #fff3cd;
     border: 1px solid #ffeeba;
-    border-left: 5px solid #ffc107; /* Emphasize with a border */
+    border-left: 5px solid #ffc107;
     border-radius: 8px;
     padding: 12px 20px;
     margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 1.0em;
+    font-size: 1em;
 }
 
 .pending-item strong {
     color: #856404;
 }
 
-/* Search and Pagination Controls */
+/* Search & Pagination */
 .search-pagination-control {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    gap: 15px; /* Spacing between elements */
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .search-bar {
@@ -240,7 +226,7 @@
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1em;
-    flex-grow: 1; /* Allow search bar to take available space */
+    flex-grow: 1;
     min-width: 200px;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
 }
@@ -255,7 +241,6 @@
     padding: 8px 10px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    font-size: 1em;
     background-color: white;
     cursor: pointer;
 }
@@ -307,43 +292,43 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    animation: fadeIn 0.3s ease-out;
     border: 1px solid #e0e0e0;
 }
 
 .item-details-modal h4 {
-    margin-top: 0;
     color: #0056b3;
     font-size: 1.8em;
     border-bottom: 1px solid #e9ecef;
     padding-bottom: 10px;
-    margin-bottom: 15px;
-}
-
-.item-details-modal p {
-    margin: 5px 0;
-    font-size: 1.05em;
 }
 
 .item-details-modal img {
-    max-width: 100%; /* Ensure image fits within modal */
+    max-width: 100%;
     height: auto;
     border-radius: 8px;
     margin-top: 15px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.item-details-modal .btn-close {
-    align-self: flex-end; /* Align close button to the right */
-    margin-top: 20px;
+/* Feedback Table */
+.feedback-table th:nth-child(5), .feedback-table td:nth-child(5) {
+    width: 40%;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-/* Clickable Titles */
+.feedback-text-cell {
+    white-space: normal;
+    max-height: 80px;
+    overflow-y: auto;
+}
+
+/* Clickable */
 .clickable-title {
     cursor: pointer;
     color: #007bff;
     text-decoration: none;
-    transition: color 0.2s ease;
 }
 
 .clickable-title:hover {
@@ -351,36 +336,33 @@
     color: #0056b3;
 }
 
-/* Feedback Table Specific Styles */
-.feedback-table th:nth-child(5), /* Feedback Text column */
-.feedback-table td:nth-child(5) {
-    width: 40%; /* Allocate more width for feedback text */
-    max-width: 300px; /* Max width to prevent overly wide columns */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap; /* Prevent wrapping unless explicitly broken */
+/* Home Button */
+.home-button {
+    background-color: #0077b6;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 119, 182, 0.2);
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
 }
 
-.feedback-text-cell {
-    white-space: normal; /* Allow text to wrap within the cell */
-    max-height: 80px; /* Limit height to prevent large cells */
-    overflow-y: auto; /* Add scroll for overflowing text */
+.home-button:hover {
+    background-color: #023e8a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 119, 182, 0.3);
 }
 
-
-/* Responsive Adjustments */
+/* Responsive Styles */
 @media (max-width: 768px) {
-    .admin-container {
-        padding: 15px;
-    }
-
     .admin-title {
         font-size: 1.8em;
     }
 
     .admin-actions-grid {
         flex-direction: column;
-        gap: 10px;
     }
 
     .admin-action-button {
@@ -402,32 +384,19 @@
     }
 
     .entries-control {
-        display: flex;
         justify-content: flex-start;
-        align-items: center;
         gap: 5px;
-        margin-top: 10px;
     }
 }
 
 @media (max-width: 480px) {
-    .admin-container {
-        padding: 10px;
-    }
-
     .admin-title {
         font-size: 1.5em;
-    }
-
-    .admin-table {
-        font-size: 0.8em;
     }
 
     .btn-approve, .btn-danger, .btn-enable, .btn-delete, .btn-close, .btn-delete-selected, .btn-approve-all, .btn-back {
         padding: 6px 10px;
         font-size: 0.8em;
-        margin-right: 3px;
-        margin-bottom: 5px; /* Stack buttons vertically if needed */
     }
 
     .pagination-button {
@@ -443,104 +412,4 @@
     .item-details-modal h4 {
         font-size: 1.5em;
     }
-}
-/* Basic styles to make it look decent initially */
-.admin-container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-}
-
-.admin-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-.admin-table th, .admin-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-.admin-table th {
-    background-color: #f2f2f2;
-}
-
-.admin-card {
-    border: 1px solid #ccc;
-    padding: 15px;
-    margin-bottom: 10px;
-    cursor: pointer;
-}
-
-.clickable-title {
-    color: blue;
-    cursor: pointer;
-    text-decoration: underline;
-}
-.btn-disapprove {
-  background-color: #f44336; /* Red */
-  border: none;
-  color: white;
-  padding: 8px 16px;
-  margin: 4px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 14px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.btn-disapprove:hover {
-  background-color: #d32f2f;
-}
-.btn-approve-all {
-  background-color: #4CAF50;
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  margin: 6px;
-  font-size: 15px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.btn-approve-all:hover {
-  background-color: #45a049;
-}
-
-.btn-disapprove-all {
-  background-color: #f44336;
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  margin: 6px;
-  font-size: 15px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.btn-disapprove-all:hover {
-  background-color: #d32f2f;
-}
-.home-button {
-    background-color: #0077b6;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 119, 182, 0.2);
-    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
-}
-
-.home-button:hover {
-    background-color: #023e8a;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 119, 182, 0.3);
 }
