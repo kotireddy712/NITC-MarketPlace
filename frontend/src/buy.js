@@ -36,14 +36,15 @@ export default function Buy() {
         setLoading(true);
         setError('');
         try {
-            let url = '${process.env.REACT_APP_BACKEND_URL}/items`;
-            if (selectedCategory) {
-                url += `?category_id=${selectedCategory}`;
-            }
-            const res = await axios.get(url);
-            setItems(res.data);
-            setShowContactForItemId(null);
-        } catch (err) {
+    let url = `${process.env.REACT_APP_BACKEND_URL}/items`;
+    if (selectedCategory) {
+        url += `?category_id=${selectedCategory}`;
+    }
+    const res = await axios.get(url);
+    setItems(res.data);
+    setShowContactForItemId(null);
+      }
+ catch (err) {
             setError('Failed to load items. Please try again.');
             console.error(err);
         } finally {

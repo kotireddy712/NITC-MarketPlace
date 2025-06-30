@@ -62,20 +62,22 @@ const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/items-by
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/users');
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/users`);
       setUsers(res.data);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
   };
   const fetchPendingItems = async () => {
-   try {
-    const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/pending-items`);
+  try {
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
+    const res = await axios.get(`${backendUrl}/admin/pending-items`);
     setPendingItems(res.data);
   } catch (error) {
     console.error('Error fetching pending items:', error);
   }
 };
+
 
   // --- New Feedback Fetching Function ---
   const fetchFeedbacks = async () => {

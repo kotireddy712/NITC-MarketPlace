@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './AuthForm.css'; // Assuming your CSS is here
-//import backgroundImage from './p1.png'; // Assuming your background image is here
+import './AuthForm.css';
 
-// Set axios to send cookies with all requests globally.
-// This is CRUCIAL for session persistence between your frontend and Flask backend.
 axios.defaults.withCredentials = true;
 
 function AuthForm() {
@@ -22,21 +19,18 @@ function AuthForm() {
 
     const [darkMode, setDarkMode] = useState(false);
     const [message, setMessage] = useState('');
-    const [isSuccess, setIsSuccess] = useState(null); // null for initial, true for success, false for error
-    const [isAdmin, setIsAdmin] = useState(false); // To store admin status from login
-    const [showAdminChoice, setShowAdminChoice] = useState(false); // To show admin/user choice after admin login
+    const [isSuccess, setIsSuccess] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [showAdminChoice, setShowAdminChoice] = useState(false);
 
-    // States for OTP flow
-    const [otpSent, setOtpSent] = useState(false); // True after OTP is sent successfully
-    const [showOtpVerification, setShowOtpVerification] = useState(false); // Controls visibility of OTP input field
-    const [isOtpVerified, setIsOtpVerified] = useState(false); // True after OTP is successfully verified
+    const [otpSent, setOtpSent] = useState(false);
+    const [showOtpVerification, setShowOtpVerification] = useState(false);
+    const [isOtpVerified, setIsOtpVerified] = useState(false);
 
-    // States for UI feedback (loading/disabling buttons)
-    const [otpCountdown, setOtpCountdown] = useState(0); // Countdown for OTP resend
-    const [isVerifying, setIsVerifying] = useState(false); // For OTP verification button loading state
-    const [isLoading, setIsLoading] = useState(false); // General loading state for main form submission
+    const [otpCountdown, setOtpCountdown] = useState(0);
+    const [isVerifying, setIsVerifying] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    // Effect to load theme preference from localStorage
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
@@ -45,17 +39,14 @@ function AuthForm() {
         }
     }, []);
 
-    // Effect for OTP countdown timer
     useEffect(() => {
         let timer;
         if (otpCountdown > 0) {
             timer = setTimeout(() => setOtpCountdown(otpCountdown - 1), 1000);
         }
-        // Cleanup timer on component unmount or if countdown finishes/resets
         return () => clearTimeout(timer);
     }, [otpCountdown]);
 
-    // Toggles between Login and Signup modes, resetting form and states
     const toggleMode = () => {
         setIsLogin(!isLogin);
         setForm({ email: '', password: '', name: '', contact_number: '', otp: '' });
@@ -71,14 +62,10 @@ function AuthForm() {
         setIsVerifying(false);
     };
 
-    // Handles changes in form input fields
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    // --- OTP Flow Functions ---
-
-    // Sends an OTP to the user's email
     const sendOtp = async () => {
         if (!form.email) {
             setMessage('Please enter your email first.');
@@ -86,22 +73,22 @@ function AuthForm() {
             return;
         }
 
-        setIsLoading(true); // General loading for the form
-        setMessage(''); // Clear previous messages
+        setIsLoading(true);
+        setMessage('');
         setIsSuccess(null);
 
-       const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/send-otp`, {
-    email: form.email
-});
-
+        try {
+            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/send-otp`, {
+                email: form.email
+            });
 
             setMessage(res.data.message);
             setIsSuccess(true);
-            setShowOtpVerification(true); // Show OTP input field
-            setOtpSent(true); // Mark OTP as sent
-            setOtpCountdown(60); // Start 60-second countdown for resend
+            setShowOtpVerification(true);
+            setOtpSent(true);
+            setOtpCountdown(60);
         } catch (err) {
-            console.error("Error sending OTP:", err); // Log full error for debugging
+            console.error("Error sending OTP:", err);
             setMessage(err.response?.data?.message || err.message || 'Failed to send OTP.');
             setIsSuccess(false);
         } finally {
@@ -109,7 +96,6 @@ function AuthForm() {
         }
     };
 
-    // Verifies the entered OTP
     const verifyOtp = async () => {
         if (!form.otp) {
             setMessage('Please enter the OTP.');
@@ -117,29 +103,29 @@ function AuthForm() {
             return;
         }
 
-        setIsVerifying(true); // Specific loading for OTP verification
+        setIsVerifying(true);
         setMessage('');
         setIsSuccess(null);
 
-      const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/verify-otp`, {
-  email: form.email,
-  otp: form.otp
-});
-
+        try {
+            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/verify-otp`, {
+                email: form.email,
+                otp: form.otp
+            });
 
             if (res.data.verified) {
                 setMessage(res.data.message);
                 setIsSuccess(true);
-                setIsOtpVerified(true); // Mark OTP as verified
-                setShowOtpVerification(false); // Hide OTP section
-                setOtpSent(false); // Reset OTP sent state
-                setForm({ ...form, otp: '' }); // Clear OTP input
+                setIsOtpVerified(true);
+                setShowOtpVerification(false);
+                setOtpSent(false);
+                setForm({ ...form, otp: '' });
             } else {
                 setMessage(res.data.message || 'OTP verification failed.');
                 setIsSuccess(false);
             }
         } catch (err) {
-            console.error("Error verifying OTP:", err); // Log full error for debugging
+            console.error("Error verifying OTP:", err);
             setMessage(err.response?.data?.message || err.message || 'OTP verification failed.');
             setIsSuccess(false);
         } finally {
@@ -147,25 +133,24 @@ function AuthForm() {
         }
     };
 
-    // --- Main Form Submission Handler (Login and Signup) ---
     const handleLoginOrSignup = async (e) => {
-        e.preventDefault(); // Prevent default form submission reload
-        setIsLoading(true); // General loading for the form submission
-        setMessage(''); // Clear previous messages
+        e.preventDefault();
+        setIsLoading(true);
+        setMessage('');
         setIsSuccess(null);
 
-       const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/login`, {
-  email: form.email,
-  password: form.password
-});
+        if (isLogin) {
+            try {
+                const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/login`, {
+                    email: form.email,
+                    password: form.password
+                });
 
                 const data = res.data;
-
                 setMessage(data.message);
                 setIsSuccess(true);
 
                 if (data.user_id) {
-                    // Store user data in localStorage (consider Redux/Context for larger apps)
                     localStorage.setItem('user_id', data.user_id);
                     localStorage.setItem('user_name', data.name);
                     localStorage.setItem('user_email', data.email);
@@ -173,61 +158,53 @@ function AuthForm() {
                     setIsAdmin(data.is_admin);
 
                     if (data.is_admin) {
-                        setShowAdminChoice(true); // Show admin/user choice
+                        setShowAdminChoice(true);
                     } else {
-                        // Navigate to user dashboard
                         setTimeout(() => navigate('/dashboard'), 1500);
                     }
                 }
             } catch (err) {
-                console.error("Error during login:", err); // Log full error for debugging
+                console.error("Error during login:", err);
                 setMessage(err.response?.data?.message || err.message || 'Login failed.');
                 setIsSuccess(false);
             } finally {
                 setIsLoading(false);
             }
         } else {
-            // --- Signup Flow Logic ---
-            // This button's text changes based on the state of the signup flow
             if (!otpSent && !isOtpVerified) {
-                // If OTP not sent, send it
                 await sendOtp();
             } else if (otpSent && !isOtpVerified) {
-                // If OTP sent but not verified, try to verify it
                 await verifyOtp();
             } else {
-                // If OTP verified, proceed with full signup details
                 if (!form.name || !form.password || !form.contact_number) {
                     setMessage('Please fill in all signup details (Full Name, Password, Contact Number).');
                     setIsSuccess(false);
-                    setIsLoading(false); // Stop loading if fields are missing
+                    setIsLoading(false);
                     return;
                 }
 
                 try {
-                  const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/signup`, {
+                    const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/signup`, {
                         email: form.email,
                         password: form.password,
                         name: form.name,
-                        phone: form.contact_number // Backend expects 'phone'
+                        phone: form.contact_number
                     });
 
                     setMessage(res.data.message);
                     setIsSuccess(true);
 
-                    // Redirect to login after successful signup
                     setTimeout(() => {
-                        setIsLogin(true); // Switch to login view
-                        setForm({ email: form.email, password: '', name: '', contact_number: '', otp: '' }); // Clear sensitive fields
+                        setIsLogin(true);
+                        setForm({ email: form.email, password: '', name: '', contact_number: '', otp: '' });
                         setMessage('Signup successful! Please log in with your new password.');
                         setIsSuccess(true);
-                        // Reset all signup-related states
                         setShowOtpVerification(false);
                         setIsOtpVerified(false);
                         setOtpSent(false);
                     }, 1500);
                 } catch (err) {
-                    console.error("Error during signup:", err); // Log full error for debugging
+                    console.error("Error during signup:", err);
                     setMessage(err.response?.data?.message || err.message || 'Signup failed.');
                     setIsSuccess(false);
                 } finally {
@@ -237,7 +214,6 @@ function AuthForm() {
         }
     };
 
-    // Toggles dark/light mode
     const handleToggleTheme = () => {
         if (darkMode) {
             document.documentElement.removeAttribute('data-theme');
@@ -250,7 +226,6 @@ function AuthForm() {
         }
     };
 
-    // Handles admin choice after login
     const handleAdminChoice = (choice) => {
         setShowAdminChoice(false);
         if (choice === 'admin') {
@@ -281,11 +256,9 @@ function AuthForm() {
                         placeholder="Email (use @nitc.ac.in)"
                         onChange={handleChange}
                         required
-                        // Disable email input during signup flow after OTP is sent/verified
                         disabled={!isLogin && (otpSent || isOtpVerified || isLoading)}
                     />
 
-                    {/* OTP Verification Section (only visible during signup, after OTP sent, before verified) */}
                     {!isLogin && showOtpVerification && !isOtpVerified && (
                         <div className="otp-section">
                             <div className="otp-input-container">
@@ -311,7 +284,7 @@ function AuthForm() {
                             </div>
                             <button
                                 type="button"
-                                onClick={sendOtp} // This re-sends OTP
+                                onClick={sendOtp}
                                 disabled={otpCountdown > 0 || isLoading}
                                 className="resend-otp-btn"
                             >
@@ -320,7 +293,6 @@ function AuthForm() {
                         </div>
                     )}
 
-                    {/* Signup Details Section (only visible during signup, after OTP verified) */}
                     {!isLogin && isOtpVerified && (
                         <>
                             <input
@@ -328,15 +300,6 @@ function AuthForm() {
                                 name="name"
                                 value={form.name}
                                 placeholder="Full Name"
-                                onChange={handleChange}
-                                required
-                                disabled={isLoading} // Disable if overall form is loading
-                            />
-                            <input
-                                type="password"
-                                name="password"
-                                value={form.password}
-                                placeholder="Password"
                                 onChange={handleChange}
                                 required
                                 disabled={isLoading}
@@ -350,10 +313,18 @@ function AuthForm() {
                                 required
                                 disabled={isLoading}
                             />
+                            <input
+                                type="password"
+                                name="password"
+                                value={form.password}
+                                placeholder="Password"
+                                onChange={handleChange}
+                                required
+                                disabled={isLoading}
+                            />
                         </>
                     )}
 
-                    {/* Password Input for Login Mode */}
                     {isLogin && (
                         <input
                             type="password"
@@ -366,56 +337,22 @@ function AuthForm() {
                         />
                     )}
 
-                    {/* Main Submit Button - text changes based on context */}
-                    <button type="submit" disabled={isLoading || (isVerifying && !isLogin && showOtpVerification)}>
-                        {isLoading || (isVerifying && !isLogin && showOtpVerification) ? 'Processing...' :
-                         isLogin ? 'Login' :
-                         (isOtpVerified ? 'Sign Up' : 'Send OTP')}
+                    <button type="submit" disabled={isLoading}>
+                        {isLoading ? 'Processing...' : isLogin ? 'Login' : isOtpVerified ? 'Complete Signup' : otpSent ? 'Verify OTP' : 'Send OTP'}
                     </button>
 
-                    {/* Message Display Area */}
                     {message && (
-                        <div className={`message ${isSuccess ? 'success' : 'error'}`}>
-                            {message}
-                        </div>
+                        <p className={`message ${isSuccess ? 'success' : 'error'}`}>{message}</p>
                     )}
                 </form>
 
-                {/* Admin Choice after Login */}
-{showAdminChoice && (
-  <div className="admin-choice">
-    <h2>Login Successful!</h2>
-    <p>Proceed as:</p>
-    <div className="choice-buttons">
-      <button onClick={() => handleAdminChoice('admin')}>Admin</button>
-      <button onClick={() => handleAdminChoice('user')}>User</button>
-    </div>
-    <button className="back-btn" onClick={() => setShowAdminChoice(false)}>
-      Back
-    </button>
-  </div>
-)}
-
-
-                {/* ⭐ NEW: Back to Home Button ⭐ */}
-                <button 
-                    onClick={() => navigate('/')} 
-                    className="back-to-home-btn"
-                    style={{ 
-                        marginTop: '20px', 
-                        padding: '10px 20px', 
-                        backgroundColor: '#6c757d', /* A neutral grey */
-                        color: 'white', 
-                        border: 'none', 
-                        borderRadius: '5px', 
-                        cursor: 'pointer',
-                        fontSize: '1em',
-                        transition: 'background-color 0.3s ease',
-                    }}
-                >
-                    Back to Home
-                </button>
-                {/* ⭐ END NEW ⭐ */}
+                {showAdminChoice && (
+                    <div className="admin-choice">
+                        <p>Login as:</p>
+                        <button onClick={() => handleAdminChoice('admin')}>Admin</button>
+                        <button onClick={() => handleAdminChoice('user')}>User</button>
+                    </div>
+                )}
             </div>
         </div>
     );
