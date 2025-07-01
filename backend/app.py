@@ -817,13 +817,15 @@ def change_password():
     new_password = data.get('newPassword')
     if not email or not old_password or not new_password:
         return jsonify({'message': 'Missing fields'}), 400
-    try:
+    try: 
         conn = mysql.connector.connect(
-            host='localhost',
-            user='root',
-            password='1234',
-            database='nitc_mp_db'
-        )
+          host=os.environ["DB_HOST"],
+           port=int(os.environ["DB_PORT"]),
+           user=os.environ["DB_USER"],
+           password=os.environ["DB_PASSWORD"],
+          database=os.environ["DB_NAME"]
+      )
+
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT password FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
