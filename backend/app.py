@@ -30,7 +30,12 @@ app.logger.setLevel(logging.DEBUG) # Set app logger to DEBUG level
 # Add secret key for sessions
 # IMPORTANT: Change this to a strong, random string in production!
 # This key is vital for securely signing session cookies.
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-super-secret-key-please-change-this-in-production-!!!!!!')
+# app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-super-secret-key-please-change-this-in-production-!!!!!!')
+# Add secret key for sessions (read from .env)
+app.config['SECRET_KEY'] = os.getenv(
+    'SECRET_KEY', 
+    'fallback-secret-key-if-env-not-set'
+)
 
 # Session cookie configuration
 # CRITICAL: For cross-origin frontend (Netlify HTTPS) and backend,
