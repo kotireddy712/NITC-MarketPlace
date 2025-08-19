@@ -19,7 +19,6 @@ load_dotenv()
 app = Flask(__name__)
 # Configure CORS to allow credentials and specify allowed origins
 CORS(app, supports_credentials=True, origins=[
-    "http://localhost:3000",             # Local React development server
     "https://nitc-marketplace.netlify.app"  # Your deployed Netlify frontend URL
 ])
 
