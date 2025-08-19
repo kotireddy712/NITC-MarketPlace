@@ -19,7 +19,6 @@ load_dotenv()
 app = Flask(__name__)
 # Configure CORS to allow credentials and specify allowed origins
 CORS(app, supports_credentials=True, origins=[
-    "http://localhost:3000",             # Local React development server
     "https://nitc-marketplace.netlify.app"  # Your deployed Netlify frontend URL
 ])
 
@@ -504,9 +503,60 @@ def signup():
 
 # --- Basic Login Route (from your previous code) ---
 # --- Basic Login Route ---
+# @app.route("/login", methods=["POST"])
+# def login():
+#     """Handles user login."""
+#     db_conn = get_db()
+#     cursor = db_conn.cursor(dictionary=True)
+#     data = request.json
+#     email = data.get("email")
+#     password = data.get("password")
+
+#     if not all([email, password]):
+#         return jsonify({"message": "Missing required fields."}), 400
+
+#     try:
+#         # Fetch user including the hashed password and is_disabled status
+#         cursor.execute(
+#             "SELECT user_id, name, email, password, role, is_disabled FROM users WHERE email=%s",
+#             (email,)
+#         )
+#         user = cursor.fetchone()
+
+#         if not user:
+#             return jsonify({"message": "Invalid credentials or user not found."}), 401
+
+#         # Check if account is disabled
+#         if user.get("is_disabled") == 1:
+#             return jsonify({"message": "Account is disabled. Please contact support."}), 403
+
+#         # Check if password exists (i.e., user has completed signup)
+#         if user["password"] is None or user["password"] == '':
+#             return jsonify({"message": "Account not fully signed up. Please complete signup first."}), 403
+
+#         # Verify the password using bcrypt
+#         if not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
+#             return jsonify({"message": "Incorrect password."}), 403
+
+#         # Password is correct, return user info (excluding password hash)
+#         return jsonify({
+#             "message": "Login successful!",
+#             "user_id": user["user_id"],
+#             "name": user["name"],
+#             "email": user["email"],
+#             "is_admin": user["role"] == "admin" # Provide a boolean for easy frontend check
+#         })
+
+#     except mysql.connector.Error as err:
+#         app.logger.error(f"Database error during login for {email}: {err}")
+#         return jsonify({"message": f"Database error during login: {err}"}), 500
+
+#     except Exception as e:
+#         app.logger.error(f"Unexpected error during login for {email}: {e}")
+#         return jsonify({"message": f"An unexpected error occurred during login: {e}"}), 500
 @app.route("/login", methods=["POST"])
 def login():
-    """Handles user login."""
+    """Handles user login and sets session data upon successful authentication."""
     db_conn = get_db()
     cursor = db_conn.cursor(dictionary=True)
     data = request.json
@@ -539,10 +589,16 @@ def login():
         if not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
             return jsonify({"message": "Incorrect password."}), 403
 
+        # Password is correct, set session variables
+        session['user_id'] = user["user_id"]
+        session['name'] = user["name"]
+        session['email'] = user["email"]
+        session['role'] = user["role"] # Store role for authorization checks later
+
         # Password is correct, return user info (excluding password hash)
         return jsonify({
             "message": "Login successful!",
-            "user_id": user["user_id"],
+            "user_id": user["user_id"], # Optionally return these if frontend still needs them immediately
             "name": user["name"],
             "email": user["email"],
             "is_admin": user["role"] == "admin" # Provide a boolean for easy frontend check
@@ -555,6 +611,8 @@ def login():
     except Exception as e:
         app.logger.error(f"Unexpected error during login for {email}: {e}")
         return jsonify({"message": f"An unexpected error occurred during login: {e}"}), 500
+
+
 
 # You can add more routes for other functionalities (e.g., listing products, user profile, etc.) here
 
