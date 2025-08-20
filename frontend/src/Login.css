@@ -123,3 +123,37 @@ input {
         transform: translateY(0);
     }
 }
+.loading {
+  text-align: center;
+  padding: 2rem;
+}
+
+.user-info {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.user-info p {
+  margin: 0.5rem 0;
+}
+
+.dashboard-buttons {
+  margin: 1rem 0;
+}
+
+.admin-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.user-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

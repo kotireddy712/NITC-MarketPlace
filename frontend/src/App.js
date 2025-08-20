@@ -28,7 +28,14 @@ import News from './News';
 import Accessibility from './Accessibility';
 import About from './About';
 import Credits from './Credits';
+// Configure axios globally for all components
+import axios from 'axios';
 
+// Enable cookies for all requests
+axios.defaults.withCredentials = true;
+
+// Set base URL if needed
+axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL;
 import './App.css'; // Your main app CSS
 import './FeedbackModal.css'; // <--- NEW: Import the FeedbackModal CSS
 
