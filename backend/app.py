@@ -14,47 +14,146 @@ import logging
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
+# load_dotenv()
+
+# app = Flask(__name__)
+# # Configure CORS to allow credentials and specify allowed origins
+# CORS(app, supports_credentials=True, origins=[
+#     "https://nitc-marketplace.netlify.app"  # Your deployed Netlify frontend URL
+# ])
+
+# # --- Configure Logging ---
+# logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+# app.logger.setLevel(logging.DEBUG) # Set app logger to DEBUG level
+
+# # Add secret key for sessions
+# # IMPORTANT: Change this to a strong, random string in production!
+# # This key is vital for securely signing session cookies.
+# # app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-super-secret-key-please-change-this-in-production-!!!!!!')
+# # Add secret key for sessions (read from .env)
+# app.config['SECRET_KEY'] = os.getenv(
+#     'SECRET_KEY', 
+#     'fallback-secret-key-if-env-not-set'
+# )
+
+# # Session cookie configuration
+# # CRITICAL: For cross-origin frontend (Netlify HTTPS) and backend,
+# # set SAMESITE to 'None' and SECURE to True.
+# # Browsers will only send 'SameSite=None' cookies if 'Secure=True'.
+# app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+# app.config['SESSION_COOKIE_SECURE'] = True # MUST BE TRUE FOR HTTPS DEPLOYMENT
+
+# # --- Email Configuration (using environment variables) ---
+# app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+# app.config['MAIL_PORT'] = 587
+# app.config['MAIL_USE_TLS'] = True
+# app.config['MAIL_USE_SSL'] = False # TLS is used, so SSL should be False
+# app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+# app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+# app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
+
+# mail = Mail(app)
+
+# # --- Database Connection Pool Configuration (using environment variables) ---
+# db_config = {
+#     "host": os.environ["DB_HOST"],
+#     "port": int(os.environ["DB_PORT"]),
+#     "user": os.environ["DB_USER"],
+#     "password": os.environ["DB_PASSWORD"],
+#     "database": os.environ["DB_NAME"],
+#     "autocommit": False
+# }
+
+# try:
+#     db_pool = pooling.MySQLConnectionPool(
+#         pool_name="mypool",
+#         pool_size=5, # Number of connections in the pool
+#         **db_config
+#     )
+#     app.logger.info("Database connection pool created successfully.")
+# except mysql.connector.Error as err:
+#     app.logger.critical(f"Error creating database connection pool: {err}")
+#     # Exit if database connection cannot be established at startup, as the app won't function
+#     exit(1)
+
+# # --- Helper Functions for Database Connection Management ---
+# def get_db():
+#     """
+#     Provides a database connection from the pool.
+#     Stores the connection and cursor in Flask's `g` object for request-scoped access.
+#     """
+#     if 'db' not in g:
+#         g.db = db_pool.get_connection()
+#         # Cursor returns rows as dictionaries for easier access by column name
+#         g.cursor = g.db.cursor(dictionary=True)
+#     return g.db
+
+# @app.teardown_appcontext
+# def close_db_connection(exception):
+#     """
+#     Closes the database connection at the end of each request.
+#     Ensures resources are properly released.
+#     """
+#     db = g.pop('db', None)
+#     if db is not None and db.is_connected():
+#         app.logger.debug("Closing database connection.")
+#         g.cursor.close()
+#         db.close()
+
+# # --- Cloudinary Configuration (Optional: for image uploads) ---
+# cloudinary.config(
+#     cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+#     api_key=os.getenv('CLOUDINARY_API_KEY'),
+#     api_secret=os.getenv('CLOUDINARY_API_SECRET')
+# )
+
+# -----------------------------------------------------------------------------------------
+# from flask import Flask, request, jsonify, g, session
+# from flask_cors import CORS
+# import mysql.connector
+# from mysql.connector import pooling
+# import cloudinary
+# import cloudinary.uploader
+# import os
+# import bcrypt
+# from datetime import timedelta
+# from flask_mail import Mail
+# import logging
+# from dotenv import load_dotenv
+
+# ---------------- Load .env ----------------
 load_dotenv()
 
 app = Flask(__name__)
-# Configure CORS to allow credentials and specify allowed origins
+
+# ---------------- CORS (allow frontend) ----------------
 CORS(app, supports_credentials=True, origins=[
-    "https://nitc-marketplace.netlify.app"  # Your deployed Netlify frontend URL
+    "https://nitc-marketplace.netlify.app"  # your frontend URL
 ])
 
-# --- Configure Logging ---
+# ---------------- Logging ----------------
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-app.logger.setLevel(logging.DEBUG) # Set app logger to DEBUG level
+app.logger.setLevel(logging.DEBUG)
 
-# Add secret key for sessions
-# IMPORTANT: Change this to a strong, random string in production!
-# This key is vital for securely signing session cookies.
-# app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-super-secret-key-please-change-this-in-production-!!!!!!')
-# Add secret key for sessions (read from .env)
-app.config['SECRET_KEY'] = os.getenv(
-    'SECRET_KEY', 
-    'fallback-secret-key-if-env-not-set'
-)
+# ---------------- Secret Key for Session ----------------
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'fallback-secret-key')
 
-# Session cookie configuration
-# CRITICAL: For cross-origin frontend (Netlify HTTPS) and backend,
-# set SAMESITE to 'None' and SECURE to True.
-# Browsers will only send 'SameSite=None' cookies if 'Secure=True'.
+# ✅ Cookie config (important for Render + Netlify)
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'
-app.config['SESSION_COOKIE_SECURE'] = True # MUST BE TRUE FOR HTTPS DEPLOYMENT
+app.config['SESSION_COOKIE_SECURE'] = True
+app.permanent_session_lifetime = timedelta(hours=1)
 
-# --- Email Configuration (using environment variables) ---
+# ---------------- Mail Config ----------------
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False # TLS is used, so SSL should be False
+app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
-
 mail = Mail(app)
 
-# --- Database Connection Pool Configuration (using environment variables) ---
+# ---------------- DB Pool ----------------
 db_config = {
     "host": os.environ["DB_HOST"],
     "port": int(os.environ["DB_PORT"]),
@@ -65,48 +164,100 @@ db_config = {
 }
 
 try:
-    db_pool = pooling.MySQLConnectionPool(
-        pool_name="mypool",
-        pool_size=5, # Number of connections in the pool
-        **db_config
-    )
-    app.logger.info("Database connection pool created successfully.")
+    db_pool = pooling.MySQLConnectionPool(pool_name="mypool", pool_size=5, **db_config)
+    app.logger.info("Database pool created successfully.")
 except mysql.connector.Error as err:
-    app.logger.critical(f"Error creating database connection pool: {err}")
-    # Exit if database connection cannot be established at startup, as the app won't function
+    app.logger.critical(f"Error creating database pool: {err}")
     exit(1)
 
-# --- Helper Functions for Database Connection Management ---
+# ---------------- DB Helpers ----------------
 def get_db():
-    """
-    Provides a database connection from the pool.
-    Stores the connection and cursor in Flask's `g` object for request-scoped access.
-    """
     if 'db' not in g:
         g.db = db_pool.get_connection()
-        # Cursor returns rows as dictionaries for easier access by column name
         g.cursor = g.db.cursor(dictionary=True)
     return g.db
 
 @app.teardown_appcontext
 def close_db_connection(exception):
-    """
-    Closes the database connection at the end of each request.
-    Ensures resources are properly released.
-    """
     db = g.pop('db', None)
     if db is not None and db.is_connected():
         app.logger.debug("Closing database connection.")
         g.cursor.close()
         db.close()
 
-# --- Cloudinary Configuration (Optional: for image uploads) ---
+# ---------------- Cloudinary ----------------
 cloudinary.config(
     cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
     api_key=os.getenv('CLOUDINARY_API_KEY'),
     api_secret=os.getenv('CLOUDINARY_API_SECRET')
 )
 
+# ---------------- Login Route ----------------
+@app.route("/login", methods=["POST"])
+def login():
+    db_conn = get_db()
+    cursor = db_conn.cursor(dictionary=True)
+    data = request.json
+    email = data.get("email")
+    password = data.get("password")
+
+    if not all([email, password]):
+        return jsonify({"message": "Missing required fields."}), 400
+
+    cursor.execute(
+        "SELECT user_id, name, email, password, role, is_disabled FROM users WHERE email=%s",
+        (email,)
+    )
+    user = cursor.fetchone()
+
+    if not user:
+        return jsonify({"message": "Invalid credentials or user not found."}), 401
+
+    if user.get("is_disabled") == 1:
+        return jsonify({"message": "Account is disabled. Please contact support."}), 403
+
+    if not user["password"]:
+        return jsonify({"message": "Account not fully signed up."}), 403
+
+    if not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
+        return jsonify({"message": "Incorrect password."}), 403
+
+    # ✅ assign session cookie
+    session.permanent = True
+    session['user_id'] = user["user_id"]
+    session['name'] = user["name"]
+    session['email'] = user["email"]
+    session['role'] = user["role"]
+
+    return jsonify({
+        "message": "Login successful!",
+        "user_id": user["user_id"],
+        "name": user["name"],
+        "email": user["email"],
+        "is_admin": user["role"] == "admin"
+    })
+
+# ---------------- Check Session ----------------
+@app.route("/me", methods=["GET"])
+def me():
+    if "user_id" in session:
+        return jsonify({
+            "logged_in": True,
+            "user_id": session["user_id"],
+            "name": session["name"],
+            "email": session["email"],
+            "role": session["role"]
+        })
+    return jsonify({"logged_in": False}), 401
+
+# ---------------- Logout ----------------
+@app.route("/logout", methods=["POST"])
+def logout():
+    session.clear()
+    return jsonify({"message": "Logged out successfully."})
+
+
+# -----------------------------------------------------------------------------------
 # --- OTP Helper Functions ---
 def generate_otp(length=6):
     """Generates a secure random 6-digit OTP."""
@@ -554,63 +705,63 @@ def signup():
 #     except Exception as e:
 #         app.logger.error(f"Unexpected error during login for {email}: {e}")
 #         return jsonify({"message": f"An unexpected error occurred during login: {e}"}), 500
-@app.route("/login", methods=["POST"])
-def login():
-    """Handles user login and sets session data upon successful authentication."""
-    db_conn = get_db()
-    cursor = db_conn.cursor(dictionary=True)
-    data = request.json
-    email = data.get("email")
-    password = data.get("password")
+# @app.route("/login", methods=["POST"])
+# def login():
+#     """Handles user login and sets session data upon successful authentication."""
+#     db_conn = get_db()
+#     cursor = db_conn.cursor(dictionary=True)
+#     data = request.json
+#     email = data.get("email")
+#     password = data.get("password")
 
-    if not all([email, password]):
-        return jsonify({"message": "Missing required fields."}), 400
+#     if not all([email, password]):
+#         return jsonify({"message": "Missing required fields."}), 400
 
-    try:
-        # Fetch user including the hashed password and is_disabled status
-        cursor.execute(
-            "SELECT user_id, name, email, password, role, is_disabled FROM users WHERE email=%s",
-            (email,)
-        )
-        user = cursor.fetchone()
+#     try:
+#         # Fetch user including the hashed password and is_disabled status
+#         cursor.execute(
+#             "SELECT user_id, name, email, password, role, is_disabled FROM users WHERE email=%s",
+#             (email,)
+#         )
+#         user = cursor.fetchone()
 
-        if not user:
-            return jsonify({"message": "Invalid credentials or user not found."}), 401
+#         if not user:
+#             return jsonify({"message": "Invalid credentials or user not found."}), 401
 
-        # Check if account is disabled
-        if user.get("is_disabled") == 1:
-            return jsonify({"message": "Account is disabled. Please contact support."}), 403
+#         # Check if account is disabled
+#         if user.get("is_disabled") == 1:
+#             return jsonify({"message": "Account is disabled. Please contact support."}), 403
 
-        # Check if password exists (i.e., user has completed signup)
-        if user["password"] is None or user["password"] == '':
-            return jsonify({"message": "Account not fully signed up. Please complete signup first."}), 403
+#         # Check if password exists (i.e., user has completed signup)
+#         if user["password"] is None or user["password"] == '':
+#             return jsonify({"message": "Account not fully signed up. Please complete signup first."}), 403
 
-        # Verify the password using bcrypt
-        if not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
-            return jsonify({"message": "Incorrect password."}), 403
+#         # Verify the password using bcrypt
+#         if not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
+#             return jsonify({"message": "Incorrect password."}), 403
 
-        # Password is correct, set session variables
-        session['user_id'] = user["user_id"]
-        session['name'] = user["name"]
-        session['email'] = user["email"]
-        session['role'] = user["role"] # Store role for authorization checks later
+#         # Password is correct, set session variables
+#         session['user_id'] = user["user_id"]
+#         session['name'] = user["name"]
+#         session['email'] = user["email"]
+#         session['role'] = user["role"] # Store role for authorization checks later
 
-        # Password is correct, return user info (excluding password hash)
-        return jsonify({
-            "message": "Login successful!",
-            "user_id": user["user_id"], # Optionally return these if frontend still needs them immediately
-            "name": user["name"],
-            "email": user["email"],
-            "is_admin": user["role"] == "admin" # Provide a boolean for easy frontend check
-        })
+#         # Password is correct, return user info (excluding password hash)
+#         return jsonify({
+#             "message": "Login successful!",
+#             "user_id": user["user_id"], # Optionally return these if frontend still needs them immediately
+#             "name": user["name"],
+#             "email": user["email"],
+#             "is_admin": user["role"] == "admin" # Provide a boolean for easy frontend check
+#         })
 
-    except mysql.connector.Error as err:
-        app.logger.error(f"Database error during login for {email}: {err}")
-        return jsonify({"message": f"Database error during login: {err}"}), 500
+#     except mysql.connector.Error as err:
+#         app.logger.error(f"Database error during login for {email}: {err}")
+#         return jsonify({"message": f"Database error during login: {err}"}), 500
 
-    except Exception as e:
-        app.logger.error(f"Unexpected error during login for {email}: {e}")
-        return jsonify({"message": f"An unexpected error occurred during login: {e}"}), 500
+#     except Exception as e:
+#         app.logger.error(f"Unexpected error during login for {email}: {e}")
+#         return jsonify({"message": f"An unexpected error occurred during login: {e}"}), 500
 
 
 
