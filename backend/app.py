@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, g, session
+from flask import Flask, request, jsonify, g, session, current_app
 from flask_cors import CORS
 import mysql.connector
 from mysql.connector import pooling
@@ -12,8 +12,9 @@ import secrets
 import string
 import logging
 from dotenv import load_dotenv
-# from auth_utils import login_required
 from auth_utils import login_required, admin_required, clear_session  # ✅ Import decorators
+
+# from events_routes import events_bp # <<<--- REMOVED THIS IMPORT
 # from events_routes import events_bp
 # Load environment variables from .env file
 load_dotenv()
@@ -25,7 +26,6 @@ CORS(app, supports_credentials=True, origins=[
     "https://nitc-marketplace.netlify.app"  # Your deployed Netlify frontend URL
 ])
 
-# app.register_blueprint(events_bp)
 from flask_cors import CORS
 CORS(app, supports_credentials=True)
 
@@ -646,6 +646,124 @@ def logout():
 
 # ---------------------------------------------------------------------------------------------------
 
+# --- CALENDAR EVENT ROUTES (Moved from events_routes.py) ---
+@app.route("/events", methods=["GET"])
+@login_required # Users must be logged in to view the calendar
+def get_all_events():
+    """Retrieves all calendar events for authenticated users."""
+    
+    db_conn = get_db()
+    cursor = g.cursor
+    
+    try:
+        # Fetch all events, ordered by start_date
+        query = """
+        SELECT event_id, title, description, start_date, end_date
+        FROM nitc_mp_db.events
+        ORDER BY start_date;
+        """
+        cursor.execute(query)
+        events = cursor.fetchall()
+
+        # Format datetime objects to ISO strings for JavaScript consumption
+        for event in events:
+            if isinstance(event.get('start_date'), datetime):
+                event['start_date'] = event['start_date'].isoformat()
+            if event.get('end_date') and isinstance(event.get('end_date'), datetime):
+                event['end_date'] = event['end_date'].isoformat()
+
+        app.logger.info(f"Successfully fetched {len(events)} events.")
+        return jsonify(events), 200
+
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error fetching events: {err}")
+        return jsonify({"message": f"Database error: {err}"}), 500
+    except Exception as e:
+        app.logger.error(f"Unexpected error fetching events: {e}")
+        return jsonify({"message": f"An unexpected error occurred: {e}"}), 500
+
+
+@app.route("/admin/events", methods=["POST"])
+@admin_required # Only admins can add events
+def add_event():
+    """Adds a new event to the calendar."""
+    
+    db_conn = get_db()
+    cursor = g.cursor
+    
+    data = request.json
+
+    title = data.get("title")
+    description = data.get("description")
+    start_date_str = data.get("start_date")
+    end_date_str = data.get("end_date")
+
+    if not all([title, start_date_str]):
+        return jsonify({"message": "Title and start date are required."}), 400
+
+    try:
+        # Convert string dates to datetime objects
+        # We remove "Z" if it exists, as React DatePicker sometimes adds it for UTC
+        start_date = datetime.fromisoformat(start_date_str.replace("Z", "")) 
+        end_date = datetime.fromisoformat(end_date_str.replace("Z", "")) if end_date_str else None
+
+        # Get user ID from session for 'created_by' foreign key
+        created_by_user_id = session.get("user_id")
+
+        query = """
+        INSERT INTO nitc_mp_db.events (title, description, start_date, end_date, created_by)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (title, description, start_date, end_date, created_by_user_id))
+        db_conn.commit()
+
+        app.logger.info(f"Event '{title}' added successfully by user_id: {created_by_user_id}")
+        return jsonify({"message": "Event added successfully!", "event_id": cursor.lastrowid}), 201
+
+    except ValueError as ve:
+        app.logger.error(f"Invalid date format provided: {ve}")
+        return jsonify({"message": "Invalid date format. Please ensure correct datetime format (YYYY-MM-DDTHH:MM)."}), 400
+    except mysql.connector.Error as err:
+        db_conn.rollback()
+        app.logger.error(f"Database error adding event: {err}")
+        return jsonify({"message": f"Database error: {err}"}), 500
+    except Exception as e:
+        db_conn.rollback()
+        app.logger.error(f"Unexpected error adding event: {e}")
+        return jsonify({"message": f"An unexpected error occurred: {e}"}), 500
+
+
+@app.route("/admin/events/<int:event_id>", methods=["DELETE"])
+@admin_required # Only admins can delete events
+def delete_event(event_id):
+    """Deletes a specific event by its ID."""
+    
+    db_conn = get_db()
+    cursor = g.cursor
+    
+    try:
+        query = "DELETE FROM nitc_mp_db.events WHERE event_id = %s"
+        cursor.execute(query, (event_id,))
+        
+        if cursor.rowcount == 0:
+            db_conn.rollback()
+            return jsonify({"message": "Event not found."}), 404
+
+        db_conn.commit()
+        app.logger.info(f"Event ID {event_id} deleted successfully.")
+        return jsonify({"message": "Event deleted successfully."}), 200
+
+    except mysql.connector.Error as err:
+        db_conn.rollback()
+        app.logger.error(f"Database error deleting event ID {event_id}: {err}")
+        return jsonify({"message": f"Database error: {err}"}), 500
+    except Exception as e:
+        db_conn.rollback()
+        app.logger.error(f"Unexpected error deleting event ID {event_id}: {e}")
+        return jsonify({"message": f"An unexpected error occurred: {e}"}), 500
+# --- END CALENDAR EVENT ROUTES ---
+
+
 @app.route('/items', methods=['GET'])
 def get_items():
     db_conn = get_db()
@@ -913,21 +1031,10 @@ def delete_item(item_id):
         app.logger.error(f"Unexpected error deleting item {item_id}: {e}")
         return jsonify({"message": f"An unexpected error occurred: {e}"}), 500
 
-# @app.route('/api/user/<email>', methods=['GET'])
-# def get_user(email):
-#     conn = get_db()
-#     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("SELECT user_id, name, email, contact_number, photo_url FROM users WHERE email = %s", (email,))
-#     user = cursor.fetchone()
-#     if user:
-#         return jsonify(user)
-#     else:
-#         return jsonify({"error": "User not found"}), 404
-
 @app.route('/api/user/<email>', methods=['PUT'])
 def update_user(email):
     conn = get_db()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
     name = request.form.get('name')
     contact_number = request.form.get('contact_number')
     image_file = request.files.get('image')
@@ -1249,7 +1356,9 @@ def category_counts():
         print("Error fetching category counts:", e)
         return jsonify({'error': 'Internal server error'}), 500
     finally:
-        cursor.close()
+        # We don't need to close cursor here because it's managed by g.cursor, 
+        # but since your original code did, I'll keep the pattern for consistency
+        pass 
 
 @app.route('/admin/users', methods=['GET'])
 def fetch_users():
@@ -1264,7 +1373,8 @@ def fetch_users():
         print("Error fetching users:", e)
         return jsonify({'error': 'Internal server error'}), 500
     finally:
-        cursor.close()
+        # See note above
+        pass
 
 # Route to disable a user
 @app.route('/admin/disable-user', methods=['POST'])
@@ -1294,7 +1404,7 @@ def disable_user():
             db.rollback()
         return jsonify({'error': 'Internal server error'}), 500
     finally:
-        cursor.close()
+        pass
 
 
 # Route to enable a user
@@ -1326,7 +1436,7 @@ def enable_user():
             db.rollback()
         return jsonify({'error': 'Internal server error'}), 500
     finally:
-        cursor.close()
+        pass
 
 
 @app.route('/admin/pending-items', methods=['GET'])
@@ -1347,7 +1457,7 @@ def get_pending_items():
         print("Error fetching pending items:", e)
         return jsonify({'error': 'Internal server error'}), 500
     finally:
-        cursor.close()
+        pass
 
 @app.route('/admin/approve-item', methods=['POST'])
 def approve_item_post():
@@ -1369,7 +1479,7 @@ def approve_item_post():
             db.rollback()
         return jsonify({'error': 'Internal server error'}), 500
     finally:
-        cursor.close()
+        pass
 
 @app.route('/admin/disapprove-item', methods=['POST'])
 def disapprove_item_post():
@@ -1391,7 +1501,7 @@ def disapprove_item_post():
             db.rollback()
         return jsonify({'error': 'Internal server error'}), 500
     finally:
-        cursor.close()
+        pass
 
 
 
@@ -1409,7 +1519,7 @@ def approve_all_items():
             db.rollback()
         return jsonify({'error': 'Internal server error'}), 500
     finally:
-        cursor.close()
+        pass
 
 @app.route('/admin/disapprove-all-items', methods=['DELETE'])
 def disapprove_all_items():
@@ -1425,7 +1535,7 @@ def disapprove_all_items():
             db.rollback()
         return jsonify({'error': 'Internal server error'}), 500
     finally:
-        cursor.close()
+        pass
         
 # NEW ROUTE: Get all items within a specific category for admin view
 @app.route('/admin/items-in-category/<int:category_id>', methods=['GET'])
@@ -1513,7 +1623,7 @@ def get_item_details(item_id):
         print("Error fetching item details:", e)
         return jsonify({'error': 'Internal server error'}), 500
     finally:
-        cursor.close()
+        pass
 @app.route('/admin/delete-user/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     db = get_db()
@@ -1530,7 +1640,7 @@ def delete_user(user_id):
         print("Error deleting user:", e)
         return jsonify({'error': 'Internal server error'}), 500
     finally:
-        cursor.close()
+        pass
 @app.route('/admin/delete-users', methods=['POST'])
 def delete_users():
     db = get_db()
@@ -1552,7 +1662,7 @@ def delete_users():
         print('Error deleting users:', e)
         return jsonify({'error': 'Internal server error'}), 500
     finally:
-        cursor.close()
+        pass
 
 # --- ADD this new route to your app.py ---
 @app.route('/admin/feedbacks', methods=['GET'])
@@ -1729,410 +1839,9 @@ def get_user_data(email):
     except Exception as e:
         app.logger.error(f"An unexpected error occurred fetching user data: {e}")
         return jsonify({"msg": f"An unexpected error occurred: {e}"}), 500
-    
-# @app.route("/api/placements/update", methods=["GET"])
-# def update_placements():
-#     try:
-#         data = asyncio.run(scrape())
 
-#         if not data:
-#             return jsonify({"message": "No placement data found"}), 200
-
-#         conn = get_db_connection()
-#         cursor = conn.cursor()
-
-#         for record in data:
-#             sql = """
-#             INSERT INTO placements (company_name, role, drive_date, package_info, source_url, last_scraped_at)
-#             VALUES (%s, %s, %s, %s, %s, %s)
-#             ON DUPLICATE KEY UPDATE
-#                 role = VALUES(role),
-#                 drive_date = VALUES(drive_date),
-#                 package_info = VALUES(package_info),
-#                 last_scraped_at = VALUES(last_scraped_at)
-#             """
-#             cursor.execute(sql, (
-#                 record["company_name"], record["role"], record["drive_date"],
-#                 record["package_info"], record["source_url"], record["last_scraped_at"]
-#             ))
-
-#         conn.commit()
-#         cursor.close()
-#         conn.close()
-
-#         return jsonify({"message": f"✅ Saved {len(data)} records."})
-
-#     except Exception as e:
-#         print("Error:", e)
-#         return jsonify({"error": str(e)}), 500
-    
-@app.route("/api/tickets", methods=["POST"])
-def raise_new_ticket():
-    """Endpoint for a student to raise a new hostel maintenance ticket."""
-    data = request.json
-    hostel_number = data.get('hostel_number')
-    room_no = data.get('room_no')
-    description = data.get('description')
-    
-    if not all([hostel_number, room_no, description]):
-        return jsonify({"message": "Missing required fields: hostel, room, or description."}), 400
-
-    # 1. Get user details from session and database
-    user_info, error_msg, status_code = get_user_info_from_session_db()
-    if error_msg:
-        return jsonify({"message": error_msg}), status_code
-
-    user_id = user_info['user_id']
-    roll_no = user_info['roll_no']
-    mobile_number = user_info['contact_number']
-
-    db_conn = get_db()
-    cursor = db_conn.cursor(dictionary=True)
-
-    try:
-        # 2. Insert the new ticket into the database
-        sql = """
-        INSERT INTO hostel_tickets 
-        (user_id, roll_no, mobile_number, hostel_number, room_no, description) 
-        VALUES (%s, %s, %s, %s, %s, %s)
-        """
-        cursor.execute(sql, (user_id, roll_no, mobile_number, hostel_number, room_no, description))
-        db_conn.commit()
-        
-        new_ticket_id = cursor.lastrowid
-        app.logger.info(f"New ticket raised by user {user_id}: ID {new_ticket_id}")
-
-        return jsonify({"message": "Ticket raised successfully.", "ticket_id": new_ticket_id}), 201
-        
-    except mysql.connector.Error as err:
-        db_conn.rollback()
-        app.logger.error(f"Database error raising ticket for user {user_id}: {err}", exc_info=True)
-        return jsonify({"message": f"Database error: {err}"}), 500
-
-@app.route("/api/tickets/user", methods=["GET"])
-def get_user_tickets():
-    """Endpoint for a student to view their own tickets."""
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({"message": "Unauthorized: User not logged in"}), 401
-        
-    db_conn = get_db()
-    cursor = db_conn.cursor(dictionary=True)
-
-    try:
-        sql = """
-        SELECT ticket_id, hostel_number, room_no, description, status, admin_remarks, created_at 
-        FROM hostel_tickets 
-        WHERE user_id = %s
-        ORDER BY created_at DESC
-        """
-        cursor.execute(sql, (user_id,))
-        tickets = cursor.fetchall()
-
-        return jsonify(tickets), 200
-        
-    except mysql.connector.Error as err:
-        app.logger.error(f"Database error fetching user tickets for user {user_id}: {err}", exc_info=True)
-        return jsonify({"message": f"Database error: {err}"}), 500
-
-
-@app.route("/api/admin/tickets", methods=["GET"])
-def get_all_tickets():
-    """Endpoint for admin to view all maintenance tickets."""
-    if not is_admin():
-        return jsonify({"message": "Forbidden: Admin access required"}), 403
-        
-    db_conn = get_db()
-    cursor = db_conn.cursor(dictionary=True)
-
-    try:
-        # Join with users to get name and email
-        sql = """
-        SELECT 
-            t.ticket_id, t.hostel_number, t.room_no, t.description, t.status, t.admin_remarks, t.created_at,
-            u.name, u.email, u.roll_no, u.contact_number
-        FROM hostel_tickets t
-        JOIN users u ON t.user_id = u.user_id
-        ORDER BY t.created_at DESC
-        """
-        cursor.execute(sql)
-        tickets = cursor.fetchall()
-
-        return jsonify(tickets), 200
-        
-    except mysql.connector.Error as err:
-        app.logger.error(f"Database error fetching all tickets for admin: {err}", exc_info=True)
-        return jsonify({"message": f"Database error: {err}"}), 500
-
-
-@app.route("/api/admin/tickets/<int:ticket_id>/status", methods=["PUT"])
-def update_ticket_status(ticket_id):
-    """Endpoint for admin to update the status and add remarks to a ticket."""
-    if not is_admin():
-        return jsonify({"message": "Forbidden: Admin access required"}), 403
-
-    data = request.json
-    new_status = data.get('status')
-    admin_remarks = data.get('admin_remarks', '').strip()
-
-    if new_status not in ['Pending', 'In Progress', 'Resolved', 'Rejected']:
-        return jsonify({"message": "Invalid status value."}), 400
-        
-    if new_status in ['Resolved', 'Rejected'] and not admin_remarks:
-         return jsonify({"message": "Admin Remarks are required for status: Resolved or Rejected."}), 400
-
-    db_conn = get_db()
-    cursor = db_conn.cursor(dictionary=True)
-
-    try:
-        sql = """
-        UPDATE hostel_tickets 
-        SET status = %s, admin_remarks = %s, updated_at = NOW()
-        WHERE ticket_id = %s
-        """
-        cursor.execute(sql, (new_status, admin_remarks, ticket_id))
-        
-        if cursor.rowcount == 0:
-            db_conn.rollback()
-            return jsonify({"message": "Ticket not found or status already set."}), 404
-        
-        db_conn.commit()
-        app.logger.info(f"Ticket {ticket_id} status updated to {new_status} by admin.")
-        return jsonify({"message": f"Ticket {ticket_id} status updated to {new_status}."}), 200
-        
-    except mysql.connector.Error as err:
-        db_conn.rollback()
-        app.logger.error(f"Database error updating ticket {ticket_id} status: {err}", exc_info=True)
-        return jsonify({"message": f"Database error: {err}"}), 500
-
-# ... (Keep existing placement update route) ...
-@app.route("/api/placements/update", methods=["GET"])
-def update_placements():
-    # ... (Keep existing update_placements function) ...
-    try:
-        data = asyncio.run(scrape())
-
-        if not data:
-            return jsonify({"message": "No placement data found"}), 200
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        for record in data:
-            sql = """
-            INSERT INTO placements (company_name, role, drive_date, package_info, source_url, last_scraped_at)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE
-                role = VALUES(role),
-                drive_date = VALUES(drive_date),
-                package_info = VALUES(package_info),
-                last_scraped_at = VALUES(last_scraped_at)
-            """
-            cursor.execute(sql, (
-                record["company_name"], record["role"], record["drive_date"],
-                record["package_info"], record["source_url"], record["last_scraped_at"]
-            ))
-
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-        return jsonify({"message": f"Placements updated successfully with {len(data)} records."}), 200
-        
-    except Exception as e:
-        app.logger.error(f"Error during placement update: {e}")
-        return jsonify({"message": "Failed to update placements due to an internal error."}), 500
-    
-# @app.route("/api/events", methods=["GET"])
-# @login_required
-# def get_events():
-#     db = get_db()
-#     cursor = db.cursor(dictionary=True)
-#     try:
-#         cursor.execute("SELECT * FROM events ORDER BY start_date ASC")
-#         events = cursor.fetchall()
-#         return jsonify(events), 200
-#     except mysql.connector.Error as err:
-#         app.logger.error(f"MySQL Error in get_events: {err}")
-#         return jsonify({"message": "Database error while fetching events."}), 500
-#     finally:
-#         cursor.close()
-
-# # 🧩 Add new event (Admin only)
-# @app.route("/api/events", methods=["POST"])
-# @admin_required
-# def add_event():
-#     data = request.json
-#     title = data.get("title")
-#     description = data.get("description")
-#     start_date = data.get("start_date")
-#     end_date = data.get("end_date")
-
-#     if not title or not start_date:
-#         return jsonify({"message": "Title and start date are required"}), 400
-
-#     db = get_db()
-#     cursor = db.cursor()
-#     try:
-#         # session["user_id"] is available due to the @admin_required decorator
-#         cursor.execute(
-#             "INSERT INTO events (title, description, start_date, end_date, created_by) VALUES (%s, %s, %s, %s, %s)",
-#             (title, description, start_date, end_date, session["user_id"])
-#         )
-#         db.commit()
-#         return jsonify({"message": "Event added successfully"}), 201
-#     except mysql.connector.Error as err:
-#         app.logger.error(f"MySQL Error in add_event: {err}")
-#         return jsonify({"message": "Database error while adding event."}), 500
-#     finally:
-#         cursor.close()
-
-# # 🧩 Edit event (Admin only)
-# @app.route("/api/events/<int:event_id>", methods=["PUT"])
-# @admin_required
-# def edit_event(event_id):
-#     data = request.json
-#     title = data.get("title")
-#     description = data.get("description")
-#     start_date = data.get("start_date")
-#     end_date = data.get("end_date")
-
-#     if not title or not start_date:
-#         return jsonify({"message": "Title and start date are required"}), 400
-
-#     db = get_db()
-#     cursor = db.cursor()
-#     try:
-#         cursor.execute(
-#             """
-#             UPDATE events
-#             SET title=%s, description=%s, start_date=%s, end_date=%s
-#             WHERE event_id=%s
-#             """,
-#             (title, description, start_date, end_date, event_id)
-#         )
-#         db.commit()
-#         if cursor.rowcount == 0:
-#             return jsonify({"message": "Event not found or no changes made"}), 404
-#         return jsonify({"message": "Event updated successfully"}), 200
-#     except mysql.connector.Error as err:
-#         app.logger.error(f"MySQL Error in edit_event: {err}")
-#         return jsonify({"message": "Database error while updating event."}), 500
-#     finally:
-#         cursor.close()
-
-# # 🧩 Delete event (Admin only)
-# @app.route("/api/events/<int:event_id>", methods=["DELETE"])
-# @admin_required
-# def delete_event(event_id):
-#     db = get_db()
-#     cursor = db.cursor()
-#     try:
-#         cursor.execute("DELETE FROM events WHERE event_id = %s", (event_id,))
-#         db.commit()
-#         if cursor.rowcount == 0:
-#             return jsonify({"message": "Event not found"}), 404
-#         return jsonify({"message": "Event deleted successfully"}), 200
-#     except mysql.connector.Error as err:
-#         app.logger.error(f"MySQL Error in delete_event: {err}")
-#         return jsonify({"message": "Database error while deleting event."}), 500
-#     finally:
-#         cursor.close()
-# Get all events
-@app.route("/api/events", methods=["GET"])
-@login_required
-def get_events():
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    try:
-        cursor.execute("SELECT * FROM events ORDER BY start_date ASC")
-        events = cursor.fetchall()
-        return jsonify(events), 200
-    except mysql.connector.Error as err:
-        app.logger.error(f"MySQL Error in get_events: {err}")
-        return jsonify({"message": "Database error while fetching events."}), 500
-    finally:
-        cursor.close()
-
-# Add event (Admin only)
-@app.route("/api/events", methods=["POST"])
-@admin_required
-def add_event():
-    data = request.json
-    title = data.get("title")
-    description = data.get("description")
-    start_date = data.get("start_date")
-    end_date = data.get("end_date")
-
-    if not title or not start_date:
-        return jsonify({"message": "Title and start date are required"}), 400
-
-    db = get_db()
-    cursor = db.cursor()
-    try:
-        cursor.execute(
-            "INSERT INTO events (title, description, start_date, end_date, created_by) VALUES (%s, %s, %s, %s, %s)",
-            (title, description, start_date, end_date, session["user_id"])
-        )
-        db.commit()
-        return jsonify({"message": "Event added successfully"}), 201
-    except mysql.connector.Error as err:
-        app.logger.error(f"MySQL Error in add_event: {err}")
-        return jsonify({"message": "Database error while adding event."}), 500
-    finally:
-        cursor.close()
-
-# Edit event
-@app.route("/api/events/<int:event_id>", methods=["PUT"])
-@admin_required
-def edit_event(event_id):
-    data = request.json
-    title = data.get("title")
-    description = data.get("description")
-    start_date = data.get("start_date")
-    end_date = data.get("end_date")
-
-    if not title or not start_date:
-        return jsonify({"message": "Title and start date are required"}), 400
-
-    db = get_db()
-    cursor = db.cursor()
-    try:
-        cursor.execute(
-            """
-            UPDATE events
-            SET title=%s, description=%s, start_date=%s, end_date=%s
-            WHERE event_id=%s
-            """,
-            (title, description, start_date, end_date, event_id)
-        )
-        db.commit()
-        if cursor.rowcount == 0:
-            return jsonify({"message": "Event not found or no changes made"}), 404
-        return jsonify({"message": "Event updated successfully"}), 200
-    except mysql.connector.Error as err:
-        app.logger.error(f"MySQL Error in edit_event: {err}")
-        return jsonify({"message": "Database error while updating event."}), 500
-    finally:
-        cursor.close()
-
-# Delete event
-@app.route("/api/events/<int:event_id>", methods=["DELETE"])
-@admin_required
-def delete_event(event_id):
-    db = get_db()
-    cursor = db.cursor()
-    try:
-        cursor.execute("DELETE FROM events WHERE event_id = %s", (event_id,))
-        db.commit()
-        if cursor.rowcount == 0:
-            return jsonify({"message": "Event not found"}), 404
-        return jsonify({"message": "Event deleted successfully"}), 200
-    except mysql.connector.Error as err:
-        app.logger.error(f"MySQL Error in delete_event: {err}")
-        return jsonify({"message": "Database error while deleting event."}), 500
-    finally:
-        cursor.close()
+# <<<--- REMOVED THIS LINE TO UNREGISTER THE BLUEPRINT --->>>
+# app.register_blueprint(events_bp)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
