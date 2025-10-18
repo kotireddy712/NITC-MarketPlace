@@ -1,8 +1,336 @@
-// src/Sell.js
+// // src/Sell.js
+// import React, { useState, useEffect } from 'react';
+// import axios from 'axios';
+// import { useNavigate } from 'react-router-dom';
+// import './sell.css'; // You can create this for styling
+
+// export default function Sell() {
+//     const navigate = useNavigate();
+//     const [title, setTitle] = useState('');
+//     const [description, setDescription] = useState('');
+//     const [price, setPrice] = useState('');
+//     const [quantity, setQuantity] = useState('1');
+//     const [itemCondition, setItemCondition] = useState('Used');
+//     const [image, setImage] = useState(null);
+//     const [categories, setCategories] = useState([]);
+//     const [selectedCategory, setSelectedCategory] = useState('');
+//     const [loading, setLoading] = useState(false);
+//     const [error, setError] = useState('');
+
+//     useEffect(() => {
+//         // Fetch categories when the component mounts
+//         const fetchCategories = async () => {
+//             try {
+//                 const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/categories`);
+//                 setCategories(res.data);
+//                 if (res.data.length > 0) {
+//                     setSelectedCategory(res.data[0].category_id); // Set default selected category
+//                 }
+//             } catch (err) {
+//                 setError('Failed to fetch categories.');
+//                 console.error('Error fetching categories:', err);
+//             }
+//         };
+//         fetchCategories();
+//     }, []);
+
+//     const handleSubmit = async (e) => {
+//         e.preventDefault();
+//         setLoading(true);
+//         setError('');
+
+//         const user_id = localStorage.getItem('user_id');
+//         if (!user_id) {
+//             setError('User not logged in. Please log in to sell an item.');
+//             setLoading(false);
+//             navigate('/'); // Redirect to login
+//             return;
+//         }
+
+//         const formData = new FormData();
+//         formData.append('user_id', user_id);
+//         formData.append('title', title);
+//         formData.append('description', description);
+//         formData.append('price', price);
+//         formData.append('quantity', quantity);
+//         formData.append('item_condition', itemCondition);
+//         formData.append('category_id', selectedCategory);
+//         if (image) {
+//             formData.append('image', image);
+//         }
+
+//         try {
+//             const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/sell_item`, formData, {
+//                 headers: {
+//                     'Content-Type': 'multipart/form-data',
+//                 },
+//             });
+//             alert(res.data.message);
+//             // Optionally, clear form or redirect
+//             setTitle('');
+//             setDescription('');
+//             setPrice('');
+//             setQuantity('1');
+//             setItemCondition('Used');
+//             setImage(null);
+//             setSelectedCategory(categories.length > 0 ? categories[0].category_id : '');
+//             // navigate('/dashboard'); // uncomment to redirect to dashboard
+//         } catch (err) {
+//             setError(err.response?.data?.message || 'Failed to list item.');
+//             console.error('Error listing item:', err);
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     return (
+//         <div className="sell-item-container">
+//             <h2>List a New Item</h2>
+//             {error && <p className="error-message">{error}</p>}
+//             <form onSubmit={handleSubmit}>
+//                 <div className="form-group">
+//                     <label>Title:</label>
+//                     <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+//                 </div>
+
+//                 <div className="form-group">
+//                     <label>Description:</label>
+//                     <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows="4"></textarea>
+//                 </div>
+
+//                 <div className="form-group">
+//                     <label>Price ($):</label>
+//                     <input type="number" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} required />
+//                 </div>
+
+//                 <div className="form-group">
+//                     <label>Quantity:</label>
+//                     <input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} min="1" required />
+//                 </div>
+
+//                 <div className="form-group">
+//                     <label>Condition:</label>
+//                     <select value={itemCondition} onChange={(e) => setItemCondition(e.target.value)} required>
+//                         <option value="New">New</option>
+//                         <option value="Good">Good</option>
+//                         <option value="Used">Used</option>
+//                     </select>
+//                 </div>
+
+//                 <div className="form-group">
+//                     <label>Category:</label>
+//                     <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} required>
+//                         {categories.map((cat) => (
+//                             <option key={cat.category_id} value={cat.category_id}>
+//                                 {cat.name}
+//                             </option>
+//                         ))}
+//                     </select>
+//                 </div>
+
+//                 <div className="form-group">
+//                     <label>Image:</label>
+//                     <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files[0])} />
+//                 </div>
+
+//                 <button type="submit" disabled={loading}>
+//                     {loading ? 'Listing...' : 'List Item'}
+//                 </button>
+//             </form>
+//             <button onClick={() => navigate('/dashboard')} className="back-button">Back to Dashboard</button>
+//         </div>
+//     );
+// }
+// import React, { useState, useEffect } from 'react';
+// import axios from 'axios';
+// import { useNavigate } from 'react-router-dom';
+// import './sell.css';
+
+// export default function Sell() {
+//     const navigate = useNavigate();
+//     const [title, setTitle] = useState('');
+//     const [description, setDescription] = useState('');
+//     const [price, setPrice] = useState('');
+//     const [quantity, setQuantity] = useState('1');
+//     const [itemCondition, setItemCondition] = useState('Used');
+//     const [image, setImage] = useState(null);
+//     const [categories, setCategories] = useState([]);
+//     const [selectedCategory, setSelectedCategory] = useState('');
+//     const [loading, setLoading] = useState(false);
+//     const [error, setError] = useState('');
+
+//     useEffect(() => {
+//         // Fetch categories on mount
+//         const fetchCategories = async () => {
+//             try {
+//                 const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/categories`, {
+//                     withCredentials: true, // 👈 important for session cookie
+//                 });
+//                 setCategories(res.data);
+//                 if (res.data.length > 0) {
+//                     setSelectedCategory(res.data[0].category_id);
+//                 }
+//             } catch (err) {
+//                 setError('Failed to fetch categories.');
+//                 console.error('Error fetching categories:', err);
+//             }
+//         };
+//         fetchCategories();
+//     }, []);
+
+//     const handleSubmit = async (e) => {
+//         e.preventDefault();
+//         setLoading(true);
+//         setError('');
+
+//         try {
+//             const formData = new FormData();
+//             formData.append('title', title);
+//             formData.append('description', description);
+//             formData.append('price', price);
+//             formData.append('quantity', quantity);
+//             formData.append('item_condition', itemCondition);
+//             formData.append('category_id', selectedCategory);
+//             if (image) {
+//                 formData.append('image', image);
+//             }
+
+//             // ✅ Send session cookie to Flask automatically
+//             const res = await axios.post(
+//                 `${process.env.REACT_APP_BACKEND_URL}/sell_item`,
+//                 formData,
+//                 {
+//                     headers: { 'Content-Type': 'multipart/form-data' },
+//                     withCredentials: true, // 👈 CRITICAL for session authentication
+//                 }
+//             );
+
+//             alert(res.data.message);
+
+//             // Reset form
+//             setTitle('');
+//             setDescription('');
+//             setPrice('');
+//             setQuantity('1');
+//             setItemCondition('Used');
+//             setImage(null);
+//             setSelectedCategory(categories.length > 0 ? categories[0].category_id : '');
+//             // navigate('/dashboard'); // optional redirect
+//         } catch (err) {
+//             if (err.response && err.response.status === 401) {
+//                 setError('Session expired. Please log in again.');
+//                 navigate('/');
+//             } else {
+//                 setError(err.response?.data?.message || 'Failed to list item.');
+//             }
+//             console.error('Error listing item:', err);
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     return (
+//         <div className="sell-item-container">
+//             <h2>List a New Item</h2>
+//             {error && <p className="error-message">{error}</p>}
+
+//             <form onSubmit={handleSubmit}>
+//                 <div className="form-group">
+//                     <label>Title:</label>
+//                     <input
+//                         type="text"
+//                         value={title}
+//                         onChange={(e) => setTitle(e.target.value)}
+//                         required
+//                     />
+//                 </div>
+
+//                 <div className="form-group">
+//                     <label>Description:</label>
+//                     <textarea
+//                         value={description}
+//                         onChange={(e) => setDescription(e.target.value)}
+//                         rows="4"
+//                     ></textarea>
+//                 </div>
+
+//                 <div className="form-group">
+//                     <label>Price ($):</label>
+//                     <input
+//                         type="number"
+//                         step="0.01"
+//                         value={price}
+//                         onChange={(e) => setPrice(e.target.value)}
+//                         required
+//                     />
+//                 </div>
+
+//                 <div className="form-group">
+//                     <label>Quantity:</label>
+//                     <input
+//                         type="number"
+//                         value={quantity}
+//                         onChange={(e) => setQuantity(e.target.value)}
+//                         min="1"
+//                         required
+//                     />
+//                 </div>
+
+//                 <div className="form-group">
+//                     <label>Condition:</label>
+//                     <select
+//                         value={itemCondition}
+//                         onChange={(e) => setItemCondition(e.target.value)}
+//                         required
+//                     >
+//                         <option value="New">New</option>
+//                         <option value="Good">Good</option>
+//                         <option value="Used">Used</option>
+//                     </select>
+//                 </div>
+
+//                 <div className="form-group">
+//                     <label>Category:</label>
+//                     <select
+//                         value={selectedCategory}
+//                         onChange={(e) => setSelectedCategory(e.target.value)}
+//                         required
+//                     >
+//                         {categories.map((cat) => (
+//                             <option key={cat.category_id} value={cat.category_id}>
+//                                 {cat.name}
+//                             </option>
+//                         ))}
+//                     </select>
+//                 </div>
+
+//                 <div className="form-group">
+//                     <label>Image:</label>
+//                     <input
+//                         type="file"
+//                         accept="image/*"
+//                         onChange={(e) => setImage(e.target.files[0])}
+//                     />
+//                 </div>
+
+//                 <button type="submit" disabled={loading}>
+//                     {loading ? 'Listing...' : 'List Item'}
+//                 </button>
+//             </form>
+
+//             <button
+//                 onClick={() => navigate('/dashboard')}
+//                 className="back-button"
+//             >
+//                 Back to Dashboard
+//             </button>
+//         </div>
+//     );
+// }
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './sell.css'; // You can create this for styling
+import './sell.css';
 
 export default function Sell() {
     const navigate = useNavigate();
@@ -17,14 +345,37 @@ export default function Sell() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    // 🔒 Step 1: Check if session is valid BEFORE showing page
     useEffect(() => {
-        // Fetch categories when the component mounts
+        const verifySession = async () => {
+            try {
+                const res = await axios.get(
+                    `${process.env.REACT_APP_BACKEND_URL}/check_session`,
+                    { withCredentials: true }
+                );
+                if (!res.data.logged_in) {
+                    alert('Please log in first.');
+                    navigate('/');
+                }
+            } catch (err) {
+                console.error('Session check failed:', err);
+                navigate('/');
+            }
+        };
+
+        verifySession();
+    }, [navigate]);
+
+    // Fetch categories when logged in
+    useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/categories`);
+                const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/categories`, {
+                    withCredentials: true,
+                });
                 setCategories(res.data);
                 if (res.data.length > 0) {
-                    setSelectedCategory(res.data[0].category_id); // Set default selected category
+                    setSelectedCategory(res.data[0].category_id);
                 }
             } catch (err) {
                 setError('Failed to fetch categories.');
@@ -39,34 +390,28 @@ export default function Sell() {
         setLoading(true);
         setError('');
 
-        const user_id = localStorage.getItem('user_id');
-        if (!user_id) {
-            setError('User not logged in. Please log in to sell an item.');
-            setLoading(false);
-            navigate('/'); // Redirect to login
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('user_id', user_id);
-        formData.append('title', title);
-        formData.append('description', description);
-        formData.append('price', price);
-        formData.append('quantity', quantity);
-        formData.append('item_condition', itemCondition);
-        formData.append('category_id', selectedCategory);
-        if (image) {
-            formData.append('image', image);
-        }
-
         try {
-            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/sell_item`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('price', price);
+            formData.append('quantity', quantity);
+            formData.append('item_condition', itemCondition);
+            formData.append('category_id', selectedCategory);
+            if (image) {
+                formData.append('image', image);
+            }
+
+            const res = await axios.post(
+                `${process.env.REACT_APP_BACKEND_URL}/sell_item`,
+                formData,
+                {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                    withCredentials: true, // 🔒 send session cookie
+                }
+            );
+
             alert(res.data.message);
-            // Optionally, clear form or redirect
             setTitle('');
             setDescription('');
             setPrice('');
@@ -74,9 +419,13 @@ export default function Sell() {
             setItemCondition('Used');
             setImage(null);
             setSelectedCategory(categories.length > 0 ? categories[0].category_id : '');
-            // navigate('/dashboard'); // uncomment to redirect to dashboard
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to list item.');
+            if (err.response && err.response.status === 401) {
+                setError('Session expired. Please log in again.');
+                navigate('/');
+            } else {
+                setError(err.response?.data?.message || 'Failed to list item.');
+            }
             console.error('Error listing item:', err);
         } finally {
             setLoading(false);

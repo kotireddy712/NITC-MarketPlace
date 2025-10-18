@@ -12,7 +12,9 @@ import secrets
 import string
 import logging
 from dotenv import load_dotenv
-
+# from auth_utils import login_required
+from auth_utils import login_required, admin_required, clear_session  # ✅ Import decorators
+# from events_routes import events_bp
 # Load environment variables from .env file
 load_dotenv()
 
@@ -23,6 +25,10 @@ CORS(app, supports_credentials=True, origins=[
     "https://nitc-marketplace.netlify.app"  # Your deployed Netlify frontend URL
 ])
 
+# app.register_blueprint(events_bp)
+from flask_cors import CORS
+CORS(app, supports_credentials=True)
+
 # --- Configure Logging ---
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 app.logger.setLevel(logging.DEBUG) # Set app logger to DEBUG level
@@ -30,20 +36,24 @@ app.logger.setLevel(logging.DEBUG) # Set app logger to DEBUG level
 # Add secret key for sessions
 # IMPORTANT: Change this to a strong, random string in production!
 # This key is vital for securely signing session cookies.
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-super-secret-key-please-change-this-in-production-!!!!!!')
+# app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-super-secret-key-please-change-this-in-production-!!!!!!')
 
-# Session cookie configuration
-# CRITICAL: For cross-origin frontend (Netlify HTTPS) and backend,
-# set SAMESITE to 'None' and SECURE to True.
-# Browsers will only send 'SameSite=None' cookies if 'Secure=True'.
+# # Session cookie configuration
+# # CRITICAL: For cross-origin frontend (Netlify HTTPS) and backend,
+# # set SAMESITE to 'None' and SECURE to True.
+# # Browsers will only send 'SameSite=None' cookies if 'Secure=True'.
+# app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+# app.config['SESSION_COOKIE_SECURE'] = True # MUST BE TRUE FOR HTTPS DEPLOYMENT
+
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-super-secret-key')
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'
-app.config['SESSION_COOKIE_SECURE'] = True # MUST BE TRUE FOR HTTPS DEPLOYMENT
+app.config['SESSION_COOKIE_SECURE'] = True
 
 # --- Email Configuration (using environment variables) ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False # TLS is used, so SSL should be False
+# app.config['MAIL_USE_SSL'] = False # TLS is used, so SSL should be False
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
@@ -499,9 +509,62 @@ def signup():
 
 # --- Basic Login Route (from your previous code) ---
 # --- Basic Login Route ---
+# @app.route("/login", methods=["POST"])
+# def login():
+#     """Handles user login."""
+#     db_conn = get_db()
+#     cursor = db_conn.cursor(dictionary=True)
+#     data = request.json
+#     email = data.get("email")
+#     password = data.get("password")
+
+#     if not all([email, password]):
+#         return jsonify({"message": "Missing required fields."}), 400
+
+#     try:
+#         # Fetch user including the hashed password and is_disabled status
+#         cursor.execute(
+#             "SELECT user_id, name, email, password, role, is_disabled FROM users WHERE email=%s",
+#             (email,)
+#         )
+#         user = cursor.fetchone()
+
+#         if not user:
+#             return jsonify({"message": "Invalid credentials or user not found."}), 401
+
+#         # Check if account is disabled
+#         if user.get("is_disabled") == 1:
+#             return jsonify({"message": "Account is disabled. Please contact support."}), 403
+
+#         # Check if password exists (i.e., user has completed signup)
+#         if user["password"] is None or user["password"] == '':
+#             return jsonify({"message": "Account not fully signed up. Please complete signup first."}), 403
+
+#         # Verify the password using bcrypt
+#         if not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
+#             return jsonify({"message": "Incorrect password."}), 403
+
+#         # Password is correct, return user info (excluding password hash)
+#         return jsonify({
+#             "message": "Login successful!",
+#             "user_id": user["user_id"],
+#             "name": user["name"],
+#             "email": user["email"],
+#             "is_admin": user["role"] == "admin" # Provide a boolean for easy frontend check
+#         })
+
+#     except mysql.connector.Error as err:
+#         app.logger.error(f"Database error during login for {email}: {err}")
+#         return jsonify({"message": f"Database error during login: {err}"}), 500
+
+#     except Exception as e:
+#         app.logger.error(f"Unexpected error during login for {email}: {e}")
+#         return jsonify({"message": f"An unexpected error occurred during login: {e}"}), 500
+
+
 @app.route("/login", methods=["POST"])
 def login():
-    """Handles user login."""
+    """Handles user login, sets session, and returns user info with role."""
     db_conn = get_db()
     cursor = db_conn.cursor(dictionary=True)
     data = request.json
@@ -512,7 +575,7 @@ def login():
         return jsonify({"message": "Missing required fields."}), 400
 
     try:
-        # Fetch user including the hashed password and is_disabled status
+        # Fetch user from DB
         cursor.execute(
             "SELECT user_id, name, email, password, role, is_disabled FROM users WHERE email=%s",
             (email,)
@@ -522,26 +585,34 @@ def login():
         if not user:
             return jsonify({"message": "Invalid credentials or user not found."}), 401
 
-        # Check if account is disabled
+        # Check if account disabled
         if user.get("is_disabled") == 1:
             return jsonify({"message": "Account is disabled. Please contact support."}), 403
 
-        # Check if password exists (i.e., user has completed signup)
-        if user["password"] is None or user["password"] == '':
-            return jsonify({"message": "Account not fully signed up. Please complete signup first."}), 403
+        # Ensure password exists
+        if not user["password"]:
+            return jsonify({"message": "Account not fully set up. Please complete signup."}), 403
 
-        # Verify the password using bcrypt
-        if not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
+        # Verify password with bcrypt
+        if not bcrypt.checkpw(password.encode("utf-8"), user["password"].encode("utf-8")):
             return jsonify({"message": "Incorrect password."}), 403
 
-        # Password is correct, return user info (excluding password hash)
+        # ✅ Set secure session
+        session.permanent = True
+        app.permanent_session_lifetime = timedelta(days=7)
+        session["user_id"] = user["user_id"]
+        session["email"] = user["email"]
+        session["role"] = user["role"]
+
+        # ✅ Return clean response for frontend
         return jsonify({
             "message": "Login successful!",
             "user_id": user["user_id"],
             "name": user["name"],
             "email": user["email"],
-            "is_admin": user["role"] == "admin" # Provide a boolean for easy frontend check
-        })
+            "is_admin": user["role"] == "admin",
+            "role": user["role"]
+        }), 200
 
     except mysql.connector.Error as err:
         app.logger.error(f"Database error during login for {email}: {err}")
@@ -550,6 +621,26 @@ def login():
     except Exception as e:
         app.logger.error(f"Unexpected error during login for {email}: {e}")
         return jsonify({"message": f"An unexpected error occurred during login: {e}"}), 500
+
+@app.route("/check_session", methods=["GET"])
+def check_session():
+    """Check if the user is still logged in."""
+    if "user_id" in session:
+        return jsonify({
+            "logged_in": True,
+            "user_id": session["user_id"],
+            "email": session["email"],
+            "role": session["role"]
+        }), 200
+    return jsonify({"logged_in": False}), 401
+
+
+@app.route("/logout", methods=["POST"])
+@login_required
+def logout():
+    """Logout and clear session."""
+    session.clear()
+    return jsonify({"message": "Logged out successfully"}), 200
 
 # You can add more routes for other functionalities (e.g., listing products, user profile, etc.) here
 
@@ -607,11 +698,69 @@ def get_categories():
         app.logger.error(f"Unexpected error fetching categories: {e}")
         return jsonify({"message": f"An unexpected error occurred fetching categories: {e}"}), 500
 
+# @app.route('/sell_item', methods=['POST'])
+# def sell_item():
+#     db_conn = get_db()
+#     cursor = db_conn.cursor(dictionary=True)
+#     user_id = request.form.get('user_id')
+#     title = request.form.get('title')
+#     description = request.form.get('description')
+#     price = request.form.get('price')
+#     quantity = request.form.get('quantity')
+#     item_condition = request.form.get('item_condition')
+#     category_id = request.form.get('category_id')
+#     image_file = request.files.get('image')
+#     if not all([user_id, title, price, category_id, item_condition]):
+#         return jsonify({"message": "Missing required fields."}), 400
+#     try:
+#         user_id = int(user_id)
+#         price = float(price)
+#         quantity = int(quantity)
+#         category_id = int(category_id)
+#     except ValueError:
+#         return jsonify({"message": "Invalid data types for user_id, price, quantity, or category_id."}), 400
+#     image_url = None
+#     if image_file:
+#         try:
+#             upload_result = cloudinary.uploader.upload(image_file)
+#             image_url = upload_result.get('secure_url')
+#         except Exception as e:
+#             app.logger.error(f"Cloudinary upload failed for item {title}: {e}")
+#             return jsonify({"message": f"Image upload failed: {e}"}), 500
+#     try:
+#         insert_item_query = """
+#         INSERT INTO items (title, description, price, quantity, image_url, item_condition, user_id, category_id)
+#         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+#         """
+#         cursor.execute(insert_item_query, (
+#             title, description, price, quantity, image_url, item_condition, user_id, category_id
+#         ))
+#         update_category_count_query = """
+#         UPDATE categories
+#         SET total_items = total_items + 1
+#         WHERE category_id = %s
+#         """
+#         cursor.execute(update_category_count_query, (category_id,))
+#         db_conn.commit()
+#         return jsonify({"message": "Item listed successfully!", "image_url": image_url}), 201
+#     except mysql.connector.Error as err:
+#         db_conn.rollback()
+#         app.logger.error(f"Database error listing item {title}: {err}")
+#         return jsonify({"message": f"Database error: {err}"}), 500
+#     except Exception as e:
+#         db_conn.rollback()
+#         app.logger.error(f"An unexpected error occurred listing item {title}: {e}")
+#         return jsonify({"message": f"An unexpected error occurred: {e}"}), 500
+
 @app.route('/sell_item', methods=['POST'])
+@login_required
 def sell_item():
     db_conn = get_db()
     cursor = db_conn.cursor(dictionary=True)
-    user_id = request.form.get('user_id')
+
+    # ✅ Use user_id directly from the session — not from frontend input
+    user_id = session.get("user_id")
+
     title = request.form.get('title')
     description = request.form.get('description')
     price = request.form.get('price')
@@ -619,15 +768,17 @@ def sell_item():
     item_condition = request.form.get('item_condition')
     category_id = request.form.get('category_id')
     image_file = request.files.get('image')
-    if not all([user_id, title, price, category_id, item_condition]):
+
+    if not all([title, price, category_id, item_condition]):
         return jsonify({"message": "Missing required fields."}), 400
+
     try:
-        user_id = int(user_id)
         price = float(price)
         quantity = int(quantity)
         category_id = int(category_id)
     except ValueError:
-        return jsonify({"message": "Invalid data types for user_id, price, quantity, or category_id."}), 400
+        return jsonify({"message": "Invalid data types for price, quantity, or category_id."}), 400
+
     image_url = None
     if image_file:
         try:
@@ -636,6 +787,7 @@ def sell_item():
         except Exception as e:
             app.logger.error(f"Cloudinary upload failed for item {title}: {e}")
             return jsonify({"message": f"Image upload failed: {e}"}), 500
+
     try:
         insert_item_query = """
         INSERT INTO items (title, description, price, quantity, image_url, item_condition, user_id, category_id)
@@ -644,6 +796,7 @@ def sell_item():
         cursor.execute(insert_item_query, (
             title, description, price, quantity, image_url, item_condition, user_id, category_id
         ))
+
         update_category_count_query = """
         UPDATE categories
         SET total_items = total_items + 1
@@ -651,11 +804,14 @@ def sell_item():
         """
         cursor.execute(update_category_count_query, (category_id,))
         db_conn.commit()
+
         return jsonify({"message": "Item listed successfully!", "image_url": image_url}), 201
+
     except mysql.connector.Error as err:
         db_conn.rollback()
         app.logger.error(f"Database error listing item {title}: {err}")
         return jsonify({"message": f"Database error: {err}"}), 500
+
     except Exception as e:
         db_conn.rollback()
         app.logger.error(f"An unexpected error occurred listing item {title}: {e}")
@@ -1573,6 +1729,410 @@ def get_user_data(email):
     except Exception as e:
         app.logger.error(f"An unexpected error occurred fetching user data: {e}")
         return jsonify({"msg": f"An unexpected error occurred: {e}"}), 500
+    
+# @app.route("/api/placements/update", methods=["GET"])
+# def update_placements():
+#     try:
+#         data = asyncio.run(scrape())
+
+#         if not data:
+#             return jsonify({"message": "No placement data found"}), 200
+
+#         conn = get_db_connection()
+#         cursor = conn.cursor()
+
+#         for record in data:
+#             sql = """
+#             INSERT INTO placements (company_name, role, drive_date, package_info, source_url, last_scraped_at)
+#             VALUES (%s, %s, %s, %s, %s, %s)
+#             ON DUPLICATE KEY UPDATE
+#                 role = VALUES(role),
+#                 drive_date = VALUES(drive_date),
+#                 package_info = VALUES(package_info),
+#                 last_scraped_at = VALUES(last_scraped_at)
+#             """
+#             cursor.execute(sql, (
+#                 record["company_name"], record["role"], record["drive_date"],
+#                 record["package_info"], record["source_url"], record["last_scraped_at"]
+#             ))
+
+#         conn.commit()
+#         cursor.close()
+#         conn.close()
+
+#         return jsonify({"message": f"✅ Saved {len(data)} records."})
+
+#     except Exception as e:
+#         print("Error:", e)
+#         return jsonify({"error": str(e)}), 500
+    
+@app.route("/api/tickets", methods=["POST"])
+def raise_new_ticket():
+    """Endpoint for a student to raise a new hostel maintenance ticket."""
+    data = request.json
+    hostel_number = data.get('hostel_number')
+    room_no = data.get('room_no')
+    description = data.get('description')
+    
+    if not all([hostel_number, room_no, description]):
+        return jsonify({"message": "Missing required fields: hostel, room, or description."}), 400
+
+    # 1. Get user details from session and database
+    user_info, error_msg, status_code = get_user_info_from_session_db()
+    if error_msg:
+        return jsonify({"message": error_msg}), status_code
+
+    user_id = user_info['user_id']
+    roll_no = user_info['roll_no']
+    mobile_number = user_info['contact_number']
+
+    db_conn = get_db()
+    cursor = db_conn.cursor(dictionary=True)
+
+    try:
+        # 2. Insert the new ticket into the database
+        sql = """
+        INSERT INTO hostel_tickets 
+        (user_id, roll_no, mobile_number, hostel_number, room_no, description) 
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(sql, (user_id, roll_no, mobile_number, hostel_number, room_no, description))
+        db_conn.commit()
         
+        new_ticket_id = cursor.lastrowid
+        app.logger.info(f"New ticket raised by user {user_id}: ID {new_ticket_id}")
+
+        return jsonify({"message": "Ticket raised successfully.", "ticket_id": new_ticket_id}), 201
+        
+    except mysql.connector.Error as err:
+        db_conn.rollback()
+        app.logger.error(f"Database error raising ticket for user {user_id}: {err}", exc_info=True)
+        return jsonify({"message": f"Database error: {err}"}), 500
+
+@app.route("/api/tickets/user", methods=["GET"])
+def get_user_tickets():
+    """Endpoint for a student to view their own tickets."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"message": "Unauthorized: User not logged in"}), 401
+        
+    db_conn = get_db()
+    cursor = db_conn.cursor(dictionary=True)
+
+    try:
+        sql = """
+        SELECT ticket_id, hostel_number, room_no, description, status, admin_remarks, created_at 
+        FROM hostel_tickets 
+        WHERE user_id = %s
+        ORDER BY created_at DESC
+        """
+        cursor.execute(sql, (user_id,))
+        tickets = cursor.fetchall()
+
+        return jsonify(tickets), 200
+        
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error fetching user tickets for user {user_id}: {err}", exc_info=True)
+        return jsonify({"message": f"Database error: {err}"}), 500
+
+
+@app.route("/api/admin/tickets", methods=["GET"])
+def get_all_tickets():
+    """Endpoint for admin to view all maintenance tickets."""
+    if not is_admin():
+        return jsonify({"message": "Forbidden: Admin access required"}), 403
+        
+    db_conn = get_db()
+    cursor = db_conn.cursor(dictionary=True)
+
+    try:
+        # Join with users to get name and email
+        sql = """
+        SELECT 
+            t.ticket_id, t.hostel_number, t.room_no, t.description, t.status, t.admin_remarks, t.created_at,
+            u.name, u.email, u.roll_no, u.contact_number
+        FROM hostel_tickets t
+        JOIN users u ON t.user_id = u.user_id
+        ORDER BY t.created_at DESC
+        """
+        cursor.execute(sql)
+        tickets = cursor.fetchall()
+
+        return jsonify(tickets), 200
+        
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error fetching all tickets for admin: {err}", exc_info=True)
+        return jsonify({"message": f"Database error: {err}"}), 500
+
+
+@app.route("/api/admin/tickets/<int:ticket_id>/status", methods=["PUT"])
+def update_ticket_status(ticket_id):
+    """Endpoint for admin to update the status and add remarks to a ticket."""
+    if not is_admin():
+        return jsonify({"message": "Forbidden: Admin access required"}), 403
+
+    data = request.json
+    new_status = data.get('status')
+    admin_remarks = data.get('admin_remarks', '').strip()
+
+    if new_status not in ['Pending', 'In Progress', 'Resolved', 'Rejected']:
+        return jsonify({"message": "Invalid status value."}), 400
+        
+    if new_status in ['Resolved', 'Rejected'] and not admin_remarks:
+         return jsonify({"message": "Admin Remarks are required for status: Resolved or Rejected."}), 400
+
+    db_conn = get_db()
+    cursor = db_conn.cursor(dictionary=True)
+
+    try:
+        sql = """
+        UPDATE hostel_tickets 
+        SET status = %s, admin_remarks = %s, updated_at = NOW()
+        WHERE ticket_id = %s
+        """
+        cursor.execute(sql, (new_status, admin_remarks, ticket_id))
+        
+        if cursor.rowcount == 0:
+            db_conn.rollback()
+            return jsonify({"message": "Ticket not found or status already set."}), 404
+        
+        db_conn.commit()
+        app.logger.info(f"Ticket {ticket_id} status updated to {new_status} by admin.")
+        return jsonify({"message": f"Ticket {ticket_id} status updated to {new_status}."}), 200
+        
+    except mysql.connector.Error as err:
+        db_conn.rollback()
+        app.logger.error(f"Database error updating ticket {ticket_id} status: {err}", exc_info=True)
+        return jsonify({"message": f"Database error: {err}"}), 500
+
+# ... (Keep existing placement update route) ...
+@app.route("/api/placements/update", methods=["GET"])
+def update_placements():
+    # ... (Keep existing update_placements function) ...
+    try:
+        data = asyncio.run(scrape())
+
+        if not data:
+            return jsonify({"message": "No placement data found"}), 200
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        for record in data:
+            sql = """
+            INSERT INTO placements (company_name, role, drive_date, package_info, source_url, last_scraped_at)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                role = VALUES(role),
+                drive_date = VALUES(drive_date),
+                package_info = VALUES(package_info),
+                last_scraped_at = VALUES(last_scraped_at)
+            """
+            cursor.execute(sql, (
+                record["company_name"], record["role"], record["drive_date"],
+                record["package_info"], record["source_url"], record["last_scraped_at"]
+            ))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": f"Placements updated successfully with {len(data)} records."}), 200
+        
+    except Exception as e:
+        app.logger.error(f"Error during placement update: {e}")
+        return jsonify({"message": "Failed to update placements due to an internal error."}), 500
+    
+# @app.route("/api/events", methods=["GET"])
+# @login_required
+# def get_events():
+#     db = get_db()
+#     cursor = db.cursor(dictionary=True)
+#     try:
+#         cursor.execute("SELECT * FROM events ORDER BY start_date ASC")
+#         events = cursor.fetchall()
+#         return jsonify(events), 200
+#     except mysql.connector.Error as err:
+#         app.logger.error(f"MySQL Error in get_events: {err}")
+#         return jsonify({"message": "Database error while fetching events."}), 500
+#     finally:
+#         cursor.close()
+
+# # 🧩 Add new event (Admin only)
+# @app.route("/api/events", methods=["POST"])
+# @admin_required
+# def add_event():
+#     data = request.json
+#     title = data.get("title")
+#     description = data.get("description")
+#     start_date = data.get("start_date")
+#     end_date = data.get("end_date")
+
+#     if not title or not start_date:
+#         return jsonify({"message": "Title and start date are required"}), 400
+
+#     db = get_db()
+#     cursor = db.cursor()
+#     try:
+#         # session["user_id"] is available due to the @admin_required decorator
+#         cursor.execute(
+#             "INSERT INTO events (title, description, start_date, end_date, created_by) VALUES (%s, %s, %s, %s, %s)",
+#             (title, description, start_date, end_date, session["user_id"])
+#         )
+#         db.commit()
+#         return jsonify({"message": "Event added successfully"}), 201
+#     except mysql.connector.Error as err:
+#         app.logger.error(f"MySQL Error in add_event: {err}")
+#         return jsonify({"message": "Database error while adding event."}), 500
+#     finally:
+#         cursor.close()
+
+# # 🧩 Edit event (Admin only)
+# @app.route("/api/events/<int:event_id>", methods=["PUT"])
+# @admin_required
+# def edit_event(event_id):
+#     data = request.json
+#     title = data.get("title")
+#     description = data.get("description")
+#     start_date = data.get("start_date")
+#     end_date = data.get("end_date")
+
+#     if not title or not start_date:
+#         return jsonify({"message": "Title and start date are required"}), 400
+
+#     db = get_db()
+#     cursor = db.cursor()
+#     try:
+#         cursor.execute(
+#             """
+#             UPDATE events
+#             SET title=%s, description=%s, start_date=%s, end_date=%s
+#             WHERE event_id=%s
+#             """,
+#             (title, description, start_date, end_date, event_id)
+#         )
+#         db.commit()
+#         if cursor.rowcount == 0:
+#             return jsonify({"message": "Event not found or no changes made"}), 404
+#         return jsonify({"message": "Event updated successfully"}), 200
+#     except mysql.connector.Error as err:
+#         app.logger.error(f"MySQL Error in edit_event: {err}")
+#         return jsonify({"message": "Database error while updating event."}), 500
+#     finally:
+#         cursor.close()
+
+# # 🧩 Delete event (Admin only)
+# @app.route("/api/events/<int:event_id>", methods=["DELETE"])
+# @admin_required
+# def delete_event(event_id):
+#     db = get_db()
+#     cursor = db.cursor()
+#     try:
+#         cursor.execute("DELETE FROM events WHERE event_id = %s", (event_id,))
+#         db.commit()
+#         if cursor.rowcount == 0:
+#             return jsonify({"message": "Event not found"}), 404
+#         return jsonify({"message": "Event deleted successfully"}), 200
+#     except mysql.connector.Error as err:
+#         app.logger.error(f"MySQL Error in delete_event: {err}")
+#         return jsonify({"message": "Database error while deleting event."}), 500
+#     finally:
+#         cursor.close()
+# Get all events
+@app.route("/api/events", methods=["GET"])
+@login_required
+def get_events():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT * FROM events ORDER BY start_date ASC")
+        events = cursor.fetchall()
+        return jsonify(events), 200
+    except mysql.connector.Error as err:
+        app.logger.error(f"MySQL Error in get_events: {err}")
+        return jsonify({"message": "Database error while fetching events."}), 500
+    finally:
+        cursor.close()
+
+# Add event (Admin only)
+@app.route("/api/events", methods=["POST"])
+@admin_required
+def add_event():
+    data = request.json
+    title = data.get("title")
+    description = data.get("description")
+    start_date = data.get("start_date")
+    end_date = data.get("end_date")
+
+    if not title or not start_date:
+        return jsonify({"message": "Title and start date are required"}), 400
+
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute(
+            "INSERT INTO events (title, description, start_date, end_date, created_by) VALUES (%s, %s, %s, %s, %s)",
+            (title, description, start_date, end_date, session["user_id"])
+        )
+        db.commit()
+        return jsonify({"message": "Event added successfully"}), 201
+    except mysql.connector.Error as err:
+        app.logger.error(f"MySQL Error in add_event: {err}")
+        return jsonify({"message": "Database error while adding event."}), 500
+    finally:
+        cursor.close()
+
+# Edit event
+@app.route("/api/events/<int:event_id>", methods=["PUT"])
+@admin_required
+def edit_event(event_id):
+    data = request.json
+    title = data.get("title")
+    description = data.get("description")
+    start_date = data.get("start_date")
+    end_date = data.get("end_date")
+
+    if not title or not start_date:
+        return jsonify({"message": "Title and start date are required"}), 400
+
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute(
+            """
+            UPDATE events
+            SET title=%s, description=%s, start_date=%s, end_date=%s
+            WHERE event_id=%s
+            """,
+            (title, description, start_date, end_date, event_id)
+        )
+        db.commit()
+        if cursor.rowcount == 0:
+            return jsonify({"message": "Event not found or no changes made"}), 404
+        return jsonify({"message": "Event updated successfully"}), 200
+    except mysql.connector.Error as err:
+        app.logger.error(f"MySQL Error in edit_event: {err}")
+        return jsonify({"message": "Database error while updating event."}), 500
+    finally:
+        cursor.close()
+
+# Delete event
+@app.route("/api/events/<int:event_id>", methods=["DELETE"])
+@admin_required
+def delete_event(event_id):
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM events WHERE event_id = %s", (event_id,))
+        db.commit()
+        if cursor.rowcount == 0:
+            return jsonify({"message": "Event not found"}), 404
+        return jsonify({"message": "Event deleted successfully"}), 200
+    except mysql.connector.Error as err:
+        app.logger.error(f"MySQL Error in delete_event: {err}")
+        return jsonify({"message": "Database error while deleting event."}), 500
+    finally:
+        cursor.close()
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
