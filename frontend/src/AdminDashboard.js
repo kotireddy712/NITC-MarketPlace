@@ -1446,11 +1446,11 @@
 // export default AdminDashboard;
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // <<<--- ADDED THIS IMPORT ---
+import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
 
 function AdminDashboard() {
-  const navigate = useNavigate(); // <<<--- ADDED THIS LINE ---
+  const navigate = useNavigate();
   const [categoryCounts, setCategoryCounts] = useState([]);
   const [users, setUsers] = useState([]);
   const [pendingItems, setPendingItems] = useState([]);
@@ -1461,7 +1461,7 @@ function AdminDashboard() {
 
   // Pagination and selection states for Users
   const [currentPage, setCurrentPage] = useState(1);
-  const [entriesPerPage, setEntriesPerPage] = useState(10); // Changed default to 10 for users table
+  const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [selectedUsers, setSelectedUsers] = useState([]);
 
   // New states for Feedback section
@@ -1500,7 +1500,7 @@ function AdminDashboard() {
     }
   };
   const handleCategoryClick = async (categoryId) => {
-    console.log("Category clicked:", categoryId); // 🔥 Debug line
+    console.log("Category clicked:", categoryId); 
     try {
       const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/items-by-category/${categoryId}`);
       setItems(res.data);
@@ -1616,7 +1616,6 @@ function AdminDashboard() {
     alert(`Error disapproving item: ${error.message}`);
   }
 };
-
 
 
   const approveAllItems = async () => {
@@ -1756,7 +1755,7 @@ const handleLogout = async () => {
           View Feedbacks
         </button>
 
-        {/* Calendar Management Button <<<--- ADDED CALENDAR BUTTON ---*/}
+        {/* Calendar Management Button */}
         <button
           className="admin-action-button"
           onClick={() => navigate('/admin/events')}
@@ -1764,6 +1763,14 @@ const handleLogout = async () => {
           📅 Manage Events
         </button>
         
+        {/* Ticket Management Button <<<--- ADDED MISSING BUTTON HERE ---*/}
+        <button
+          className="admin-action-button"
+          onClick={() => navigate('/admin/tickets')}
+        >
+          🎫 Manage Tickets
+        </button>
+
       </section>
 
       {/* Conditional Rendering for Sections (excluding Feedback) */}

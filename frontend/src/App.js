@@ -21,6 +21,10 @@
 // import LostFoundListings from './LostFoundListings';
 // import MyLostFoundListings from './MyLostFoundListings';
 
+// // Calendar Components <<<--- ADDED IMPORTS ---
+// import EventsCalendar from './EventsCalendar';
+// import AdminEvents from './AdminEvents';
+
 // // Informational Pages
 // import LandingPage from './LandingPage';
 // import UnderConstruction from './UnderConstruction';
@@ -38,6 +42,7 @@
 // // Styles
 // import './App.css';
 // import './FeedbackModal.css';
+// import './EventsCalendar.css'; // <<<--- ADDED CSS IMPORT ---
 
 // function App() {
 //   return (
@@ -57,6 +62,20 @@
 //         <Route path="/listings" element={<Listings />} />
 //         <Route path="/profile" element={<Profile />} />
 //         <Route path="/rules" element={<RulesAndRegulations />} />
+        
+//         {/* Calendar Routes <<<--- ADDED CALENDAR ROUTES ---*/}
+//         {/* User View: Publicly available to all logged-in users */}
+//         <Route path="/calendar" element={<EventsCalendar />} /> 
+        
+//         {/* Admin Management: Protected by the Admin Route */}
+//         <Route 
+//             path="/admin/events" 
+//             element={
+//                 <ProtectedAdminRoute>
+//                     <AdminEvents />
+//                 </ProtectedAdminRoute>
+//             } 
+//         />
 
 //         {/* Admin Dashboard */}
 //         <Route
@@ -119,9 +138,13 @@ import LostFoundForm from './LostFoundForm';
 import LostFoundListings from './LostFoundListings';
 import MyLostFoundListings from './MyLostFoundListings';
 
-// Calendar Components <<<--- ADDED IMPORTS ---
+// Calendar Components
 import EventsCalendar from './EventsCalendar';
 import AdminEvents from './AdminEvents';
+
+// Hostel Tickets Components <<<--- ADDED IMPORTS ---
+import RaiseTicket from './RaiseTicket';
+import AdminTickets from './AdminTickets';
 
 // Informational Pages
 import LandingPage from './LandingPage';
@@ -140,7 +163,9 @@ import PlacementsList from './PlacementsList';
 // Styles
 import './App.css';
 import './FeedbackModal.css';
-import './EventsCalendar.css'; // <<<--- ADDED CSS IMPORT ---
+import './EventsCalendar.css';
+import './RaiseTicket.css'; // Assuming you added this from previous step
+import './AdminTickets.css'; // Assuming you added this from previous step
 
 function App() {
   return (
@@ -161,10 +186,13 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/rules" element={<RulesAndRegulations />} />
         
-        {/* Calendar Routes <<<--- ADDED CALENDAR ROUTES ---*/}
-        {/* User View: Publicly available to all logged-in users */}
+        {/* Calendar Routes */}
         <Route path="/calendar" element={<EventsCalendar />} /> 
         
+        {/* Hostel Tickets Routes */}
+        {/* Student View: Raise and Track tickets */}
+        <Route path="/tickets" element={<RaiseTicket />} /> 
+
         {/* Admin Management: Protected by the Admin Route */}
         <Route 
             path="/admin/events" 
@@ -174,6 +202,16 @@ function App() {
                 </ProtectedAdminRoute>
             } 
         />
+        {/* Admin Ticket Route */}
+        <Route 
+            path="/admin/tickets" 
+            element={
+                <ProtectedAdminRoute>
+                    <AdminTickets />
+                </ProtectedAdminRoute>
+            } 
+        />
+
 
         {/* Admin Dashboard */}
         <Route
