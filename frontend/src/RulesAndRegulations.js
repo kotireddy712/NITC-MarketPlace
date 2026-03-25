@@ -1,7 +1,7 @@
 // src/components/RulesAndRegulations.js
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './RulesAndRegulations.css'; // Ensure this CSS file is linked
+import './styles/RulesAndRegulations.css'; // Ensure this CSS file is linked
 
 function RulesAndRegulations() {
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
-import kotiImg from './koti.jpg';
-import reddyImg from './reddy.jpg';
+import kotiImg from './assets/images/koti.jpg';
+import reddyImg from './assets/images/reddy.jpg';
 
 const Credits = () => {
   return (

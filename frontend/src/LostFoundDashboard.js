@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './LostFoundDashboard.css'; // You'll create this CSS file
+import './styles/LostFoundDashboard.css'; // You'll create this CSS file
 
 function LostFoundDashboard() {
   const navigate = useNavigate();

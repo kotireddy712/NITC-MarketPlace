@@ -1,5 +1,5 @@
 // import React, { useState, useEffect } from 'react';
-// import './FeedbackModal.css';
+// import './styles/FeedbackModal.css';
 
 // /**
 //  * FeedbackModal Component
@@ -100,7 +100,7 @@
 
 // export default FeedbackModal;
 import React, { useState, useEffect } from 'react';
-import './FeedbackModal.css';
+import './styles/FeedbackModal.css';
 
 /**
  * FeedbackModal Component

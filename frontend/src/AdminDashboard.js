@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './AdminDashboard.css';
+import './styles/AdminDashboard.css';
 
 function AdminDashboard() {
   const [categoryCounts, setCategoryCounts] = useState([]);

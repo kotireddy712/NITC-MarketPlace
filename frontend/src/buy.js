@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './buy.css';
+import './styles/buy.css';
 
 export default function Buy() {
     const navigate = useNavigate();

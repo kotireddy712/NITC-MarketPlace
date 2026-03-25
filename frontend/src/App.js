@@ -29,8 +29,8 @@ import Accessibility from './Accessibility';
 import About from './About';
 import Credits from './Credits';
 
-import './App.css'; // Your main app CSS
-import './FeedbackModal.css'; // <--- NEW: Import the FeedbackModal CSS
+import './styles/App.css'; // Your main app CSS
+import './styles/FeedbackModal.css'; // <--- NEW: Import the FeedbackModal CSS
 
 function App() {
   return (

@@ -1,6 +1,6 @@
 // import React from 'react';
 // import { useNavigate } from 'react-router-dom';
-// import './BuySellDashboard.css'; // New CSS file for Buy/Sell Dashboard
+// import './styles/BuySellDashboard.css'; // New CSS file for Buy/Sell Dashboard
 
 // function BuySellDashboard() {
 //   const navigate = useNavigate();
@@ -48,7 +48,7 @@
 // export default BuySellDashboard;
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Dashboard.css'; // Reuse your Dashboard styles
+import './styles/Dashboard.css'; // Reuse your Dashboard styles
 
 export default function BuySellDashboard() {
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './AuthForm.css'; // Assuming your CSS is here
+import './styles/AuthForm.css'; // Assuming your CSS is here
 //import backgroundImage from './p1.png'; // Assuming your background image is here
 
 // Set axios to send cookies with all requests globally.

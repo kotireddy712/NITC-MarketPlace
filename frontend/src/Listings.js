@@ -256,7 +256,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Listings.css'; // Your styles
+import './styles/Listings.css'; // Your styles
 
 function MyListings() {
     const navigate = useNavigate();

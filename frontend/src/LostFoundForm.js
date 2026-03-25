@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './LostFoundForm.css'; // You'll create this CSS file
+import './styles/LostFoundForm.css'; // You'll create this CSS file
 
 function LostFoundForm() {
   const navigate = useNavigate();

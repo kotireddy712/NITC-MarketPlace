@@ -1,7 +1,7 @@
 // import React, { useEffect, useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
 // import axios from 'axios';
-// import './Dashboard.css'; // Keep dashboard-specific CSS
+// import './styles/Dashboard.css'; // Keep dashboard-specific CSS
 // import FeedbackModal from './FeedbackModal'; // Import the new FeedbackModal component
 
 // function Dashboard() {
@@ -132,7 +132,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './Dashboard.css'; // Keep dashboard-specific CSS
+import './styles/Dashboard.css'; // Keep dashboard-specific CSS
 import FeedbackModal from './FeedbackModal'; // Import the FeedbackModal component
 
 function Dashboard() {

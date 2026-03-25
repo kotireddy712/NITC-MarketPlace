@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './LostFoundListings.css'; // Ensure this CSS file exists and is linked
+import './styles/LostFoundListings.css'; // Ensure this CSS file exists and is linked
 
 function LostFoundListings() {
   const navigate = useNavigate();
